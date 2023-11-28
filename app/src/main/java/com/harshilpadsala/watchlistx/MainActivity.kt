@@ -30,7 +30,9 @@ import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.HomeScreen
 import com.harshilpadsala.watchlistx.constants.BottomNavItem
 import com.harshilpadsala.watchlistx.ui.theme.WatchlistXTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
