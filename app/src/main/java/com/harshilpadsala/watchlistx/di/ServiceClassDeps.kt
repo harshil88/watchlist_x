@@ -20,7 +20,10 @@ object ServiceClassDeps {
     fun providesGsonConverterFactory() : GsonConverterFactory = GsonConverterFactory.create()
 
     @Provides
-    fun providesOkHttpClient() : OkHttpClient = OkHttpClient().newBuilder().addInterceptor(WatchListXInterceptors).build()
+    fun providesOkHttpClient() : OkHttpClient = OkHttpClient().newBuilder()
+        .addInterceptor(WatchListXInterceptors)
+        .addInterceptor(httpLoggingInterceptor)
+        .build()
 
     @Provides
     fun providesRetrofitObject(baseUri : String, gsonConverterFactory: GsonConverterFactory , okHttpClient: OkHttpClient) : Retrofit = Retrofit.Builder()

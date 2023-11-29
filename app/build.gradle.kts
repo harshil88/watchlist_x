@@ -78,6 +78,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.google.dagger:hilt-android:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha02")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
 }
 

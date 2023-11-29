@@ -74,8 +74,6 @@ fun BottomBarDisplay(navController : NavHostController){
 @Composable
 fun MainBottomNav(navController : NavHostController){
 
-
-
     val navStackBackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navStackBackEntry?.destination
 
