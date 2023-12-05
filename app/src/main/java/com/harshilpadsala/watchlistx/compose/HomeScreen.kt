@@ -29,7 +29,7 @@ import utils.ToastX
 
 @Composable
 fun HomeScreen(
-
+    onClick: (Long) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -40,19 +40,20 @@ fun HomeScreen(
     ) {
 
         PaddingX(top = 24.dp, bottom = 24.dp) {
-            RenderDiscoverMoviesList()
+            RenderDiscoverMoviesList(
+                onClick = onClick
+            )
         }
 
 
-            RenderDiscoverTVList()
-
+        RenderDiscoverTVList(onClick = onClick)
 
 
     }
 }
 
 @Composable
-fun RenderDiscoverMoviesList(movieViewModel: MovieVM = hiltViewModel()) {
+fun RenderDiscoverMoviesList(movieViewModel: MovieVM = hiltViewModel() , onClick : (Long) -> Unit) {
 
     when (val movieState = movieViewModel.mutableState.value) {
 
@@ -67,6 +68,7 @@ fun RenderDiscoverMoviesList(movieViewModel: MovieVM = hiltViewModel()) {
                 HorizontalMovieList(
                     movies = movieState.response?.results ?: listOf(), modifier = Modifier
                 ) {
+                    onClick(it.id?.toLong() ?: 0L)
                 }
             }
         }
@@ -84,7 +86,7 @@ fun RenderDiscoverMoviesList(movieViewModel: MovieVM = hiltViewModel()) {
 }
 
 @Composable
-fun RenderDiscoverTVList(movieViewModel: MovieVM = hiltViewModel()) {
+fun RenderDiscoverTVList(movieViewModel: MovieVM = hiltViewModel() , onClick : (Long) -> Unit) {
 
     when (val tvState = movieViewModel.tvShowState.value) {
 
@@ -93,6 +95,7 @@ fun RenderDiscoverTVList(movieViewModel: MovieVM = hiltViewModel()) {
                 HorizontalTVList(
                     shows = tvState.response?.results ?: listOf(), modifier = Modifier
                 ) { tv ->
+                    onClick(tv.id?.toLong() ?: 0L)
                 }
             }
         }
@@ -113,15 +116,15 @@ fun ListContent(
     title: String,
     moviesList: @Composable () -> Unit,
 ) {
-Column {
-    PaddingX(start = 24.dp) {
-        Text(
-            text = title, style = TextStyle(
-                fontSize = 24.sp, color = Color.Yellow, fontWeight = FontWeight.Bold
+    Column {
+        PaddingX(start = 24.dp) {
+            Text(
+                text = title, style = TextStyle(
+                    fontSize = 24.sp, color = Color.Yellow, fontWeight = FontWeight.Bold
+                )
             )
-        )
+        }
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+        moviesList()
     }
-    Spacer(modifier = Modifier.padding(top = 16.dp))
-    moviesList()
-}
 }

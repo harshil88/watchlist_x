@@ -1,6 +1,6 @@
 package com.harshilpadsala.watchlistx.di
 
-import com.harshilpadsala.watchlistx.repo.MovieRepo
+import com.harshilpadsala.watchlistx.repo.HomeRepo
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +14,6 @@ object RepoDeps {
 
     @Provides
     @Singleton
-    fun providesMovieRepo(retrofit: Retrofit) : MovieRepo = retrofit.create(MovieRepo::class.java)
+    fun providesMovieRepo(retrofit: Retrofit) : HomeRepo = retrofit.create(HomeRepo::class.java)
 
 }
