@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.repo.HomeRepo
 import com.harshilpadsala.watchlistx.state.FailureState
 import com.harshilpadsala.watchlistx.state.InitialState
+import com.harshilpadsala.watchlistx.state.MovieCreditsSuccess
 import com.harshilpadsala.watchlistx.state.MovieDetailSuccess
 import com.harshilpadsala.watchlistx.state.MovieImagesSuccess
 import com.harshilpadsala.watchlistx.state.MovieListState
@@ -37,6 +38,10 @@ class MovieVM @Inject constructor() : ViewModel() {
     private val _movieImagesState = mutableStateOf<MovieListState>(InitialState)
     val movieImagesState: State<MovieListState>
         get() = _movieImagesState
+
+    private val _movieCreditsState = mutableStateOf<MovieListState>(InitialState)
+    val movieCreditsState: State<MovieListState>
+        get() = _movieCreditsState
 
 
 
@@ -101,6 +106,22 @@ class MovieVM @Inject constructor() : ViewModel() {
                 )
             }.onFailure {
                 _movieImagesState.value = FailureState(
+                    error = it.message
+                )
+            }
+        }
+    }
+
+    fun getMovieCredits(movieId : Long) {
+        viewModelScope.launch {
+            kotlin.runCatching {
+                homeRepo.getMovieCredits(movieId)
+            }.onSuccess {
+                _movieCreditsState.value = MovieCreditsSuccess(
+                    response = it.body()
+                )
+            }.onFailure {
+                _movieCreditsState.value = FailureState(
                     error = it.message
                 )
             }

@@ -75,3 +75,5 @@ data class CollectionDetails(
     @SerializedName("backdrop_path")
     val backdropPath: String?
 )
+
+

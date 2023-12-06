@@ -68,7 +68,7 @@ fun BottomBarDisplay(navController: NavHostController) {
         bottomBar = {
             MainBottomNav(navController = navController)
         }
-    ) { paddingValues ->
+    ) {
         NavHost(navController = navController, startDestination = BottomNavItem.Home.route) {
             composable(BottomNavItem.Home.route) {
                 HomeScreen {

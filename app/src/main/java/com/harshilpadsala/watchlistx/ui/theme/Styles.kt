@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -27,65 +28,72 @@ object StylesX {
 
     val titleLarge = TextStyle(
         fontFamily = poppins,
-        fontSize = 22.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Color.Black
+        color = Darkness.grey
     )
 
     val titleMedium = TextStyle(
         fontFamily = poppins,
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Color.Black
+        color = Darkness.grey
     )
 
     val titleSmall = TextStyle(
         fontFamily = poppins,
-        fontSize = 14.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Color.Black,
+        color = Darkness.grey,
     )
 
     val labelSmall = TextStyle(
         fontFamily = poppins,
-        fontSize = 14.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
+        color = Darkness.grey,
     )
 
     val labelLarge = TextStyle(
         fontFamily = poppins,
-        fontSize = 22.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
+        color = Darkness.grey,
     )
 
     val labelMedium = TextStyle(
         fontFamily = poppins,
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
+        color = Darkness.grey,
     )
 
     val bodySmall = TextStyle(
         fontFamily = poppins,
         fontSize = 10.sp,
         fontWeight = FontWeight.Normal,
-        color = Color.Gray,
+        color = Darkness.grey,
     )
 
     val bodyMedium = TextStyle(
         fontFamily = poppins,
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         fontWeight = FontWeight.Normal,
-        color = Color.Gray,
+        color = Darkness.grey,
     )
 
     val bodyLarge = TextStyle(
         fontFamily = poppins,
-        fontSize = 22.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.Normal,
-        color = Color.Gray,
+        color = Darkness.grey,
+    )
+
+    fun TextStyle.toSpanStyle() : SpanStyle = SpanStyle(
+        fontFamily = this.fontFamily,
+        fontSize = this.fontSize,
+        fontWeight = this.fontWeight,
+        color = this.color
     )
 
 }

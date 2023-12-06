@@ -26,3 +26,5 @@ data class Movie(
     @SerializedName("vote_count")
     val voteCount: Int?
 )
+
+
