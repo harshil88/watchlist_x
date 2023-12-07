@@ -27,7 +27,7 @@ fun MovieDetailTile(
     onClick: () -> Unit,
 ) {
 
-    var thumbnailCoil = rememberAsyncImagePainter(
+    val thumbnailCoil = rememberAsyncImagePainter(
         model = ImageRequest
             .Builder(LocalContext.current)
             .data(posterPath ?: DUMMY_IMAGE_URI)

@@ -18,9 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -28,7 +26,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
 import com.harshilpadsala.watchlistx.compose.DiscoverScreen
 import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.HomeScreen
@@ -50,8 +47,7 @@ class MainActivity : ComponentActivity() {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     BottomBarDisplay(navController = navController)
                 }
@@ -67,37 +63,30 @@ class MainActivity : ComponentActivity() {
 fun BottomBarDisplay(navController: NavHostController) {
     val navStackBackEntry by navController.currentBackStackEntryAsState()
 
-    Scaffold(
-        bottomBar = {
-            MainBottomNav(navController = navController)
-        }
-    ) {
+    Scaffold(bottomBar = {
+        MainBottomNav(navController = navController)
+    }) {
         NavHost(
-            navController = navController,
-            startDestination = BottomNavItem.Home.route) {
+            navController = navController, startDestination = BottomNavItem.Home.route
+        ) {
             composable(BottomNavItem.Home.route) {
-                HomeScreen {
-                    movieId ->
+                HomeScreen { movieId ->
                     navController.navigate("movieDetail/$movieId")
                 }
             }
             composable(BottomNavItem.Discover.route) { DiscoverScreen() }
             composable(BottomNavItem.Favourites.route) { FavouriteScreen() }
-            composable(
-                "movieDetail/{movieId}" ,
-                arguments = listOf(
-                navArgument(
-                    name = "movieId",
-                ){
-                    type = NavType.LongType
-                    defaultValue = 5L
-                }
-            )
-                
-            ){
-                MovieDetailScreen(movieId = navStackBackEntry?.arguments?.getLong("movieId")?:0L)
+            composable("movieDetail/{movieId}", arguments = listOf(navArgument(
+                name = "movieId",
+            ) {
+                type = NavType.LongType
+                defaultValue = 5L
+            })
+
+            ) {
+                MovieDetailScreen(movieId = navStackBackEntry?.arguments?.getLong("movieId") ?: 0L)
             }
-          //  movieDetailGraph(navController)
+            //  movieDetailGraph(navController)
         }
     }
 }
@@ -125,15 +114,12 @@ fun MainBottomNav(navController: NavHostController) {
     val currentDestination = navStackBackEntry?.destination
 
     val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Discover,
-        BottomNavItem.Favourites
+        BottomNavItem.Home, BottomNavItem.Discover, BottomNavItem.Favourites
     )
 
     BottomNavigation {
         items.forEach { item ->
-            BottomNavigationItem(
-                selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
+            BottomNavigationItem(selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                 onClick = {
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.startDestinationId)
