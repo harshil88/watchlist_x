@@ -18,7 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.harshilpadsala.watchlistx.compose.DiscoverScreen
 import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.HomeScreen
@@ -69,17 +72,20 @@ fun BottomBarDisplay(navController: NavHostController) {
             MainBottomNav(navController = navController)
         }
     ) {
-        NavHost(navController = navController, startDestination = BottomNavItem.Home.route) {
+        NavHost(
+            navController = navController,
+            startDestination = BottomNavItem.Home.route) {
             composable(BottomNavItem.Home.route) {
                 HomeScreen {
                     movieId ->
-                    navController.navigate("movieDetail/${movieId}")
+                    navController.navigate("movieDetail/$movieId")
                 }
             }
             composable(BottomNavItem.Discover.route) { DiscoverScreen() }
             composable(BottomNavItem.Favourites.route) { FavouriteScreen() }
-
-            composable("movieDetail/{movieId}" , arguments = listOf(
+            composable(
+                "movieDetail/{movieId}" ,
+                arguments = listOf(
                 navArgument(
                     name = "movieId",
                 ){
@@ -87,12 +93,30 @@ fun BottomBarDisplay(navController: NavHostController) {
                     defaultValue = 5L
                 }
             )
+                
             ){
                 MovieDetailScreen(movieId = navStackBackEntry?.arguments?.getLong("movieId")?:0L)
             }
+          //  movieDetailGraph(navController)
         }
     }
 }
+
+//fun NavGraphBuilder.movieDetailGraph(navController: NavController){
+//
+//
+//
+//    navigation(startDestination = "movieDetail" , route = "movieDetail/{movieId}"){
+//        composable("movieDetail/{movieId}" , arguments = listOf(
+//            navArgument("movieId"){
+//                type = NavType.LongType
+//                defaultValue = 5L
+//            }
+//        )){
+//            backStackEntry ->
+//            MovieDetailScreen(movieId = backStackEntry.arguments?.getLong("movieId")?:0)}
+//    }
+//}
 
 @Composable
 fun MainBottomNav(navController: NavHostController) {
