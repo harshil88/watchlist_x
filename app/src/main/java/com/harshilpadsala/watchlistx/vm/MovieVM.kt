@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.harshilpadsala.watchlistx.data.req.ToggleFavouriteRequest
 import com.harshilpadsala.watchlistx.repo.HomeRepo
 import com.harshilpadsala.watchlistx.state.FailureState
 import com.harshilpadsala.watchlistx.state.InitialState
@@ -13,6 +14,7 @@ import com.harshilpadsala.watchlistx.state.MovieImagesSuccess
 import com.harshilpadsala.watchlistx.state.MovieListState
 import com.harshilpadsala.watchlistx.state.MovieListSuccess
 import com.harshilpadsala.watchlistx.state.TVListSuccess
+import com.harshilpadsala.watchlistx.state.ToggleFavouriteSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,6 +44,10 @@ class MovieVM @Inject constructor() : ViewModel() {
     private val _movieCreditsState = mutableStateOf<MovieListState>(InitialState)
     val movieCreditsState: State<MovieListState>
         get() = _movieCreditsState
+
+    private val _toggleFavouriteState = mutableStateOf<MovieListState>(InitialState)
+    val toggleFavouriteState: State<MovieListState>
+        get() = _toggleFavouriteState
 
 
 
@@ -118,6 +124,28 @@ class MovieVM @Inject constructor() : ViewModel() {
                 homeRepo.getMovieCredits(movieId)
             }.onSuccess {
                 _movieCreditsState.value = MovieCreditsSuccess(
+                    response = it.body()
+                )
+            }.onFailure {
+                _movieCreditsState.value = FailureState(
+                    error = it.message
+                )
+            }
+        }
+    }
+    fun toggleFavourite(fav : Boolean) {
+
+        val toggleFavouriteRequest = ToggleFavouriteRequest(
+            mediaType = "movie",
+            mediaId = 550,
+            favorite = fav
+        )
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                homeRepo.toggleFavourite(12375371 ,toggleFavouriteRequest)
+            }.onSuccess {
+                _movieCreditsState.value = ToggleFavouriteSuccess(
                     response = it.body()
                 )
             }.onFailure {

@@ -64,7 +64,8 @@ fun YourRating(rating : Double ,   modifier : Modifier, ){
 
 @Composable
 fun RatingSpannableString(rating : Double , users: Int){
-    Text(text = buildAnnotatedString {
+    Text(text =
+    buildAnnotatedString {
         append(text = "%.2f".format(rating))
         withStyle(style = StylesX.labelMedium.copy(color = Darkness.light).toSpanStyle()){
             append(text = "/10")

@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.data.res.list
 
 import com.google.gson.annotations.SerializedName
+import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 
 data class Movie(
     val adult: Boolean?,
@@ -26,5 +27,16 @@ data class Movie(
     @SerializedName("vote_count")
     val voteCount: Int?
 )
+
+
+fun Movie.toListItemX(): ListItemXData = ListItemXData(
+    id = this.id ?: 0,
+    title = this.title ?: "",
+    voteAverage = this.voteAverage ?: 0.0,
+    posterPath = this.posterPath ?: "",
+    releaseDate = this.releaseDate ?: "",
+    originalLanguage = this.originalLanguage ?: "",
+)
+
 
 

@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.data.res.list
 
 import com.google.gson.annotations.SerializedName
+import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 
 data class TVShow(
     @SerializedName("backdrop_path")
@@ -25,4 +26,13 @@ data class TVShow(
     val voteAverage: Double?,
     @SerializedName("vote_count")
     val voteCount: Int?
+)
+
+fun TVShow.toListItemX(): ListItemXData = ListItemXData(
+    id = this.id ?: 0,
+    title = this.name ?: "",
+    voteAverage = this.voteAverage ?: 0.0,
+    posterPath = this.posterPath ?: "",
+    releaseDate = this.firstAirDate ?: "",
+    originalLanguage = this.originalLanguage ?: "",
 )

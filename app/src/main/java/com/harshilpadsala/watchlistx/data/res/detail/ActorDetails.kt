@@ -32,7 +32,7 @@ data class ActorDetails(
 data class CardModel(
     val id: Int?,
     val title: String?,
-    val imageUri : String?
+    val imageUri : String?,
 )
 
 fun ActorDetails.toCardComponent() : CardModel = CardModel(

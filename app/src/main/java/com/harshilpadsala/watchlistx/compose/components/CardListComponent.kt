@@ -57,7 +57,7 @@ fun CardDetail(
     onClick: () -> Unit,
 ) {
 
-    var thumbnailCoil = rememberAsyncImagePainter(
+    val thumbnailCoil = rememberAsyncImagePainter(
         model = ImageRequest
             .Builder(LocalContext.current)
             .data(posterPath ?: Constant.DUMMY_IMAGE_URI)

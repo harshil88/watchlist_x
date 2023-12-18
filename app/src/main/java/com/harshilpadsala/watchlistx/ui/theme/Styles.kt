@@ -19,71 +19,84 @@ object StylesX {
         certificates = R.array.com_google_android_gms_fonts_certs
     )
 
-    private val poppins = FontFamily(
-        Font(
+    private val montserrat = FontFamily(
+       fonts = listOf(
+           Font(
             googleFont = GoogleFont("Montserrat"),
             fontProvider = provider,
-        )
+            weight = FontWeight.SemiBold,
+        ),
+           Font(
+               googleFont = GoogleFont("Montserrat"),
+               fontProvider = provider,
+               weight = FontWeight.Medium,
+           ),
+           Font(
+               googleFont = GoogleFont("Montserrat"),
+               fontProvider = provider,
+               weight = FontWeight.Normal,
+           ),
+       )
     )
 
     val titleLarge = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 20.sp,
         fontWeight = FontWeight.SemiBold,
         color = Darkness.grey
     )
 
     val titleMedium = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
         color = Darkness.grey
     )
 
     val titleSmall = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         color = Darkness.grey,
     )
 
     val labelSmall = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 12.sp,
         fontWeight = FontWeight.Medium,
         color = Darkness.grey,
     )
 
     val labelLarge = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 20.sp,
         fontWeight = FontWeight.Medium,
         color = Darkness.grey,
     )
 
     val labelMedium = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 14.sp,
         fontWeight = FontWeight.Medium,
         color = Darkness.grey,
     )
 
     val bodySmall = TextStyle(
-        fontFamily = poppins,
-        fontSize = 10.sp,
+        fontFamily = montserrat,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Normal,
         color = Darkness.grey,
     )
 
     val bodyMedium = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 14.sp,
         fontWeight = FontWeight.Normal,
         color = Darkness.grey,
     )
 
     val bodyLarge = TextStyle(
-        fontFamily = poppins,
+        fontFamily = montserrat,
         fontSize = 20.sp,
         fontWeight = FontWeight.Normal,
         color = Darkness.grey,

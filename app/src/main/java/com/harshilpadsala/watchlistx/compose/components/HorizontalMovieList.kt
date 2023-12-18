@@ -22,7 +22,7 @@ fun HorizontalMovieList(
             count = movies.size,
         ) { index ->
             PaddingX(
-                start = if(index == 0) 16.dp else 0.dp
+                start = if (index == 0) 16.dp else 0.dp
             ) {
                 MovieDetailTile(
                     title = movies[index].title,

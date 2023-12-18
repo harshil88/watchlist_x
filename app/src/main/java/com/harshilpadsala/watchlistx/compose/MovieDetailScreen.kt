@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -132,9 +134,9 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
         is MovieDetailSuccess -> {
 
 
-            GenresRow(genres = movieDetailState?.response?.genres?: listOf() , modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 24.dp))
+            GenresRow(genres = movieDetailState.response?.genres?: listOf() , modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 24.dp))
             Text(
-                text = movieDetailState?.response?.overview ?: "",
+                text = movieDetailState.response?.overview ?: "",
                 modifier = Modifier.padding(horizontal = 24.dp),
                 style = StylesX.bodyMedium.copy(color = Darkness.grey),
                 maxLines = 4,
@@ -142,14 +144,27 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
             )
             PrimaryButton(
                 modifier = Modifier.padding(24.dp),
-                onClick = { /*TODO*/ }) {
-                Icon(Icons.Filled.Add , contentDescription = "Add to Watchlist Icon" , tint = Darkness.stillness)
+                onClick = { /*TODO*/ },
+                pendingActionContent = {
+                    Icon(Icons.Filled.Add , contentDescription = "Add to Watchlist Icon" , tint = Darkness.stillness)
+                    Text(
+                        text = "Add to Watchlist",
+                        modifier = Modifier.padding(
+                            start = 24.dp
+                        ),
+                        style = StylesX.titleMedium.copy(color = Darkness.stillness),
+                        maxLines = 1
+                    )
+                },
+                )
+            {
+                Icon(Icons.Filled.Done , contentDescription = "Added to Watchlist Icon" , tint = Darkness.light)
                 Text(
-                    text = "Add to Watchlist",
+                    text = "Added to Watchlist",
                     modifier = Modifier.padding(
                         start = 24.dp
                     ),
-                    style = StylesX.titleMedium.copy(color = Darkness.stillness),
+                    style = StylesX.titleMedium.copy(color = Darkness.light),
                     maxLines = 1
                 )
             }
@@ -167,6 +182,13 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
 
     }
 }
+
+//@Composable
+//fun RenderAddToWatchlistButton(movieViewModel: MovieVM = hiltViewModel()){
+//    when(val toggleFavouriteState = movieViewModel.toggleFavouriteState.value){
+//        is InitialState ->
+//    }
+//}
 
 @Composable
 fun RenderCastDetail(movieViewModel: MovieVM = hiltViewModel()) {

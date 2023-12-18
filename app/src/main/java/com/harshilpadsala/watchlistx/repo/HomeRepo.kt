@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.repo
 
 import com.harshilpadsala.watchlistx.data.UpdateResponse
+import com.harshilpadsala.watchlistx.data.req.ToggleFavouriteRequest
 import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.list.Content
@@ -9,6 +10,7 @@ import com.harshilpadsala.watchlistx.data.res.list.MovieCredits
 import com.harshilpadsala.watchlistx.data.res.list.MovieImages
 import com.harshilpadsala.watchlistx.data.res.list.TVShow
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -33,7 +35,7 @@ interface HomeRepo {
     suspend fun getMovieCredits(@Path("movieId") movieId : Long) : Response<MovieCredits>
 
     @POST("3/account/{accountId}/favourite")
-    suspend fun toggleFavourite(@Path("accountId") accountId : Long) : Response<UpdateResponse>
+    suspend fun toggleFavourite(@Path("accountId") accountId : Long , @Body request : ToggleFavouriteRequest) : Response<UpdateResponse>
 
     @POST("3/account/{accountId}/watchlist")
     suspend fun toggleWatchlist(@Path("accountId") accountId : Long) : Response<UpdateResponse>
