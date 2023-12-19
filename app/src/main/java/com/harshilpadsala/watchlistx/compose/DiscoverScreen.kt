@@ -32,6 +32,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -51,11 +52,14 @@ import com.harshilpadsala.watchlistx.constants.TvList
 import com.harshilpadsala.watchlistx.constants.isScrolledToEnd
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
+import com.harshilpadsala.watchlistx.state.MovieListSuccess
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.DiscoverVM
+import kotlinx.coroutines.launch
 import utils.LoaderX
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DiscoverRoute(
@@ -92,33 +96,72 @@ fun DiscoverRoute(
             lazyListState.isScrolledToEnd()
         }
     }
-
     val uiState = viewModel.popularMovieListSuccessState
 
-    DiscoverScreen(uiState = uiState.value,
+    LaunchedEffect(endOfListReached) {
+    if (selectedMediaType.value == MediaType.Movie ) {
+        if(viewModel.currentPage != 1){
+            viewModel.discoverMovieList(movieChipState.value)
+        }
+    } else {
+
+    }
+}
+
+
+
+    if(uiState.value is DiscoverMovieUiState.SuccessUiState){
+        if ((uiState.value as DiscoverMovieUiState.SuccessUiState).currentPage == 1) {
+    scope.launch {
+        lazyListState.scrollToItem(0)
+    }
+}
+    }
+
+
+    DiscoverScreen(
+        uiState = uiState.value,
         lazyListState = lazyListState,
         modalBottomSheetState = sheetState,
         movieChipState = movieChipState.value,
         tvChipState = tvChipState.value,
         selectedMediaType = selectedMediaType.value,
-        onChipClick = {},
-        onItemClick = {},
-        onTabItemClick = {},
-        onSearchClick = {})
+        onChipClick = {
+            scope.launch {
+                sheetState.show()
+            }
 
+        },
+        onItemClick = {},
+        onTabItemClick = { mediaType ->
+
+            selectedMediaType.value = mediaType
+            if (mediaType == MediaType.Movie) {
+                viewModel.discoverMovieList(movieChipState.value)
+            } else {
+                viewModel.discoverTvList(tvChipState.value)
+
+            }
+        },
+        onSearchClick = {},
+        sheetItemClick = {
+            scope.launch {
+                sheetState.hide()
+
+                if (selectedMediaType.value == MediaType.Movie) {
+                    movieChipState.value = MovieList.values()[it]
+                    viewModel.discoverMovieList(movieChipState.value)
+
+                } else {
+                    viewModel.discoverTvList(tvChipState.value)
+                    tvChipState.value = TvList.values()[it]
+                }
+            }
+        })
 }
 
 
-//LaunchedEffect(endOfListReached) {
-//    if (selectedMediaType.value == MediaType.Movie ) {
-//        if(discoverVM.currentPage != 1){
-//            discoverVM.discoverMovieList(movieChipState.value)
-//        }
-//        //   discoverVM.discoverMovieList(movieChipState.value)
-//    } else {
-////
-//    }
-//}
+
 
 
 //scope.launch {
@@ -154,11 +197,7 @@ fun DiscoverRoute(
 
 //
 //val scope = rememberCoroutineScope()
-//if (uiState.currentPage == 1) {
-//    scope.launch {
-//        lazyListState.scrollToItem(0)
-//    }
-//}
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -172,6 +211,7 @@ internal fun DiscoverScreen(
     onChipClick: () -> Unit,
     onTabItemClick: (MediaType) -> Unit,
     onSearchClick: () -> Unit,
+    sheetItemClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit,
 ) {
 
@@ -180,9 +220,7 @@ internal fun DiscoverScreen(
         sheetBackgroundColor = Darkness.night, sheetShape = RoundedCornerShape(
             topStart = 16.dp, topEnd = 16.dp
         ), sheetContent = {
-            ModalBottomSheetContent(mediaType = selectedMediaType) { index ->
-
-            }
+            ModalBottomSheetContent(mediaType = selectedMediaType, onItemTap = sheetItemClick)
         }, sheetState = modalBottomSheetState
     ) {
         DiscoverPage(

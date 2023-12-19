@@ -53,7 +53,6 @@ class DiscoverVM @Inject constructor(
                     }
 
                     is ResponseX.Success -> {
-                        delay(5000)
                         val newElements = it.data?.results?.map { movie -> movie.toListItemX()}?.toList()?: listOf()
                         data.addAll(newElements)
                         popularMovieListSuccessState.value =
