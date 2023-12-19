@@ -14,6 +14,7 @@ import com.harshilpadsala.watchlistx.domain.usecase.DiscoverTvUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.SearchMovieUseCase
 import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +28,7 @@ class DiscoverVM @Inject constructor(
 
     val popularMovieListSuccessState =
         mutableStateOf<DiscoverMovieUiState>(DiscoverMovieUiState.Initial)
+
     var currentPage = 1
 
     var data = mutableListOf<ListItemXData>()
@@ -35,27 +37,29 @@ class DiscoverVM @Inject constructor(
         discoverMovieList(MovieList.Popular)
     }
 
+    fun reset(){
+        currentPage = 1
+        data.clear()
+    }
+
     fun discoverMovieList(movieList: MovieList) {
         viewModelScope.launch {
             discoverMovieUseCase.invoke(movieList, currentPage).collect {
                 when (it) {
                     is ResponseX.Loading -> if(currentPage == 1){
+
                         popularMovieListSuccessState.value =
                             DiscoverMovieUiState.Loading
                     }
 
                     is ResponseX.Success -> {
-                        currentPage+=1
-                        Log.i("InfiniteDebug" , "This is the current page $currentPage")
-                        Log.i("InfiniteDebug" , "This are the movies Imp data ${it.data?.page} ${it.data?.results?.size}")
-
-
+                        delay(5000)
                         val newElements = it.data?.results?.map { movie -> movie.toListItemX()}?.toList()?: listOf()
                         data.addAll(newElements)
-                        Log.i("InfiniteDebug" , "Number of items in data ${data.size}")
-
                         popularMovieListSuccessState.value =
-                        DiscoverMovieUiState.SuccessUiState(movies =  data)}
+                        DiscoverMovieUiState.SuccessUiState(movies =  data , currentPage)
+                        currentPage+=1
+                    }
 
                     is ResponseX.Error -> popularMovieListSuccessState.value =
                         DiscoverMovieUiState.PopularMovieFailureUiState(message = it.message ?: "")

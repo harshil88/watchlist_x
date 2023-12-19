@@ -26,19 +26,20 @@ import java.util.Locale
 
 @Composable
 fun ListItemX(
+    mediaId : Int,
     title: String,
     voteAverage: Double,
     thumbnailPath: String,
     originalLanguage: String,
     releaseDate: String,
     modifier: Modifier = Modifier,
-    onClick : () -> Unit,
+    onItemClick : (Int) -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable {onClick() }
+            .clickable {onItemClick(mediaId) }
     ) {
         Card(
             shape = RoundedCornerShape(8.dp)

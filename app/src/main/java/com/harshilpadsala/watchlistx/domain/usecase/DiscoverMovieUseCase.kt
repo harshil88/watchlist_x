@@ -19,10 +19,10 @@ class DiscoverMovieUseCase @Inject constructor(
             kotlin.runCatching {
                 runCatching {
                     when (movieList) {
-                        MovieList.NowPlaying -> discoverRepo.nowPlaying()
-                        MovieList.Popular -> discoverRepo.popular()
-                        MovieList.TopRated -> discoverRepo.topRated()
-                        MovieList.Upcoming -> discoverRepo.upcoming()
+                        MovieList.NowPlaying -> discoverRepo.nowPlaying(page = page)
+                        MovieList.Popular -> discoverRepo.popular(page = page)
+                        MovieList.TopRated -> discoverRepo.topRated(page = page)
+                        MovieList.Upcoming -> discoverRepo.upcoming(page = page)
                     }
                 }.onSuccess {
                     emit(ResponseX.Success(data = it.body()))

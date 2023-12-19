@@ -12,34 +12,50 @@ interface DiscoverRepo {
 
     @GET("3/search/movie")
     suspend fun searchMovies(
-        @Query("query") query : String,
-        @Query("include_adult") includeAdult : Boolean = true,
-        @Query("language") language : String = "en-US",
-        @Query("page") page : Int = 1,
-        @Query("year") year : Int? = null,
-    ) : Response<Content<Movie>>
+        @Query("query") query: String,
+        @Query("include_adult") includeAdult: Boolean = true,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1,
+        @Query("year") year: Int? = null,
+    ): Response<Content<Movie>>
 
     @GET("3/movie/now_playing")
-    suspend fun nowPlaying() : Response<Content<Movie>>
+    suspend fun nowPlaying(
+        @Query("page") page: Int = 1,
+    ): Response<Content<Movie>>
 
     @GET("3/movie/popular")
-    suspend fun popular() : Response<Content<Movie>>
+    suspend fun popular(
+        @Query("page") page: Int = 1,
+        ): Response<Content<Movie>>
 
     @GET("3/movie/top_rated")
-    suspend fun topRated() : Response<Content<Movie>>
+    suspend fun topRated(
+        @Query("page") page: Int = 1,
+        ): Response<Content<Movie>>
 
     @GET("3/movie/upcoming")
-    suspend fun upcoming() : Response<Content<Movie>>
+    suspend fun upcoming(
+        @Query("page") page: Int = 1,
+        ): Response<Content<Movie>>
 
     @GET("3/tv/airing_today")
-    suspend fun airingToday() : Response<Content<TVShow>>
+    suspend fun airingToday(
+        @Query("page") page: Int = 1,
+        ): Response<Content<TVShow>>
 
     @GET("3/tv/on_the_air")
-    suspend fun onTheAir() : Response<Content<TVShow>>
+    suspend fun onTheAir(
+        @Query("page") page: Int = 1,
+        ): Response<Content<TVShow>>
 
     @GET("3/tv/popular")
-    suspend fun popularTV() : Response<Content<TVShow>>
+    suspend fun popularTV(
+        @Query("page") page: Int = 1,
+        ): Response<Content<TVShow>>
 
     @GET("3/tv/top_rated")
-    suspend fun topRatedTV() : Response<Content<TVShow>>
+    suspend fun topRatedTV(
+        @Query("page") page: Int = 1,
+        ): Response<Content<TVShow>>
 }

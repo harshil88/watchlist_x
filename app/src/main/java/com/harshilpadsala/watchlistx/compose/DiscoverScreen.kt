@@ -1,8 +1,6 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timeline
@@ -33,9 +32,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -58,23 +54,16 @@ import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.DiscoverVM
-import kotlinx.coroutines.launch
 import utils.LoaderX
-
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
-@SuppressLint("StateFlowValueCalledInComposition")
-@Composable
-fun DiscoverScreen(
-    discoverVM: DiscoverVM = hiltViewModel()
-) {
-    BottomSheetPage()
-}
-
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomSheetPage(discoverVM: DiscoverVM = hiltViewModel()) {
+fun DiscoverRoute(
+    onMediaClick: (MediaType) -> Unit,
+    onSearchClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: DiscoverVM = hiltViewModel()
+) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -104,56 +93,106 @@ fun BottomSheetPage(discoverVM: DiscoverVM = hiltViewModel()) {
         }
     }
 
-    LaunchedEffect(endOfListReached) {
-        if (selectedMediaType.value == MediaType.Movie ) {
-            if(discoverVM.currentPage != 1){
-                discoverVM.discoverMovieList(movieChipState.value)
-            }
-       //   discoverVM.discoverMovieList(movieChipState.value)
-        } else {
-//
-        }
-    }
+    val uiState = viewModel.popularMovieListSuccessState
 
+    DiscoverScreen(uiState = uiState.value,
+        lazyListState = lazyListState,
+        modalBottomSheetState = sheetState,
+        movieChipState = movieChipState.value,
+        tvChipState = tvChipState.value,
+        selectedMediaType = selectedMediaType.value,
+        onChipClick = {},
+        onItemClick = {},
+        onTabItemClick = {},
+        onSearchClick = {})
+
+}
+
+
+//LaunchedEffect(endOfListReached) {
+//    if (selectedMediaType.value == MediaType.Movie ) {
+//        if(discoverVM.currentPage != 1){
+//            discoverVM.discoverMovieList(movieChipState.value)
+//        }
+//        //   discoverVM.discoverMovieList(movieChipState.value)
+//    } else {
+////
+//    }
+//}
+
+
+//scope.launch {
+//    sheetState.hide()
+//}.invokeOnCompletion {
+//    if (selectedMediaType.value == MediaType.Movie) {
+//        if( movieChipState.value != MovieList.values()[index]){
+//            movieChipState.value = MovieList.values()[index]
+//            discoverVM.reset()
+//            discoverVM.discoverMovieList(movieChipState.value)
+//
+//        }
+//
+//    } else {
+//        tvChipState.value = TvList.values()[index]
+//        discoverVM.discoverTvList(tvChipState.value)
+//    }
+//}
+
+//scope.launch {
+//    sheetState.show()
+//}
+//
+//mediaType ->
+//selectedMediaType.value = mediaType
+//if (mediaType == MediaType.Movie) {
+//    discoverVM.discoverMovieList(movieChipState.value)
+//} else {
+//    discoverVM.discoverTvList(tvChipState.value)
+//}
+//}
+
+
+//
+//val scope = rememberCoroutineScope()
+//if (uiState.currentPage == 1) {
+//    scope.launch {
+//        lazyListState.scrollToItem(0)
+//    }
+//}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+internal fun DiscoverScreen(
+    uiState: DiscoverMovieUiState,
+    modalBottomSheetState: ModalBottomSheetState,
+    selectedMediaType: MediaType,
+    movieChipState: MovieList,
+    tvChipState: TvList,
+    lazyListState: LazyListState,
+    onChipClick: () -> Unit,
+    onTabItemClick: (MediaType) -> Unit,
+    onSearchClick: () -> Unit,
+    onItemClick: (Int) -> Unit,
+) {
 
 
     ModalBottomSheetLayout(
         sheetBackgroundColor = Darkness.night, sheetShape = RoundedCornerShape(
             topStart = 16.dp, topEnd = 16.dp
         ), sheetContent = {
-            ModalBottomSheetContent(mediaType = selectedMediaType.value) { index ->
-                scope.launch {
-                    sheetState.hide()
-                }.invokeOnCompletion {
-                    if (selectedMediaType.value == MediaType.Movie) {
-                        movieChipState.value = MovieList.values()[index]
-                        discoverVM.discoverMovieList(movieChipState.value)
+            ModalBottomSheetContent(mediaType = selectedMediaType) { index ->
 
-                    } else {
-                        tvChipState.value = TvList.values()[index]
-                        discoverVM.discoverTvList(tvChipState.value)
-                    }
-                }
             }
-        }, sheetState = sheetState
+        }, sheetState = modalBottomSheetState
     ) {
-        DiscoverPage(onChipClick = {
-            scope.launch {
-                sheetState.show()
-            }
-        },
-            title = if (selectedMediaType.value == MediaType.Movie) movieChipState.value.name else tvChipState.value.name,
-            onItemClick = {},
-            selectedTabIndex = selectedTabIndex,
+        DiscoverPage(
+            uiState = uiState,
+            onChipClick = onChipClick,
+            title = if (selectedMediaType == MediaType.Movie) movieChipState.name else tvChipState.name,
+            onItemClick = onItemClick,
             lazyListState = lazyListState,
-            onTabItemClick = { mediaType ->
-                selectedMediaType.value = mediaType
-                if (mediaType == MediaType.Movie) {
-                    discoverVM.discoverMovieList(movieChipState.value)
-                } else {
-                    discoverVM.discoverTvList(tvChipState.value)
-                }
-            })
+            onTabItemClick = onTabItemClick
+        )
     }
 }
 
@@ -177,17 +216,17 @@ fun ModalBottomSheetContent(mediaType: MediaType, onItemTap: (Int) -> Unit) {
 }
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoverPage(
-    discoverVM: DiscoverVM = hiltViewModel(),
+    uiState: DiscoverMovieUiState,
+    lazyListState: LazyListState,
     onChipClick: () -> Unit,
     onItemClick: (Int) -> Unit,
     onTabItemClick: (MediaType) -> Unit,
     title: String,
-    lazyListState: LazyListState,
-    selectedTabIndex: MutableIntState
-) {
+
+    ) {
 
 
     Column(
@@ -204,7 +243,7 @@ fun DiscoverPage(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
         )
 
-        CategoryTabBar(selectedTabIndex, onTabItemClick)
+        CategoryTabBar(onTabItemClick)
 
         Box(
             modifier = Modifier
@@ -222,27 +261,34 @@ fun DiscoverPage(
         }
 
         PopularMovieUiState(
-            uiState = discoverVM.popularMovieListSuccessState,
-            lazyListState = lazyListState
+            uiState = uiState, lazyListState = lazyListState, onItemClick = onItemClick
         )
 
 
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun PopularMovieUiState(uiState: MutableState<DiscoverMovieUiState>, lazyListState: LazyListState)
-{
-    when (val state = uiState.value) {
+fun PopularMovieUiState(
+    uiState: DiscoverMovieUiState, lazyListState: LazyListState, onItemClick: (Int) -> Unit
+) {
+    when (uiState) {
         is DiscoverMovieUiState.Initial, DiscoverMovieUiState.Loading -> LoaderX()
         is DiscoverMovieUiState.PopularMovieFailureUiState -> {
             Text(text = "Something went wrong")
         }
 
-        is DiscoverMovieUiState.SuccessUiState -> {PopularMovieUiState(hasReachedEnd = state.hasReachedEnd,
-            movies = state.movies,
-            lazyListState = lazyListState,
-            onItemClick = { movieId -> })}
+        is DiscoverMovieUiState.SuccessUiState -> {
+
+
+            PopularMovieUiState(
+                hasReachedEnd = uiState.hasReachedEnd,
+                movies = uiState.movies,
+                lazyListState = lazyListState,
+                onItemClick = onItemClick
+            )
+        }
     }
 }
 
@@ -253,6 +299,7 @@ fun PopularMovieUiState(
     lazyListState: LazyListState,
     onItemClick: (Int) -> Unit
 ) {
+
     LazyColumn(
         modifier = Modifier.padding(
             start = 16.dp, top = 16.dp, end = 16.dp
@@ -263,26 +310,24 @@ fun PopularMovieUiState(
         ) { index ->
 
             if (!hasReachedEnd && index == movies.size) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-                   ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                ) {
                     CircularProgressIndicator()
                 }
-            }
-
-            else{
+            } else {
                 Box(modifier = Modifier.padding(bottom = 8.dp)) {
                     ListItemX(
+                        mediaId = movies[index].id,
                         title = movies[index].title,
                         voteAverage = movies[index].voteAverage,
                         thumbnailPath = Constant.TMDB_IMAGE_URI_HIGH + movies[index].posterPath,
                         originalLanguage = movies[index].originalLanguage,
                         releaseDate = movies[index].releaseDate,
                         modifier = Modifier.height(80.dp),
-                        onClick = {
-                            onItemClick(movies[index].id)
-                        },
+                        onItemClick = onItemClick,
                     )
                 }
             }
@@ -294,8 +339,11 @@ fun PopularMovieUiState(
 
 
 @Composable
-fun CategoryTabBar(selectedTabIndex: MutableIntState, onTabItemClick: (MediaType) -> Unit) {
+fun CategoryTabBar(onTabItemClick: (MediaType) -> Unit) {
 
+    val selectedTabIndex = remember {
+        mutableIntStateOf(0)
+    }
 
     TabRow(selectedTabIndex = selectedTabIndex.intValue, divider = {}, indicator = { tabPositions ->
 
@@ -305,7 +353,7 @@ fun CategoryTabBar(selectedTabIndex: MutableIntState, onTabItemClick: (MediaType
                 .height(1.dp)
                 .width(2.dp)
                 .background(color = Darkness.light),
-        ) {}
+        )
 
     }) {
         MediaType.values().mapIndexed { index, category ->

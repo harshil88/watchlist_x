@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -26,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.harshilpadsala.watchlistx.compose.DiscoverRoute
 import com.harshilpadsala.watchlistx.compose.DiscoverScreen
 import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.HomeScreen
@@ -57,6 +59,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
@@ -74,7 +77,11 @@ fun BottomBarDisplay(navController: NavHostController) {
                     navController.navigate("movieDetail/$movieId")
                 }
             }
-            composable(BottomNavItem.Discover.route) { DiscoverScreen() }
+            composable(BottomNavItem.Discover.route) { DiscoverRoute(
+                onMediaClick = {},
+                onSearchClick = {},
+
+            ) }
             composable(BottomNavItem.Favourites.route) { FavouriteScreen() }
             composable("movieDetail/{movieId}", arguments = listOf(navArgument(
                 name = "movieId",
