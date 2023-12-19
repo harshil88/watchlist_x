@@ -80,7 +80,6 @@ fun BottomBarDisplay(navController: NavHostController) {
             composable(BottomNavItem.Discover.route) { DiscoverRoute(
                 onMediaClick = {},
                 onSearchClick = {},
-
             ) }
             composable(BottomNavItem.Favourites.route) { FavouriteScreen() }
             composable("movieDetail/{movieId}", arguments = listOf(navArgument(

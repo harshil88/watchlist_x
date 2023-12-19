@@ -52,7 +52,6 @@ import com.harshilpadsala.watchlistx.constants.TvList
 import com.harshilpadsala.watchlistx.constants.isScrolledToEnd
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
-import com.harshilpadsala.watchlistx.state.MovieListSuccess
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.DiscoverVM
@@ -63,7 +62,7 @@ import utils.LoaderX
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DiscoverRoute(
-    onMediaClick: (MediaType) -> Unit,
+    onMediaClick: (Int) -> Unit,
     onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DiscoverVM = hiltViewModel()
@@ -72,23 +71,6 @@ fun DiscoverRoute(
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
-
-    val selectedMediaType = remember {
-        mutableStateOf(MediaType.Movie)
-    }
-
-    val selectedTabIndex = remember {
-        mutableIntStateOf(0)
-    }
-
-    val movieChipState = remember {
-        mutableStateOf(MovieList.Popular)
-    }
-
-    val tvChipState = remember {
-        mutableStateOf(TvList.Popular)
-    }
-
     val lazyListState = rememberLazyListState()
 
     val endOfListReached by remember {
@@ -96,72 +78,52 @@ fun DiscoverRoute(
             lazyListState.isScrolledToEnd()
         }
     }
+
     val uiState = viewModel.popularMovieListSuccessState
 
-    LaunchedEffect(endOfListReached) {
-    if (selectedMediaType.value == MediaType.Movie ) {
-        if(viewModel.currentPage != 1){
-            viewModel.discoverMovieList(movieChipState.value)
-        }
-    } else {
-
-    }
-}
-
-
-
-    if(uiState.value is DiscoverMovieUiState.SuccessUiState){
-        if ((uiState.value as DiscoverMovieUiState.SuccessUiState).currentPage == 1) {
-    scope.launch {
-        lazyListState.scrollToItem(0)
-    }
-}
-    }
+//    LaunchedEffect(endOfListReached) {
+//        if (viewModel.selectedMediaType.value == MediaType.Movie) {
+//            if (viewModel.currentPage != 1) {
+//                viewModel.discoverMovieList(viewModel.movieChipState.value)
+//            }
+//        } else {
+//
+//        }
+//    }
 
 
-    DiscoverScreen(
-        uiState = uiState.value,
+
+//    if (uiState.value is DiscoverMovieUiState.SuccessUiState) {
+//        if ((uiState.value as DiscoverMovieUiState.SuccessUiState).currentPage == 1) {
+//            scope.launch {
+//                lazyListState.scrollToItem(0)
+//            }
+//        }
+//    }
+
+
+    DiscoverScreen(uiState = uiState.value,
         lazyListState = lazyListState,
         modalBottomSheetState = sheetState,
-        movieChipState = movieChipState.value,
-        tvChipState = tvChipState.value,
-        selectedMediaType = selectedMediaType.value,
+        movieChipState = viewModel.movieChipState.value,
+        tvChipState = viewModel.tvChipState.value,
+        selectedMediaType = viewModel.selectedMediaType.value,
         onChipClick = {
             scope.launch {
                 sheetState.show()
             }
 
         },
-        onItemClick = {},
-        onTabItemClick = { mediaType ->
-
-            selectedMediaType.value = mediaType
-            if (mediaType == MediaType.Movie) {
-                viewModel.discoverMovieList(movieChipState.value)
-            } else {
-                viewModel.discoverTvList(tvChipState.value)
-
-            }
-        },
-        onSearchClick = {},
+        onItemClick = onMediaClick,
+        onTabItemClick = viewModel::onTabChange,
+        onSearchClick = onSearchClick,
         sheetItemClick = {
             scope.launch {
                 sheetState.hide()
-
-                if (selectedMediaType.value == MediaType.Movie) {
-                    movieChipState.value = MovieList.values()[it]
-                    viewModel.discoverMovieList(movieChipState.value)
-
-                } else {
-                    viewModel.discoverTvList(tvChipState.value)
-                    tvChipState.value = TvList.values()[it]
-                }
+                viewModel.toggleSheet(it)
             }
         })
 }
-
-
-
 
 
 //scope.launch {

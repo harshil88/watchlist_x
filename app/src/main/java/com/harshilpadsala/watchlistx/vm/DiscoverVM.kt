@@ -2,9 +2,11 @@ package com.harshilpadsala.watchlistx.vm
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.constants.TvList
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
@@ -25,6 +27,16 @@ class DiscoverVM @Inject constructor(
     private val discoverTvUseCase: DiscoverTvUseCase,
 ) : ViewModel() {
 
+    val selectedMediaType =
+        mutableStateOf(MediaType.Movie)
+
+    val movieChipState =
+        mutableStateOf(MovieList.Popular)
+
+    val tvChipState =
+        mutableStateOf(TvList.Popular)
+
+
 
     val popularMovieListSuccessState =
         mutableStateOf<DiscoverMovieUiState>(DiscoverMovieUiState.Initial)
@@ -41,6 +53,29 @@ class DiscoverVM @Inject constructor(
         currentPage = 1
         data.clear()
     }
+
+    fun onTabChange(mediaType: MediaType){
+        selectedMediaType.value = mediaType
+        if (mediaType == MediaType.Movie) {
+            discoverMovieList(movieChipState.value)
+        } else {
+            discoverTvList(tvChipState.value)
+
+        }
+    }
+
+    fun toggleSheet(index: Int){
+        if (selectedMediaType.value == MediaType.Movie) {
+            movieChipState.value = MovieList.values()[index]
+            discoverMovieList(movieChipState.value)
+
+        } else {
+            discoverTvList(tvChipState.value)
+            tvChipState.value = TvList.values()[index]
+        }
+    }
+
+
 
     fun discoverMovieList(movieList: MovieList) {
         viewModelScope.launch {
