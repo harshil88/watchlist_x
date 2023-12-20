@@ -18,10 +18,10 @@ class DiscoverTvUseCase @Inject constructor(
             kotlin.runCatching {
                 runCatching {
                     when (tvList) {
-                        TvList.AiringToday -> discoverRepo.airingToday()
-                        TvList.OnTheAir -> discoverRepo.onTheAir()
-                        TvList.Popular -> discoverRepo.popularTV()
-                        TvList.TopRated -> discoverRepo.topRatedTV()
+                        TvList.AiringToday -> discoverRepo.airingToday(page = page)
+                        TvList.OnTheAir -> discoverRepo.onTheAir(page = page)
+                        TvList.Popular -> discoverRepo.popularTV(page = page)
+                        TvList.TopRated -> discoverRepo.topRatedTV(page = page)
                     }
                 }.onSuccess {
                     emit(ResponseX.Success(data = it.body()))

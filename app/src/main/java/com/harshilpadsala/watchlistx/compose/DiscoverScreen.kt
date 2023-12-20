@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,10 +68,12 @@ fun DiscoverRoute(
     modifier: Modifier = Modifier,
     viewModel: DiscoverVM = hiltViewModel()
 ) {
+
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
+
     val lazyListState = rememberLazyListState()
 
     val endOfListReached by remember {
@@ -79,7 +82,21 @@ fun DiscoverRoute(
         }
     }
 
+
     val uiState = viewModel.popularMovieListSuccessState
+
+    if(endOfListReached){
+        viewModel.shouldCallNextPage()
+
+    }
+
+    LaunchedEffect(endOfListReached){
+        if(viewModel.resetCalled ){
+            viewModel.resetCalled = false
+            lazyListState.scrollToItem(0)
+        }
+    }
+
 
 //    LaunchedEffect(endOfListReached) {
 //        if (viewModel.selectedMediaType.value == MediaType.Movie) {
@@ -102,7 +119,8 @@ fun DiscoverRoute(
 //    }
 
 
-    DiscoverScreen(uiState = uiState.value,
+    DiscoverScreen(
+        uiState = uiState.value,
         lazyListState = lazyListState,
         modalBottomSheetState = sheetState,
         movieChipState = viewModel.movieChipState.value,
@@ -112,17 +130,20 @@ fun DiscoverRoute(
             scope.launch {
                 sheetState.show()
             }
-
         },
         onItemClick = onMediaClick,
-        onTabItemClick = viewModel::onTabChange,
+        onTabItemClick = {
+            viewModel.onTabChange(it)
+            viewModel.resetCalled = true
+        },
         onSearchClick = onSearchClick,
         sheetItemClick = {
             scope.launch {
                 sheetState.hide()
                 viewModel.toggleSheet(it)
             }
-        })
+        }
+    )
 }
 
 
@@ -211,7 +232,6 @@ fun ModalBottomSheetContent(mediaType: MediaType, onItemTap: (Int) -> Unit) {
                 Text(text = filters[index].name)
             })
         }
-        item {}
     }
 }
 
