@@ -26,7 +26,10 @@ interface HomeRepo {
     suspend fun getMovieDetails(@Path("movieId") movieId : Long) : Response<MovieDetails>
 
     @GET("3/movie/{movieId}/account_states")
-    suspend fun getAccountStats(@Path("movieId") movieId : Long) : Response<MovieStats>
+    suspend fun getMovieStats(@Path("movieId") movieId : Long) : Response<MovieStats>
+
+    @GET("3/tv/{tvId}/account_states")
+    suspend fun getTvStats(@Path("tvId") tvId : Long) : Response<MovieStats>
 
     @GET("3/movie/{movieId}/images")
     suspend fun getMovieImages(@Path("movieId") movieId : Long) : Response<MovieImages>
@@ -38,7 +41,7 @@ interface HomeRepo {
     suspend fun toggleFavourite(@Path("accountId") accountId : Long , @Body request : ToggleFavouriteRequest) : Response<UpdateResponse>
 
     @POST("3/account/{accountId}/watchlist")
-    suspend fun toggleWatchlist(@Path("accountId") accountId : Long) : Response<UpdateResponse>
+    suspend fun toggleWatchlist(@Path("accountId") accountId : Long , @Body request : ToggleFavouriteRequest) : Response<UpdateResponse>
 
 
 }

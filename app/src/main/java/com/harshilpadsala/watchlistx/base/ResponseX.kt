@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.onStart
 
 
 sealed interface ResponseX<out T> {
-    data class Success<T>(val data: T) : ResponseX<T>
+    data class Success<T>(val data: T? = null) : ResponseX<T>
     data class Error(val message: String? = null) : ResponseX<Nothing>
      object Loading : ResponseX<Nothing>
 }

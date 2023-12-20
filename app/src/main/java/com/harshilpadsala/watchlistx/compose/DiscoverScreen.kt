@@ -1,7 +1,6 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +36,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -85,12 +83,12 @@ fun DiscoverRoute(
 
     val uiState = viewModel.popularMovieListSuccessState
 
-    if(endOfListReached){
+    if (endOfListReached) {
         viewModel.shouldCallNextPage()
     }
 
-    LaunchedEffect(endOfListReached){
-        if(viewModel.resetCalled ){
+    LaunchedEffect(endOfListReached) {
+        if (viewModel.resetCalled) {
             viewModel.resetCalled = false
             lazyListState.scrollToItem(0)
         }
@@ -106,7 +104,6 @@ fun DiscoverRoute(
 //
 //        }
 //    }
-
 
 
 //    if (uiState.value is DiscoverMovieUiState.SuccessUiState) {

@@ -31,8 +31,6 @@ class DiscoverMovieUseCase @Inject constructor(
                 }
             }
         }
-
-
     }
 
 }

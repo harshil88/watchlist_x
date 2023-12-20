@@ -125,7 +125,8 @@ class DiscoverVM @Inject constructor(
                         popularMovieListSuccessState.value =
 
                         DiscoverMovieUiState.PopularMovieFailureUiState(message = it.message ?: "")
-                }}
+                }
+                }
             }
         }
     }
