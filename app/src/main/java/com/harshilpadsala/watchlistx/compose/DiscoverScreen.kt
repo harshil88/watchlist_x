@@ -87,7 +87,6 @@ fun DiscoverRoute(
 
     if(endOfListReached){
         viewModel.shouldCallNextPage()
-
     }
 
     LaunchedEffect(endOfListReached){

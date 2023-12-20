@@ -135,8 +135,11 @@ class DiscoverVM @Inject constructor(
         viewModelScope.launch {
             discoverTvUseCase.invoke(tvList, currentPage).collect {
                 when (it) {
-                    is ResponseX.Loading -> popularMovieListSuccessState.value =
-                        DiscoverMovieUiState.Loading
+                    is ResponseX.Loading -> if(currentPage == 1){
+
+                        popularMovieListSuccessState.value =
+                            DiscoverMovieUiState.Loading
+                    }
 
                     is ResponseX.Success -> {
 
