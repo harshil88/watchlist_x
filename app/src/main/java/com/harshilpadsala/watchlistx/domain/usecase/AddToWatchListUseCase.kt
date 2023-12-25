@@ -2,22 +2,19 @@ package com.harshilpadsala.watchlistx.domain.usecase
 
 import com.harshilpadsala.watchlistx.base.ResponseX
 import com.harshilpadsala.watchlistx.constants.MediaType
-import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.req.ToggleFavouriteRequest
-import com.harshilpadsala.watchlistx.data.res.list.Content
-import com.harshilpadsala.watchlistx.data.res.list.Movie
-import com.harshilpadsala.watchlistx.repo.DiscoverRepo
 import com.harshilpadsala.watchlistx.repo.HomeRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-enum class WishListType{
+enum class WatchListOperation{
     Favourites,
-    Watchlist
+    Watchlist,
+
 }
 
-class AddToWishListUseCase @Inject constructor(
+class AddToWatchListUseCase @Inject constructor(
     private val homeRepo: HomeRepo
 ) {
 
@@ -25,22 +22,22 @@ class AddToWishListUseCase @Inject constructor(
 
     val accountId = 12375371L
 
-    operator fun invoke(mediaType: MediaType , mediaId : Int , wishListType: WishListType , wishList : Boolean): Flow<ResponseX<String>> {
+    operator fun invoke(mediaType: MediaType, mediaId : Int, watchListOperation: WatchListOperation, wishList : Boolean): Flow<ResponseX<String>> {
         return flow {
 
             val request = ToggleFavouriteRequest(
                 mediaType = mediaType.name,
                 mediaId = mediaId,
-                watchlist = if(wishListType == WishListType.Watchlist) wishList else null,
-                favorite = if(wishListType == WishListType.Favourites) wishList else null,
+                watchlist = if(watchListOperation == WatchListOperation.Watchlist) wishList else null,
+                favorite = if(watchListOperation == WatchListOperation.Favourites) wishList else null,
             )
 
             emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
-                    when (wishListType) {
-                        WishListType.Watchlist -> homeRepo.toggleWatchlist(accountId =  accountId , request = request)
-                        WishListType.Favourites -> homeRepo.toggleFavourite(accountId = accountId , request = request)
+                    when (watchListOperation) {
+                        WatchListOperation.Watchlist -> homeRepo.toggleWatchlist(accountId =  accountId , request = request)
+                        WatchListOperation.Favourites -> homeRepo.toggleFavourite(accountId = accountId , request = request)
                     }
                 }.onSuccess {
                     emit(ResponseX.Success(data = it.message()))

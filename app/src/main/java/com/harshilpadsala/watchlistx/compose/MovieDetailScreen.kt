@@ -1,7 +1,6 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -12,7 +11,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -21,12 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.CardListComponent
 import com.harshilpadsala.watchlistx.compose.components.GenresRow
-import com.harshilpadsala.watchlistx.compose.components.GlobalRatingCard
 import com.harshilpadsala.watchlistx.compose.components.ImagePager
 import com.harshilpadsala.watchlistx.compose.components.PrimaryButton
 import com.harshilpadsala.watchlistx.compose.components.RatingRow
-import com.harshilpadsala.watchlistx.data.res.detail.ActorDetails
-import com.harshilpadsala.watchlistx.data.res.detail.CardModel
 import com.harshilpadsala.watchlistx.data.res.detail.toCardComponent
 import com.harshilpadsala.watchlistx.state.FailureState
 import com.harshilpadsala.watchlistx.state.InitialState
@@ -58,14 +53,10 @@ fun MovieDetailScreen(movieId: Long, movieVM: MovieVM = hiltViewModel()) {
         movieVM.getMovieCredits(movieId)
 
         LazyColumn {
-
-            item {  RenderMovieDetail(movieId = movieId) }
-            item {  RenderMovieImagesDetail()}
-            item {  RenderMovieDetails() }
-            item {  RenderCastDetail()}
-
-
-
+            item { RenderMovieDetail(movieId = movieId) }
+            item { RenderMovieImagesDetail() }
+            item { RenderMovieDetails() }
+            item { RenderCastDetail() }
         }
 
     }
@@ -84,12 +75,9 @@ fun RenderMovieDetail(movieId: Long, movieViewModel: MovieVM = hiltViewModel()) 
         is MovieDetailSuccess -> {
             movieViewModel.getMovieImages(movieId)
             Text(
-                text = movieDetailsState.response?.title ?: "",
-                modifier = Modifier.padding(
+                text = movieDetailsState.response?.title ?: "", modifier = Modifier.padding(
                     start = 24.dp, top = 24.dp, bottom = 24.dp
-                ),
-                style = StylesX.titleLarge.copy(color = Color.Yellow),
-                maxLines = 1
+                ), style = StylesX.titleLarge.copy(color = Color.Yellow), maxLines = 1
             )
         }
 
@@ -134,7 +122,10 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
         is MovieDetailSuccess -> {
 
 
-            GenresRow(genres = movieDetailState.response?.genres?: listOf() , modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 24.dp))
+            GenresRow(
+                genres = movieDetailState.response?.genres ?: listOf(),
+                modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 24.dp)
+            )
             Text(
                 text = movieDetailState.response?.overview ?: "",
                 modifier = Modifier.padding(horizontal = 24.dp),
@@ -146,7 +137,11 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
                 modifier = Modifier.padding(24.dp),
                 onClick = { /*TODO*/ },
                 pendingActionContent = {
-                    Icon(Icons.Filled.Add , contentDescription = "Add to Watchlist Icon" , tint = Darkness.stillness)
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = "Add to Watchlist Icon",
+                        tint = Darkness.stillness
+                    )
                     Text(
                         text = "Add to Watchlist",
                         modifier = Modifier.padding(
@@ -156,22 +151,22 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
                         maxLines = 1
                     )
                 },
+            ) {
+                Icon(
+                    Icons.Filled.Done,
+                    contentDescription = "Added to Watchlist Icon",
+                    tint = Darkness.light
                 )
-            {
-                Icon(Icons.Filled.Done , contentDescription = "Added to Watchlist Icon" , tint = Darkness.light)
                 Text(
-                    text = "Added to Watchlist",
-                    modifier = Modifier.padding(
+                    text = "Added to Watchlist", modifier = Modifier.padding(
                         start = 24.dp
-                    ),
-                    style = StylesX.titleMedium.copy(color = Darkness.light),
-                    maxLines = 1
+                    ), style = StylesX.titleMedium.copy(color = Darkness.light), maxLines = 1
                 )
             }
 
             RatingRow(
-                rating = movieDetailState.response?.voteAverage?:0.0,
-                users = movieDetailState.response?.voteCount?:0
+                rating = movieDetailState.response?.voteAverage ?: 0.0,
+                users = movieDetailState.response?.voteCount ?: 0
             )
 
 
@@ -197,15 +192,17 @@ fun RenderCastDetail(movieViewModel: MovieVM = hiltViewModel()) {
 
         is MovieCreditsSuccess -> {
             Text(
-                text =  "Top Casts",
-                modifier = Modifier.padding(
+                text = "Top Casts", modifier = Modifier.padding(
                     start = 24.dp, top = 24.dp, bottom = 24.dp
-                ),
-                style = StylesX.titleLarge.copy(color = Color.Yellow),
-                maxLines = 1
+                ), style = StylesX.titleLarge.copy(color = Color.Yellow), maxLines = 1
             )
             movieCreditsState.response?.cast?.map { actorDetails -> actorDetails.toCardComponent() }
-                ?.let { CardListComponent(cards = it.toMutableList(), modifier = Modifier, onCardClick = {id -> }) }
+                ?.let {
+                    CardListComponent(
+                        cards = it.toMutableList(),
+                        modifier = Modifier,
+                        onCardClick = { id -> })
+                }
         }
 
         is FailureState -> {

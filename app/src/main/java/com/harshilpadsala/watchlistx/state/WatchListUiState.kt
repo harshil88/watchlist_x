@@ -5,11 +5,12 @@ import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 
 sealed interface WatchListUiState {
 
+
     object Loading : WatchListUiState
 
 
     data class Success(
-        val message: String
+        val message: String,
     ) : WatchListUiState
 
     data class Error(val message: String) : WatchListUiState

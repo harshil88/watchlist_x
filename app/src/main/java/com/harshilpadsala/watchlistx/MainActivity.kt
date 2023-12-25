@@ -31,6 +31,7 @@ import com.harshilpadsala.watchlistx.compose.DiscoverRoute
 import com.harshilpadsala.watchlistx.compose.DiscoverScreen
 import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.HomeScreen
+import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
 import com.harshilpadsala.watchlistx.compose.MovieDetailScreen
 import com.harshilpadsala.watchlistx.constants.BottomNavItem
 import com.harshilpadsala.watchlistx.ui.theme.WatchlistXTheme
@@ -91,7 +92,7 @@ fun BottomBarDisplay(navController: NavHostController) {
             })
 
             ) {
-                MovieDetailScreen(movieId = navStackBackEntry?.arguments?.getLong("movieId") ?: 0L)
+                MovieDetailRoute(onBackPress = {})
             }
             //  movieDetailGraph(navController)
         }
