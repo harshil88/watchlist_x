@@ -20,15 +20,14 @@ fun MovieDetailRoute(
     onBackPress: () -> Unit, viewModel: MovieDetailViewModel = hiltViewModel()
 ) {
 
-    val movieStatsUiState = viewModel.mediaStatsStateflow.collectAsState()
-    val movieDetailUiState = viewModel.mediaDetailStateFlow.collectAsState()
+    val movieDetailUiState = viewModel.movieDetailStateFlow.collectAsState()
     val watchListUiState = viewModel.watchListUiState.collectAsState()
+    val ratingUiState = viewModel.ratingUiState.collectAsState()
 
     MovieDetailScreen(
-        movieStatsUiState = movieStatsUiState.value,
         movieDetailUiState = movieDetailUiState.value,
-        watchListUiState = WatchListUiState.Loading,
-        ratingUiState = RatingUiState.Loading,
+        watchListUiState = watchListUiState.value,
+        ratingUiState = ratingUiState.value,
         creditsUiState = CreditsUiState.Loading,
         onFavClick = { _, _ -> },
         onWatchListClick = { _, _ -> },
@@ -38,7 +37,6 @@ fun MovieDetailRoute(
 
 @Composable
 fun MovieDetailScreen(
-    movieStatsUiState: MovieStatsUiState,
     movieDetailUiState: MovieDetailUiState,
     watchListUiState: WatchListUiState,
     ratingUiState: RatingUiState,
@@ -51,7 +49,6 @@ fun MovieDetailScreen(
     Column(
         verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = movieStatsUiState.toString())
         Text(text = movieDetailUiState.toString())
 
 
