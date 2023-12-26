@@ -1,7 +1,10 @@
 package com.harshilpadsala.watchlistx.compose
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -10,7 +13,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.state.WatchListUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.CreditsUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.MovieDetailUiState
-import com.harshilpadsala.watchlistx.state.movie_detail.MovieStatsUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.RatingUiState
 import com.harshilpadsala.watchlistx.vm.MovieDetailViewModel
 
@@ -29,12 +31,24 @@ fun MovieDetailRoute(
         watchListUiState = watchListUiState.value,
         ratingUiState = ratingUiState.value,
         creditsUiState = CreditsUiState.Loading,
-        onFavClick = { _, _ -> },
-        onWatchListClick = { _, _ -> },
-        onAddRatingClick = { movieId, add -> },
-        onDeleteRatingClick = { movieId -> })
+        onFavClick = {
+                     _, _ ->
+        },
+        onWatchListClick = {
+                           _, _ ->
+        },
+        onAddRatingClick = {
+                           movieId, add ->
+        },
+        onDeleteRatingClick = {
+            movieId ->
+        }
+    )
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MovieDetailScreen(
     movieDetailUiState: MovieDetailUiState,
@@ -45,12 +59,6 @@ fun MovieDetailScreen(
     onWatchListClick: (Int, Boolean) -> Unit,
     onAddRatingClick: (Int, Boolean) -> Unit,
     onDeleteRatingClick: (Int) -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = movieDetailUiState.toString())
-
-
-    }
+) = Scaffold {
+       paddingValues ->
 }

@@ -8,13 +8,10 @@ import com.harshilpadsala.watchlistx.data.res.list.MovieCredits
 
 sealed interface MovieDetailUiState {
 
+
     object Loading : MovieDetailUiState
 
-
-
     data class MovieDetailsSuccess(val data : MovieDetailPresenter?) : MovieDetailUiState
-
-
 
     data class Error(val message : String?) : MovieDetailUiState
 

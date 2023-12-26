@@ -40,6 +40,9 @@ interface HomeRepo {
     @GET("3/movie/{movieId}/images")
     suspend fun getMovieImages(@Path("movieId") movieId : Long) : Response<MovieImages>
 
+    @GET("3/tv/{tvId}/images")
+    suspend fun getTvImages(@Path("tvId") tvId : Long) : Response<MovieImages>
+
     @GET("3/movie/{movieId}/credits")
     suspend fun getMovieCredits(@Path("movieId") movieId : Long) : Response<MovieCredits>
 

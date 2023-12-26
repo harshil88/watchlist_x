@@ -4,12 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResponseX
 import com.harshilpadsala.watchlistx.constants.MediaType
+import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.detail.toPresentation
+import com.harshilpadsala.watchlistx.data.res.list.MovieImages
+import com.harshilpadsala.watchlistx.data.res.list.toImageList
 import com.harshilpadsala.watchlistx.domain.usecase.AddToWatchListUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaAccountStatsUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaCreditsUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaDetailUseCase
+import com.harshilpadsala.watchlistx.domain.usecase.MediaImagesUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.RateMediaUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.RatingOperation
 import com.harshilpadsala.watchlistx.domain.usecase.WatchListOperation
@@ -31,6 +35,7 @@ import javax.inject.Inject
 class MovieDetailViewModel @Inject constructor(
     mediaStatsUseCase: MediaAccountStatsUseCase,
     mediaDetailUseCase: MediaDetailUseCase,
+    mediaImagesUseCase: MediaImagesUseCase,
     private val watchListUseCase: AddToWatchListUseCase,
     private val rateMediaUseCase: RateMediaUseCase,
     private val movieCreditsUseCase: MediaCreditsUseCase,
@@ -87,32 +92,48 @@ class MovieDetailViewModel @Inject constructor(
         movieId = tempMovieId,
     )
 
+    private val movieImagesFlow = mediaImagesUseCase.invoke(
+        mediaType = MediaType.Movie,
+        mediaId = tempMovieId,
+    )
+
+    private fun emitMovieDetailState(
+        statsResponse: ResponseX<MovieStats>,
+        detailResponse: ResponseX<MovieDetails>,
+        imagesResponse: ResponseX<MovieImages>
+    ): MovieDetailUiState {
+        if (statsResponse is ResponseX.Success
+            && detailResponse is ResponseX.Success
+            && imagesResponse is ResponseX.Success
+        ) {
+            return MovieDetailUiState.MovieDetailsSuccess(
+                data = detailResponse.data?.toPresentation(
+                    movieStats = statsResponse.data,
+                    images = imagesResponse.data?.toImageList()
+                )
+            )
+        }
+
+        else if (
+            statsResponse is ResponseX.Error
+            || detailResponse is ResponseX.Error
+            || imagesResponse is ResponseX.Error
+        ) {
+            return MovieDetailUiState.Error(message = "Something went wrong")
+        }
+
+        return MovieDetailUiState.Loading
+
+
+    }
+
 
     val movieDetailStateFlow: StateFlow<MovieDetailUiState> = combine(
         flow = mediaStatsFlow,
-        flow2 = movieDetailFlow
-    ) {
-      mediaStatsFlow, movieDetailFlow ->
-
-        var movieStats : MovieStats? = null
-
-        when (mediaStatsFlow) {
-            is ResponseX.Loading -> MovieDetailUiState.Loading
-            is ResponseX.Success -> {
-                movieStats = mediaStatsFlow.data
-                MovieDetailUiState.Loading
-            }
-            is ResponseX.Error -> MovieDetailUiState.Error(mediaStatsFlow.message)
-        }
-
-        when (movieDetailFlow) {
-            is ResponseX.Loading -> MovieDetailUiState.Loading
-            is ResponseX.Success -> {
-                MovieDetailUiState.MovieDetailsSuccess(data = movieDetailFlow.data?.toPresentation(movieStats))
-            }
-            is ResponseX.Error -> MovieDetailUiState.Error(movieDetailFlow.message)
-        }
-    }.stateIn(
+        flow2 = movieDetailFlow,
+        flow3 = movieImagesFlow,
+        transform = ::emitMovieDetailState
+    ).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
         initialValue = MovieDetailUiState.Loading

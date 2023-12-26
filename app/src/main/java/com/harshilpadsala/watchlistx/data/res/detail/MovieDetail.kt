@@ -64,12 +64,13 @@ data class MovieDetailPresenter(
     val voteAverage: Double?,
     val voteCount: Int?,
     val genres: List<Genre>?,
-    val movieStats: MovieStats?
+    val images : List<String>?,
+    val movieStats: MovieStats?,
 )
 
-fun MovieDetails.toPresentation(movieStats: MovieStats? = null): MovieDetailPresenter =
+fun MovieDetails.toPresentation(movieStats: MovieStats? = null , images : List<String>?): MovieDetailPresenter =
     MovieDetailPresenter(
-        id, title, releaseDate, overview, voteAverage, voteCount, genres, movieStats
+        id, title, releaseDate, overview, voteAverage, voteCount, genres, images,movieStats
     )
 
 
