@@ -35,11 +35,11 @@ import com.harshilpadsala.watchlistx.compose.components.ImagePager
 import com.harshilpadsala.watchlistx.compose.components.RatingRow
 import com.harshilpadsala.watchlistx.data.res.detail.CardModel
 import com.harshilpadsala.watchlistx.data.res.detail.toCardComponent
-import com.harshilpadsala.watchlistx.state.WatchListUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.CreditsUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.FavouriteUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.MovieDetailUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.RatingUiState
+import com.harshilpadsala.watchlistx.state.movie_detail.WatchlistUiState
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.MovieDetailViewModel
@@ -53,19 +53,19 @@ fun MovieDetailRoute(
 ) {
 
     val movieDetailUiState = viewModel.movieDetailStateFlow.collectAsState()
+    val watchListUiState = viewModel.watchListUiState.collectAsState()
     val favouriteUiState = viewModel.favouriteUiState.collectAsState()
     val creditsUiState = viewModel.mediaCreditsStateFlow.collectAsState()
     val ratingUiState = viewModel.ratingUiState.collectAsState()
 
     MovieDetailScreen(
         movieDetailUiState = movieDetailUiState.value,
-        watchListUiState = WatchListUiState.Loading,
+        watchListUiState = watchListUiState.value,
         favouriteUiState = favouriteUiState.value,
         ratingUiState = ratingUiState.value,
         creditsUiState = creditsUiState.value,
         onFavClick = viewModel::toggleFavourite,
-        onWatchListClick = { _, _ ->
-        },
+        onWatchListClick = viewModel::toggleWatchList,
         onAddRatingClick = { movieId, add ->
         },
         onDeleteRatingClick = { movieId ->
@@ -79,12 +79,12 @@ fun MovieDetailRoute(
 @Composable
 fun MovieDetailScreen(
     movieDetailUiState: MovieDetailUiState,
-    watchListUiState: WatchListUiState,
+    watchListUiState: WatchlistUiState,
     favouriteUiState: FavouriteUiState,
     ratingUiState: RatingUiState,
     creditsUiState: CreditsUiState,
     onFavClick: (Boolean) -> Unit,
-    onWatchListClick: (Int, Boolean) -> Unit,
+    onWatchListClick: (Boolean) -> Unit,
     onAddRatingClick: (Int, Boolean) -> Unit,
     onDeleteRatingClick: (Int) -> Unit,
     onBackPress: () -> Unit,
@@ -138,7 +138,7 @@ fun MovieDetailScreen(
                         WatchListButton(
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
                             watchListUiState = watchListUiState,
-                            onWatchListClick = {}
+                            onWatchListClick = onWatchListClick
                         )
 
                         RatingRow(
@@ -214,30 +214,29 @@ fun CreditsRow(credits : List<CardModel>){
 @Composable
 fun WatchListButton(
     modifier: Modifier = Modifier,
-    watchListUiState: WatchListUiState,
-    onWatchListClick: () -> Unit,
+    watchListUiState: WatchlistUiState,
+    onWatchListClick: (Boolean) -> Unit,
 ) {
     ElevatedButton(
         onClick = {
-            onWatchListClick()
+                  if(watchListUiState !is  WatchlistUiState.Loading){
+                      onWatchListClick(!watchListUiState.currentValue)
+                  }
         },
         modifier.fillMaxWidth(),
         contentPadding = PaddingValues(vertical = 12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Darkness.water ,
+            containerColor = if(watchListUiState.currentValue) Darkness.stillness else Darkness.rise ,
         ),
-
         shape = RoundedCornerShape(4.dp),
         border = BorderStroke(
             2.dp, Darkness.rise
         )
     ) {
-        when (watchListUiState) {
-            is WatchListUiState.Loading -> LoaderX(modifier = Modifier
-                .height(24.dp)
-                .width(24.dp))
-            is WatchListUiState.Success -> AddedToWatchListContent()
-            is WatchListUiState.Error -> NotAddedToWatchListContent()
+        when(watchListUiState){
+            is WatchlistUiState.Loading -> LoaderX()
+            is WatchlistUiState.Success -> if(watchListUiState.currentValue) AddedToWatchListContent() else NotAddedToWatchListContent()
+            is WatchlistUiState.Error -> if(watchListUiState.currentValue) AddedToWatchListContent() else NotAddedToWatchListContent()
         }
     }
 }

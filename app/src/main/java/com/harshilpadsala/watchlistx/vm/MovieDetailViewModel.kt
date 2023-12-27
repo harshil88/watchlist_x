@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.vm
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResponseX
@@ -17,7 +18,6 @@ import com.harshilpadsala.watchlistx.domain.usecase.MediaImagesUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.RateMediaUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.RatingOperation
 import com.harshilpadsala.watchlistx.domain.usecase.WatchListOperation
-import com.harshilpadsala.watchlistx.state.WatchListUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.CreditsUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.FavouriteUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.MovieDetailUiState
@@ -45,6 +45,8 @@ class MovieDetailViewModel @Inject constructor(
     private val tempMovieId = 901362
 
     val favouriteUiState = MutableStateFlow<FavouriteUiState>(FavouriteUiState.Loading)
+    val watchListUiState = MutableStateFlow<WatchlistUiState>(WatchlistUiState.Loading)
+
 
     val ratingUiState = MutableStateFlow<RatingUiState>(RatingUiState.Loading)
 
@@ -112,6 +114,11 @@ class MovieDetailViewModel @Inject constructor(
             }else{
                 favouriteUiState.value = FavouriteUiState.RemovedFromFav
             }
+
+            statsResponse.data?.watchlist?.let {
+                watchListUiState.value = WatchlistUiState.Success(successValue  = it)
+            }
+
             return MovieDetailUiState.MovieDetailsSuccess(
                 data = detailResponse.data?.toPresentation(
                     movieStats = statsResponse.data, images = imagesResponse.data?.toImageList()
@@ -135,22 +142,22 @@ class MovieDetailViewModel @Inject constructor(
         initialValue = MovieDetailUiState.Loading
     )
 
-//    fun toggleWatchList() {
-//        viewModelScope.launch {
-//            watchListUseCase.invoke(
-//                mediaType = MediaType.Movie,
-//                mediaId = tempMovieId,
-//                watchListOperation = WatchListOperation.Watchlist,
-//                wishList = isAddedToWatchList,
-//            ).collect {
-//                when (it) {
-//                    is ResponseX.Loading -> WatchListUiState.Loading
-//                    is ResponseX.Success -> WatchlistUiState.WatchlistSuccess(message = it.data)
-//                    is ResponseX.Error -> WatchlistUiState.Error(it.message)
-//                }
-//            }
-//        }
-//    }
+    fun toggleWatchList(value : Boolean) {
+        viewModelScope.launch {
+            watchListUseCase.invoke(
+                mediaType = MediaType.Movie,
+                mediaId = tempMovieId,
+                watchListOperation = WatchListOperation.Watchlist,
+                wishList = value,
+            ).collect {
+           watchListUiState.value =   when (it) {
+                    is ResponseX.Loading -> WatchlistUiState.Loading
+                    is ResponseX.Success ->  WatchlistUiState.Success(value)
+                    is ResponseX.Error -> WatchlistUiState.Error(value)
+                }
+            }
+        }
+    }
 
     fun toggleFavourite(value : Boolean) {
         viewModelScope.launch {

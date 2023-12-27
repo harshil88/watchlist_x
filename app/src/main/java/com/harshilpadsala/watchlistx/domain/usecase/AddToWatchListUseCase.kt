@@ -46,8 +46,6 @@ class AddToWatchListUseCase @Inject constructor(
                     Log.i("FavRes" , it.body().toString())
                     emit(ResponseX.Success(data = it.message()))
                 }.onFailure {
-                    Log.i("FavRes" , it.toString())
-                    Log.i("FavRes" , it.message.toString())
 
                     emit(ResponseX.Error(message = it.message))
                 }

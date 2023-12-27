@@ -1,15 +1,13 @@
 package com.harshilpadsala.watchlistx.state.movie_detail
 
-sealed interface WatchlistUiState{
+sealed class WatchlistUiState(open val currentValue : Boolean){
 
+    object Loading : WatchlistUiState(false)
 
-    object Loading : WatchlistUiState
+    data class Success( val successValue: Boolean, ) : WatchlistUiState(successValue)
 
-    object AddedToFav : WatchlistUiState
+    data class Error( val previousValue: Boolean ) : WatchlistUiState(previousValue)
 
-    object RemovedFromFav : WatchlistUiState
-
-    data class Error(val message : String?) : WatchlistUiState
 
 
 }
