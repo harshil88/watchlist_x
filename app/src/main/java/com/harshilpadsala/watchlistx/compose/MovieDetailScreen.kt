@@ -99,7 +99,7 @@ fun RenderMovieImagesDetail(movieViewModel: MovieVM = hiltViewModel()) {
     when (val movieImagesState = movieViewModel.movieImagesState.value) {
 
         is MovieImagesSuccess -> {
-            ImagePager(images = movieImagesState.response?.backdrops ?: listOf())
+           // ImagePager(images = movieImagesState.response?.backdrops ?: listOf())
         }
 
         is FailureState -> {

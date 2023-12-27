@@ -5,6 +5,8 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 
 
+//Todo : -Better Error Handling In Retrofit
+
 object WatchListXInterceptors : Interceptor{
 
     override fun intercept(chain: Interceptor.Chain): Response {

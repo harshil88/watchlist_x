@@ -18,6 +18,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
+
 interface HomeRepo {
     @GET("3/discover/movie")
     suspend fun getAllMovies() : Response<Content<Movie>>

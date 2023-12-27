@@ -16,8 +16,7 @@ object Darkness{
     val midnight = Color(0xFF404040)
     val night = Color(0xFF262626)
     val stillness = Color(0xFF0D0D0D)
+    val love = Color(0xFFFFC0CB)
     val rise = Color.Yellow
     val water = Color.Transparent
-
-
 }

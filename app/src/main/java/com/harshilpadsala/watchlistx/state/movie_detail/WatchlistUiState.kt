@@ -5,11 +5,25 @@ sealed interface WatchlistUiState{
 
     object Loading : WatchlistUiState
 
-    data class FavouriteSuccess(val message : String?) : WatchlistUiState
+    object AddedToFav : WatchlistUiState
 
-    data class WatchlistSuccess(val message : String?) : WatchlistUiState
+    object RemovedFromFav : WatchlistUiState
 
     data class Error(val message : String?) : WatchlistUiState
+
+
+}
+
+sealed interface FavouriteUiState{
+
+
+    object Loading : FavouriteUiState
+
+    object AddedToFav : FavouriteUiState
+
+    object RemovedFromFav : FavouriteUiState
+
+    data class Error(val message : String?) : FavouriteUiState
 
 
 }

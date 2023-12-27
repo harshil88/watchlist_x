@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,16 +29,25 @@ fun ToastX(message: String) {
 }
 
 @Composable
-fun LoaderX(modifier: Modifier = Modifier.width(64.dp)) {
+fun LoaderX(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(), contentAlignment = Alignment.Center
+        modifier = modifier, contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
             modifier = Modifier.width(64.dp),
             color = MaterialTheme.colorScheme.secondary,
         )
+    }
+}
+
+@Composable
+fun ErrorX(modifier: Modifier = Modifier.width(64.dp)) {
+    Box(
+        modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(), contentAlignment = Alignment.Center
+    ) {
+        Text(text = "Error")
     }
 }
 
@@ -63,12 +73,14 @@ fun PaddingX(
     end: Dp = 0.dp,
     bottom: Dp = 0.dp,
     content : @Composable BoxScope.() -> Unit) {
-    Box(modifier = Modifier.padding(
-        start = start,
-        top = top,
-        end = end,
-        bottom = bottom,
-    ).wrapContentSize()) {
+    Box(modifier = Modifier
+        .padding(
+            start = start,
+            top = top,
+            end = end,
+            bottom = bottom,
+        )
+        .wrapContentSize()) {
         content()
     }
 }

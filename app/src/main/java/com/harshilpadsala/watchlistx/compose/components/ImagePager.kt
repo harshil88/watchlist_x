@@ -33,7 +33,7 @@ import com.harshilpadsala.watchlistx.data.ImageDetails
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ImagePager(images: List<ImageDetails>) {
+fun ImagePager(images: List<String>) {
 
     val pagerState = rememberPagerState(
         initialPage = images.size/2,
@@ -53,7 +53,7 @@ fun ImagePager(images: List<ImageDetails>) {
             ): Int = availableSpace
         }
     ) { page ->
-        PagerContent(image = Constant.TMDB_IMAGE_URI_HIGH + images[page].filePath)
+        PagerContent(image = Constant.TMDB_IMAGE_URI_HIGH + images[page])
 
     }
 }
