@@ -1,7 +1,6 @@
 package com.harshilpadsala.watchlistx.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,7 +11,7 @@ import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.HomeScreen
 import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
 import com.harshilpadsala.watchlistx.compose.RatingRoute
-import com.harshilpadsala.watchlistx.constants.BottomNavItem
+import com.harshilpadsala.watchlistx.constants.WXNavItem
 
 private const val movieDetailRoute = "movieDetailRoute"
 private const val ratingRoute = "movieDetail"
@@ -30,20 +29,20 @@ const val ratingsNavArg = "ratings"
 @Composable
 fun WatchListXNavigation(navController : NavHostController){
     NavHost(
-        navController = navController, startDestination = BottomNavItem.Home.route
+        navController = navController, startDestination = WXNavItem.HOME.name
     ) {
-        composable(BottomNavItem.Home.route) {
+        composable(WXNavItem.HOME.name) {
             HomeScreen { movieId ->
                 navController.navigate("$movieDetailRoute/$movieId")
             }
         }
-        composable(BottomNavItem.Discover.route) {
+        composable(WXNavItem.DISCOVER.name) {
             DiscoverRoute(
                 onMediaClick = {},
                 onSearchClick = {},
             )
         }
-        composable(BottomNavItem.Favourites.route) { FavouriteScreen() }
+        composable(WXNavItem.FAVOURITE.name) { FavouriteScreen() }
         composable(ratingRoute){}
 
 

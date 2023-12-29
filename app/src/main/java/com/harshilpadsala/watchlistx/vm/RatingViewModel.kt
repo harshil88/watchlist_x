@@ -13,10 +13,7 @@ data class Rated(
 )
 
 sealed interface ChangeRating {
-
     object Loading : ChangeRating
-
-
 }
 
 
@@ -32,10 +29,5 @@ class RatingViewModel @Inject constructor(
             ratings = state.get<Float>("ratings")?.toDouble()
         )
     )
-
-    init {
-
-
-    }
 
 }
