@@ -14,7 +14,6 @@ class DiscoverTvUseCase @Inject constructor(
 ) {
     operator fun invoke(tvList: TvList, page: Int): Flow<ResponseX<Content<TVShow>?>> {
         return flow {
-            emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
                     when (tvList) {

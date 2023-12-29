@@ -35,7 +35,6 @@ class AddToWatchListUseCase @Inject constructor(
                 favorite = if(watchListOperation == WatchListOperation.Favourites) wishList else null,
             )
 
-            emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
                     when (watchListOperation) {
@@ -43,10 +42,8 @@ class AddToWatchListUseCase @Inject constructor(
                         WatchListOperation.Favourites -> homeRepo.toggleFavourite(accountId = accountId , request = request)
                     }
                 }.onSuccess {
-                    Log.i("FavRes" , it.body().toString())
                     emit(ResponseX.Success(data = it.message()))
                 }.onFailure {
-
                     emit(ResponseX.Error(message = it.message))
                 }
             }

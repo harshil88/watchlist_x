@@ -103,11 +103,6 @@ class DiscoverVM @Inject constructor(
         viewModelScope.launch {
             discoverMovieUseCase.invoke(movieList, currentPage).collect {
                 when (it) {
-                    is ResponseX.Loading -> if(currentPage == 1){
-
-                        popularMovieListSuccessState.value =
-                            DiscoverMovieUiState.Loading
-                    }
 
                     is ResponseX.Success -> {
                         isTabChanged = false
@@ -137,11 +132,7 @@ class DiscoverVM @Inject constructor(
         viewModelScope.launch {
             discoverTvUseCase.invoke(tvList, currentPage).collect {
                 when (it) {
-                    is ResponseX.Loading -> if(currentPage == 1){
 
-                        popularMovieListSuccessState.value =
-                            DiscoverMovieUiState.Loading
-                    }
 
                     is ResponseX.Success -> {
 

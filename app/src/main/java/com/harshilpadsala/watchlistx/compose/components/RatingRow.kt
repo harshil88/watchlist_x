@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.compose.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +22,7 @@ import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 
 @Composable
-fun RatingRow(rating : Double, users : Int){
+fun RatingRow(rating : Double, users : Int , onRatingClick: () -> Unit){
 
 
    Row(
@@ -30,7 +31,7 @@ fun RatingRow(rating : Double, users : Int){
        GlobalRatingCard(
            rating, users , modifier = Modifier.weight(1F)
        )
-       YourRating(rating , modifier = Modifier.weight(1F))
+       YourRating(rating , modifier = Modifier.weight(1F) , onRatingClick)
    }
 }
 
@@ -48,10 +49,12 @@ fun GlobalRatingCard(rating : Double , users: Int , modifier : Modifier){
 }
 
 @Composable
-fun YourRating(rating : Double ,   modifier : Modifier, ){
+fun YourRating(rating : Double ,   modifier : Modifier, onRatingClick : () -> Unit ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
+        modifier = modifier.clickable {
+                                      onRatingClick()
+        },
 
     ) {
         Icon( Icons.Outlined.Star,modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), contentDescription = "Rating Star", tint = Darkness.light)

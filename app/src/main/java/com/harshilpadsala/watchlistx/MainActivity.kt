@@ -20,20 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.harshilpadsala.watchlistx.compose.DiscoverRoute
-import com.harshilpadsala.watchlistx.compose.DiscoverScreen
-import com.harshilpadsala.watchlistx.compose.FavouriteScreen
-import com.harshilpadsala.watchlistx.compose.HomeScreen
-import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
-import com.harshilpadsala.watchlistx.compose.MovieDetailScreen
 import com.harshilpadsala.watchlistx.constants.BottomNavItem
+import com.harshilpadsala.watchlistx.navigation.WatchListXNavigation
+import com.harshilpadsala.watchlistx.navigation.WXAppState
+import com.harshilpadsala.watchlistx.navigation.rememberWXAppState
 import com.harshilpadsala.watchlistx.ui.theme.WatchlistXTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -46,13 +37,14 @@ class MainActivity : ComponentActivity() {
             WatchlistXTheme(darkTheme = true) {
 
 
-                val navController = rememberNavController()
 
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    BottomBarDisplay(navController = navController)
+                    WXApp(
+                        appState = rememberWXAppState()
+                    )
                 }
             }
 
@@ -64,80 +56,41 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
-fun BottomBarDisplay(navController: NavHostController) {
-    val navStackBackEntry by navController.currentBackStackEntryAsState()
+fun WXApp(appState: WXAppState) {
 
     Scaffold(bottomBar = {
-        MainBottomNav(navController = navController)
+        MainBottomNav(appState)
     }) {
-        NavHost(
-            navController = navController, startDestination = BottomNavItem.Home.route
-        ) {
-            composable(BottomNavItem.Home.route) {
-                HomeScreen { movieId ->
-                    navController.navigate("movieDetail/$movieId")
-                }
-            }
-            composable(BottomNavItem.Discover.route) { DiscoverRoute(
-                onMediaClick = {},
-                onSearchClick = {},
-            ) }
-            composable(BottomNavItem.Favourites.route) { FavouriteScreen() }
-            composable("movieDetail/{movieId}", arguments = listOf(
-                navArgument(
-                name = "movieId",
-            ) {
-                type = NavType.LongType
-                defaultValue = 5L
-            })
-
-            ) {
-                MovieDetailRoute(onBackPress = {})
-            }
-            //  movieDetailGraph(navController)
-        }
+        WatchListXNavigation(navController = appState.navController)
     }
 }
 
-//fun NavGraphBuilder.movieDetailGraph(navController: NavController){
-//
-//
-//
-//    navigation(startDestination = "movieDetail" , route = "movieDetail/{movieId}"){
-//        composable("movieDetail/{movieId}" , arguments = listOf(
-//            navArgument("movieId"){
-//                type = NavType.LongType
-//                defaultValue = 5L
-//            }
-//        )){
-//            backStackEntry ->
-//            MovieDetailScreen(movieId = backStackEntry.arguments?.getLong("movieId")?:0)}
-//    }
-//}
-
 @Composable
-fun MainBottomNav(navController: NavHostController) {
+fun MainBottomNav(appState: WXAppState) {
 
-    val navStackBackEntry by navController.currentBackStackEntryAsState()
+    val navStackBackEntry by appState.navController.currentBackStackEntryAsState()
     val currentDestination = navStackBackEntry?.destination
 
     val items = listOf(
         BottomNavItem.Home, BottomNavItem.Discover, BottomNavItem.Favourites
     )
 
-    BottomNavigation {
-        items.forEach { item ->
-            BottomNavigationItem(selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
-                onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId)
-                    }
-                },
-                label = { Text(text = item.route) },
-                icon = {
-                    Icon(Icons.Filled.Menu, contentDescription = "Menu Icon")
-                })
+    if (appState.shouldShowBottomBar) {
+        BottomNavigation {
+            items.forEach { item ->
+                BottomNavigationItem(selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
+                    onClick = {
+                        appState.navController.navigate(item.route) {
+                            popUpTo(appState.navController.graph.startDestinationId)
+                        }
+                    },
+                    label = { Text(text = item.route) },
+                    icon = {
+                        Icon(Icons.Filled.Menu, contentDescription = "Menu Icon")
+                    })
+            }
         }
     }
+
 }
 

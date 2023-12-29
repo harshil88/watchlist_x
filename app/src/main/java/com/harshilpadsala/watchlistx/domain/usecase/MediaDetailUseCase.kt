@@ -14,7 +14,6 @@ class MediaDetailUseCase @Inject constructor(
 
       fun invokeMovieDetails(movieId: Int): Flow<ResponseX<MovieDetails>> {
         return flow {
-            emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
                     homeRepo.getMovieDetails(movieId.toLong())
@@ -29,7 +28,6 @@ class MediaDetailUseCase @Inject constructor(
 
     fun invokeTvDetails(tvShowId: Int): Flow<ResponseX<TVShowDetails>> {
         return flow {
-            emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
                     homeRepo.getTvShowDetails(tvShowId.toLong())

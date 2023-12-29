@@ -9,7 +9,18 @@ sealed interface SearchUiState {
     ) : SearchUiState
 
     data class Failure(
-        val message : String?,
+        val message: String?,
     ) : SearchUiState
 
 }
+
+sealed interface BaseState<T> {
+    object Loading : BaseState<Nothing>
+
+    data class Success<T>(val data: T?) : BaseState<Nothing>
+
+    data class Error(val message: String?) : BaseState<Nothing>
+}
+
+
+sealed class ExtendedUiState : BaseState<MovieDetailSuccess>

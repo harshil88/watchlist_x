@@ -166,7 +166,8 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
 
             RatingRow(
                 rating = movieDetailState.response?.voteAverage ?: 0.0,
-                users = movieDetailState.response?.voteCount ?: 0
+                users = movieDetailState.response?.voteCount ?: 0,
+                onRatingClick = {  },
             )
 
 

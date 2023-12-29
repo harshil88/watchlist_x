@@ -15,7 +15,6 @@ class MediaAccountStatsUseCase @Inject constructor(
 
     operator fun invoke(mediaType: MediaType , mediaId : Int): Flow<ResponseX<MovieStats>> {
         return flow {
-            emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
                     when (mediaType) {

@@ -15,7 +15,6 @@ class DiscoverMovieUseCase @Inject constructor(
 
     operator fun invoke(movieList: MovieList, page: Int): Flow<ResponseX<Content<Movie>?>> {
         return flow {
-            emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
                     when (movieList) {

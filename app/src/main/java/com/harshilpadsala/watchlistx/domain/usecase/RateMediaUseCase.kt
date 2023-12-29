@@ -25,7 +25,6 @@ class RateMediaUseCase @Inject constructor(
                 value = value
             )
 
-            emit(ResponseX.Loading)
             kotlin.runCatching {
                 runCatching {
                    when(mediaType){
