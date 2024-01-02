@@ -19,4 +19,5 @@ object Darkness{
     val love = Color(0xFFFFC0CB)
     val rise = Color.Yellow
     val water = Color.Transparent
+    val danger = Color.Red
 }

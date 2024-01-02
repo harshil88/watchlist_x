@@ -1,8 +1,7 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
-import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MediaType
-import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.list.MovieImages
 import com.harshilpadsala.watchlistx.repo.HomeRepo
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +12,7 @@ class MediaImagesUseCase @Inject constructor(
     private val homeRepo: HomeRepo
 ) {
 
-    operator fun invoke(mediaType: MediaType, mediaId : Int): Flow<ResponseX<MovieImages>> {
+    operator fun invoke(mediaType: MediaType, mediaId : Int): Flow<ResultX<MovieImages>> {
         return flow {
             kotlin.runCatching {
                 runCatching {
@@ -22,9 +21,9 @@ class MediaImagesUseCase @Inject constructor(
                         MediaType.Tv -> homeRepo.getTvImages(mediaId.toLong())
                     }
                 }.onSuccess {
-                    emit(ResponseX.Success(data = it.body()))
+                    emit(ResultX.Success(data = it.body()))
                 }.onFailure {
-                    emit(ResponseX.Error(message = it.message))
+                    emit(ResultX.Error(message = it.message))
                 }
             }
         }

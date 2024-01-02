@@ -18,3 +18,10 @@ enum class TvList{
     Popular,
     TopRated,
 }
+
+enum class OperationStatus{
+    Created,
+    Updated,
+    Deleted,
+    Unknown,
+}

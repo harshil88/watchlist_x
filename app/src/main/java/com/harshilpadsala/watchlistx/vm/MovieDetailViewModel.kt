@@ -1,9 +1,8 @@
 package com.harshilpadsala.watchlistx.vm
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
@@ -16,7 +15,6 @@ import com.harshilpadsala.watchlistx.domain.usecase.MediaCreditsUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaDetailUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaImagesUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.RateMediaUseCase
-import com.harshilpadsala.watchlistx.domain.usecase.RatingOperation
 import com.harshilpadsala.watchlistx.domain.usecase.WatchListOperation
 import com.harshilpadsala.watchlistx.state.movie_detail.CreditsUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.FavouriteUiState
@@ -66,8 +64,6 @@ class MovieDetailViewModel @Inject constructor(
     )
 
 
-
-
     val movieDetailStateFlow: StateFlow<MovieDetailUiState> = combine(
         flow = mediaStatsFlow,
         flow2 = movieDetailFlow,
@@ -79,7 +75,7 @@ class MovieDetailViewModel @Inject constructor(
         initialValue = MovieDetailUiState.Loading
     )
 
-    fun toggleWatchList(value : Boolean) {
+    fun toggleWatchList(value: Boolean) {
         viewModelScope.launch {
             watchListUseCase.invoke(
                 mediaType = MediaType.Movie,
@@ -87,15 +83,15 @@ class MovieDetailViewModel @Inject constructor(
                 watchListOperation = WatchListOperation.Watchlist,
                 wishList = value,
             ).collect {
-           watchListUiState.value =   when (it) {
-                    is ResponseX.Success ->  WatchlistUiState.Success(value)
-                    is ResponseX.Error -> WatchlistUiState.Error(value)
+                watchListUiState.value = when (it) {
+                    is ResultX.Success -> WatchlistUiState.Success(value)
+                    is ResultX.Error -> WatchlistUiState.Error(value)
                 }
             }
         }
     }
 
-    fun toggleFavourite(value : Boolean) {
+    fun toggleFavourite(value: Boolean) {
         favouriteUiState.value = FavouriteUiState.Loading
         viewModelScope.launch {
             watchListUseCase.invoke(
@@ -104,9 +100,9 @@ class MovieDetailViewModel @Inject constructor(
                 watchListOperation = WatchListOperation.Favourites,
                 wishList = value,
             ).collect {
-                favouriteUiState.value =   when (it) {
-                    is ResponseX.Success -> if(value) FavouriteUiState.AddedToFav else FavouriteUiState.RemovedFromFav
-                    is ResponseX.Error -> FavouriteUiState.Error(it.message)
+                favouriteUiState.value = when (it) {
+                    is ResultX.Success -> if (value) FavouriteUiState.AddedToFav else FavouriteUiState.RemovedFromFav
+                    is ResultX.Error -> FavouriteUiState.Error(it.message)
                 }
             }
         }
@@ -139,28 +135,28 @@ class MovieDetailViewModel @Inject constructor(
                 mediaId = tempMovieId,
             ).collect {
                 mediaCreditsStateFlow.value = when (it) {
-                    is ResponseX.Success -> CreditsUiState.Success(credits = it.data?.cast)
-                    is ResponseX.Error -> CreditsUiState.Error(it.message ?: "")
+                    is ResultX.Success -> CreditsUiState.Success(credits = it.data?.cast)
+                    is ResultX.Error -> CreditsUiState.Error(it.message ?: "")
                 }
             }
         }
     }
 
     private fun emitMovieDetailState(
-        statsResponse: ResponseX<MovieStats>,
-        detailResponse: ResponseX<MovieDetails>,
-        imagesResponse: ResponseX<MovieImages>
-    ) : MovieDetailUiState {
-        if (statsResponse is ResponseX.Success && detailResponse is ResponseX.Success && imagesResponse is ResponseX.Success) {
+        statsResponse: ResultX<MovieStats>,
+        detailResponse: ResultX<MovieDetails>,
+        imagesResponse: ResultX<MovieImages>
+    ): MovieDetailUiState {
+        if (statsResponse is ResultX.Success && detailResponse is ResultX.Success && imagesResponse is ResultX.Success) {
             getMediaCredits()
-            if (statsResponse.data?.favorite == true){
+            if (statsResponse.data?.favorite == true) {
                 favouriteUiState.value = FavouriteUiState.AddedToFav
-            }else{
+            } else {
                 favouriteUiState.value = FavouriteUiState.RemovedFromFav
             }
 
             statsResponse.data?.watchlist?.let {
-                watchListUiState.value = WatchlistUiState.Success(successValue  = it)
+                watchListUiState.value = WatchlistUiState.Success(successValue = it)
             }
 
             return MovieDetailUiState.MovieDetailsSuccess(
@@ -168,7 +164,7 @@ class MovieDetailViewModel @Inject constructor(
                     movieStats = statsResponse.data, images = imagesResponse.data?.toImageList()
                 )
             )
-        } else if (statsResponse is ResponseX.Error || detailResponse is ResponseX.Error || imagesResponse is ResponseX.Error) {
+        } else if (statsResponse is ResultX.Error || detailResponse is ResultX.Error || imagesResponse is ResultX.Error) {
             return MovieDetailUiState.Error(message = "Something went wrong")
         }
         return MovieDetailUiState.Loading

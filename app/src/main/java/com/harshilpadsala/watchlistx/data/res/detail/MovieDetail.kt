@@ -2,6 +2,7 @@ package com.harshilpadsala.watchlistx.data.res.detail
 
 import com.google.gson.annotations.SerializedName
 import com.harshilpadsala.watchlistx.data.Genre
+import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 
 data class MovieDetails(
     val adult: Boolean?,
@@ -72,5 +73,11 @@ fun MovieDetails.toPresentation(movieStats: MovieStats? = null , images : List<S
     MovieDetailPresenter(
         id, title, releaseDate, overview, voteAverage, voteCount, genres, images,movieStats
     )
+
+fun MovieDetails.toRatingArgs(isRated : Boolean? , ratings : Int?): RatingArgsModel =
+    RatingArgsModel(
+        id, title, isRated, ratings, posterPath
+    )
+
 
 

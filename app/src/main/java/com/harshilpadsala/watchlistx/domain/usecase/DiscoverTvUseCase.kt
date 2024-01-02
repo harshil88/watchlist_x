@@ -1,6 +1,6 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
-import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.TvList
 import com.harshilpadsala.watchlistx.data.res.list.Content
 import com.harshilpadsala.watchlistx.data.res.list.TVShow
@@ -12,7 +12,7 @@ import javax.inject.Inject
 class DiscoverTvUseCase @Inject constructor(
     private val discoverRepo: DiscoverRepo
 ) {
-    operator fun invoke(tvList: TvList, page: Int): Flow<ResponseX<Content<TVShow>?>> {
+    operator fun invoke(tvList: TvList, page: Int): Flow<ResultX<Content<TVShow>?>> {
         return flow {
             kotlin.runCatching {
                 runCatching {
@@ -23,9 +23,9 @@ class DiscoverTvUseCase @Inject constructor(
                         TvList.TopRated -> discoverRepo.topRatedTV(page = page)
                     }
                 }.onSuccess {
-                    emit(ResponseX.Success(data = it.body()))
+                    emit(ResultX.Success(data = it.body()))
                 }.onFailure {
-                    emit(ResponseX.Error(message = it.message))
+                    emit(ResultX.Error(message = it.message))
                 }
             }
         }

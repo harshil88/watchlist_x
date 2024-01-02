@@ -1,8 +1,6 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
-import android.util.Log
-import androidx.compose.ui.text.toLowerCase
-import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.data.req.ToggleFavouriteRequest
 import com.harshilpadsala.watchlistx.repo.HomeRepo
@@ -25,7 +23,7 @@ class AddToWatchListUseCase @Inject constructor(
 
     val accountId = 12375371L
 
-    operator fun invoke(mediaType: MediaType, mediaId : Int, watchListOperation: WatchListOperation, wishList : Boolean): Flow<ResponseX<String>> {
+    operator fun invoke(mediaType: MediaType, mediaId : Int, watchListOperation: WatchListOperation, wishList : Boolean): Flow<ResultX<String>> {
         return flow {
 
             val request = ToggleFavouriteRequest(
@@ -42,9 +40,9 @@ class AddToWatchListUseCase @Inject constructor(
                         WatchListOperation.Favourites -> homeRepo.toggleFavourite(accountId = accountId , request = request)
                     }
                 }.onSuccess {
-                    emit(ResponseX.Success(data = it.message()))
+                    emit(ResultX.Success(data = it.message()))
                 }.onFailure {
-                    emit(ResponseX.Error(message = it.message))
+                    emit(ResultX.Error(message = it.message))
                 }
             }
         }

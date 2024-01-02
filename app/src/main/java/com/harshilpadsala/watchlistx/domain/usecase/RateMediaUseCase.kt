@@ -1,6 +1,6 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
-import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.data.UpdateResponse
 import com.harshilpadsala.watchlistx.data.req.MediaRatingRequest
@@ -18,7 +18,7 @@ class RateMediaUseCase @Inject constructor(
     private val homeRepo: HomeRepo
 ) {
 
-    operator fun invoke(mediaType: MediaType, mediaId : Int, ratingOperation: RatingOperation , value : Double): Flow<ResponseX<UpdateResponse>> {
+    operator fun invoke(mediaType: MediaType, mediaId : Int, ratingOperation: RatingOperation , value : Int = 0): Flow<ResultX<UpdateResponse>> {
         return flow {
 
             val request = MediaRatingRequest(
@@ -43,9 +43,9 @@ class RateMediaUseCase @Inject constructor(
                        }
                    }
                 }.onSuccess {
-                    emit(ResponseX.Success(data = it.body()))
+                    emit(ResultX.Success(data = it.body()))
                 }.onFailure {
-                    emit(ResponseX.Error(message = it.message))
+                    emit(ResultX.Error(message = it.message))
                 }
             }
         }

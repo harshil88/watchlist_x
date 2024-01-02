@@ -1,7 +1,6 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +32,7 @@ import com.harshilpadsala.watchlistx.compose.components.RatingRow
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
 import com.harshilpadsala.watchlistx.data.res.detail.CardModel
 import com.harshilpadsala.watchlistx.data.res.detail.toCardComponent
+import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 import com.harshilpadsala.watchlistx.state.movie_detail.CreditsUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.FavouriteUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.MovieDetailUiState
@@ -47,7 +47,7 @@ import utils.LoaderX
 @Composable
 fun MovieDetailRoute(
     onBackClick: () -> Unit,
-    onRatingClick: () -> Unit,
+    onRatingClick: (RatingArgsModel) -> Unit,
     viewModel: MovieDetailViewModel = hiltViewModel()
 ) {
 
@@ -57,6 +57,8 @@ fun MovieDetailRoute(
     val creditsUiState = viewModel.mediaCreditsStateFlow.collectAsState()
     val ratingUiState = viewModel.ratingUiState.collectAsState()
 
+    //Todo : Add Dynamic on Movie on Rating Press
+
     MovieDetailScreen(
         movieDetailUiState = movieDetailUiState.value,
         watchListUiState = watchListUiState.value,
@@ -65,7 +67,17 @@ fun MovieDetailRoute(
         creditsUiState = creditsUiState.value,
         onFavClick = viewModel::toggleFavourite,
         onWatchListClick = viewModel::toggleWatchList,
-        onRatingClick = onRatingClick,
+        onRatingClick = {
+                      onRatingClick(
+                          RatingArgsModel(
+                              movieId = 901362,
+                              movieName = "Trolls Band Together",
+                              posterPath = "/ui4DrH1cKk2vkHshcUcGt2lKxCm.jpg",
+                              isRated = false,
+                              ratings = 0
+                          )
+                      )
+        },
         onBackPress = {},
     )
 }
@@ -95,7 +107,6 @@ fun MovieDetailScreen(
             val isFavourite = movieDetailUiState.data?.movieStats?.favorite ?: false
             val isWatchListed = movieDetailUiState.data?.movieStats?.watchlist ?: false
 
-            Log.i("FavState", favouriteUiState.toString())
 
             Scaffold(topBar = {
                 TopBarX(title = movieDetail?.title ?: "", onBackPress = onBackPress, actions = {
@@ -107,7 +118,8 @@ fun MovieDetailScreen(
                         )
                     }
                 })
-            }) { paddingValues ->
+            }
+            ) { paddingValues ->
 
                 LazyColumn(
                     modifier = Modifier.padding(top = paddingValues.calculateTopPadding() + 16.dp)

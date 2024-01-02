@@ -1,6 +1,6 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
-import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
 import com.harshilpadsala.watchlistx.data.res.detail.TVShowDetails
 import com.harshilpadsala.watchlistx.repo.HomeRepo
@@ -12,29 +12,29 @@ class MediaDetailUseCase @Inject constructor(
     private val homeRepo: HomeRepo
 ) {
 
-      fun invokeMovieDetails(movieId: Int): Flow<ResponseX<MovieDetails>> {
+      fun invokeMovieDetails(movieId: Int): Flow<ResultX<MovieDetails>> {
         return flow {
             kotlin.runCatching {
                 runCatching {
                     homeRepo.getMovieDetails(movieId.toLong())
                 }.onSuccess {
-                    emit(ResponseX.Success(data = it.body()))
+                    emit(ResultX.Success(data = it.body()))
                 }.onFailure {
-                    emit(ResponseX.Error(message = it.message))
+                    emit(ResultX.Error(message = it.message))
                 }
             }
         }
     }
 
-    fun invokeTvDetails(tvShowId: Int): Flow<ResponseX<TVShowDetails>> {
+    fun invokeTvDetails(tvShowId: Int): Flow<ResultX<TVShowDetails>> {
         return flow {
             kotlin.runCatching {
                 runCatching {
                     homeRepo.getTvShowDetails(tvShowId.toLong())
                 }.onSuccess {
-                    emit(ResponseX.Success(data = it.body()))
+                    emit(ResultX.Success(data = it.body()))
                 }.onFailure {
-                    emit(ResponseX.Error(message = it.message))
+                    emit(ResultX.Error(message = it.message))
                 }
             }
         }

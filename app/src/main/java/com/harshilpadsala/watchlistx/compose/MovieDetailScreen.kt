@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.CardListComponent
 import com.harshilpadsala.watchlistx.compose.components.GenresRow
-import com.harshilpadsala.watchlistx.compose.components.ImagePager
 import com.harshilpadsala.watchlistx.compose.components.PrimaryButton
 import com.harshilpadsala.watchlistx.compose.components.RatingRow
 import com.harshilpadsala.watchlistx.data.res.detail.toCardComponent
@@ -99,7 +98,7 @@ fun RenderMovieImagesDetail(movieViewModel: MovieVM = hiltViewModel()) {
     when (val movieImagesState = movieViewModel.movieImagesState.value) {
 
         is MovieImagesSuccess -> {
-           // ImagePager(images = movieImagesState.response?.backdrops ?: listOf())
+            // ImagePager(images = movieImagesState.response?.backdrops ?: listOf())
         }
 
         is FailureState -> {
@@ -133,6 +132,7 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
             )
+
             PrimaryButton(
                 modifier = Modifier.padding(24.dp),
                 onClick = { /*TODO*/ },
@@ -167,7 +167,7 @@ fun RenderMovieDetails(movieViewModel: MovieVM = hiltViewModel()) {
             RatingRow(
                 rating = movieDetailState.response?.voteAverage ?: 0.0,
                 users = movieDetailState.response?.voteCount ?: 0,
-                onRatingClick = {  },
+                onRatingClick = { },
             )
 
 

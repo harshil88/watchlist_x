@@ -1,11 +1,9 @@
 package com.harshilpadsala.watchlistx.vm
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.harshilpadsala.watchlistx.base.ResponseX
+import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.constants.TvList
@@ -16,7 +14,6 @@ import com.harshilpadsala.watchlistx.domain.usecase.DiscoverTvUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.SearchMovieUseCase
 import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -104,7 +101,7 @@ class DiscoverVM @Inject constructor(
             discoverMovieUseCase.invoke(movieList, currentPage).collect {
                 when (it) {
 
-                    is ResponseX.Success -> {
+                    is ResultX.Success -> {
                         isTabChanged = false
                         isPageLoading = false
                         val newElements = it.data?.results?.map { movie -> movie.toListItemX()}?.toList()?: listOf()
@@ -114,7 +111,7 @@ class DiscoverVM @Inject constructor(
                         currentPage+=1
                     }
 
-                    is ResponseX.Error ->{
+                    is ResultX.Error ->{
                         isTabChanged = false
                         isPageLoading = false
                         popularMovieListSuccessState.value =
@@ -134,7 +131,7 @@ class DiscoverVM @Inject constructor(
                 when (it) {
 
 
-                    is ResponseX.Success -> {
+                    is ResultX.Success -> {
 
                         isPageLoading = false
                         val newElements = it.data?.results?.map { movie -> movie.toListItemX()}?.toList()?: listOf()
@@ -144,7 +141,7 @@ class DiscoverVM @Inject constructor(
                         currentPage+=1
                     }
 
-                    is ResponseX.Error -> {
+                    is ResultX.Error -> {
 
                         isPageLoading = false
                         popularMovieListSuccessState.value =
