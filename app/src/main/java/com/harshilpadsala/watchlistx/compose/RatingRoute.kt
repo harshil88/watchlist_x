@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +61,14 @@ fun RatingRoute(
     }
 
     if (uiState.value.success != null) {
-        onBackPress()
+        ToastX(message = uiState.value.success!!)
+    }
+
+    LaunchedEffect(uiState.value.success){
+
+        if(uiState.value.success!=null){
+            onBackPress()
+        }
     }
 
     RatingScreen(
