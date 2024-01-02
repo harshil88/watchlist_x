@@ -65,7 +65,6 @@ fun RatingRoute(
     }
 
     LaunchedEffect(uiState.value.success){
-
         if(uiState.value.success!=null){
             onBackPress()
         }

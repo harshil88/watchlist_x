@@ -46,28 +46,29 @@ fun WatchListXNavigation(navController: NavHostController) {
         composable(WXNavItem.FAVOURITE.name) { FavouriteScreen() }
 
 
-        composable("$ratingRoute/{$ratingArgs}", arguments = listOf(
+        composable(
+            "$ratingRoute/{$ratingArgs}", arguments = listOf(
 
-            navArgument(
-                name = ratingArgs
-            ) {
-                type = NavType.StringType
-                defaultValue = ""
-            })) {
+                navArgument(
+                    name = ratingArgs
+                ) {
+                    type = NavType.StringType
+                    defaultValue = ""
+                })
+        ) {
             RatingRoute(
                 onBackPress = {
-                              navController.navigateUp()
-                              },
+                    navController.navigateUp()
+                },
             )
         }
 
-        composable(
-            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(navArgument(
-                name = movieIdNavArg,
-            ) {
-                type = NavType.LongType
-                defaultValue = 5L
-            })
+        composable("$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(navArgument(
+            name = movieIdNavArg,
+        ) {
+            type = NavType.LongType
+            defaultValue = 5L
+        })
 
         ) {
 

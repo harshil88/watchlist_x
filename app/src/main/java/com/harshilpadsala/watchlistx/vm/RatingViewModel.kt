@@ -1,7 +1,5 @@
 package com.harshilpadsala.watchlistx.vm
 
-import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,19 +16,8 @@ import com.harshilpadsala.watchlistx.domain.usecase.RatingOperation
 import com.harshilpadsala.watchlistx.navigation.ratingArgs
 import com.harshilpadsala.watchlistx.state.RatingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class Rated(
-    var movieName: String? = null,
-    var isRated: Boolean? = null,
-    var ratings: Double? = null,
-)
-
-sealed interface ChangeRating {
-    object Loading : ChangeRating
-}
 
 
 @HiltViewModel
