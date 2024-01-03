@@ -9,7 +9,7 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.harshilpadsala.watchlistx.compose.DiscoverRoute
 import com.harshilpadsala.watchlistx.compose.FavouriteScreen
-import com.harshilpadsala.watchlistx.compose.HomeScreen
+import com.harshilpadsala.watchlistx.compose.HomeRoute
 import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
 import com.harshilpadsala.watchlistx.compose.RatingRoute
 import com.harshilpadsala.watchlistx.constants.WXNavItem
@@ -31,9 +31,8 @@ fun WatchListXNavigation(navController: NavHostController) {
         navController = navController, startDestination = WXNavItem.HOME.name
     ) {
         composable(WXNavItem.HOME.name) {
-            HomeScreen { movieId ->
-                navController.navigate("$movieDetailRoute/$movieId")
-            }
+            HomeRoute(onMediaClick = { mediaType, i ->
+            }, onGenreClick = {})
         }
 
         composable(WXNavItem.DISCOVER.name) {
@@ -63,12 +62,13 @@ fun WatchListXNavigation(navController: NavHostController) {
             )
         }
 
-        composable("$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(navArgument(
-            name = movieIdNavArg,
-        ) {
-            type = NavType.LongType
-            defaultValue = 5L
-        })
+        composable(
+            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(navArgument(
+                name = movieIdNavArg,
+            ) {
+                type = NavType.LongType
+                defaultValue = 5L
+            })
 
         ) {
 

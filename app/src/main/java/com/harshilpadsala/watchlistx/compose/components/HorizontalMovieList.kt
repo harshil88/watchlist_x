@@ -6,14 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.harshilpadsala.watchlistx.Constant.TMDB_IMAGE_URI
-import com.harshilpadsala.watchlistx.data.res.list.Movie
+import com.harshilpadsala.watchlistx.data.res.list.MovieContent
 import utils.PaddingX
 
 @Composable
 fun HorizontalMovieList(
-    movies: List<Movie>,
+    movies: List<MovieContent>,
     modifier: Modifier,
-    onMovieClick: (Movie) -> Unit,
+    onMovieClick: (MovieContent) -> Unit,
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),

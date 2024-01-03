@@ -9,38 +9,43 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.harshilpadsala.watchlistx.Constant
 import com.harshilpadsala.watchlistx.R
 import com.harshilpadsala.watchlistx.data.res.detail.CardModel
+import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import utils.PaddingX
 
+
+//todo : Remove padding at the end of the card list
 @Composable
 fun CardListComponent(
     cards: List<CardModel>,
-    modifier: Modifier,
-    onCardClick: (Int) -> Unit,){
+    modifier: Modifier = Modifier,
+    onCardClick: (Int) -> Unit,
+) {
     LazyRow(
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(
             count = cards.size,
         ) { index ->
             PaddingX(
-                start = if(index == 0) 16.dp else 0.dp
+                start = if (index == 0) 16.dp else 0.dp
             ) {
                 CardDetail(
                     title = cards[index].title,
                     posterPath = cards[index].imageUri,
                 ) {
-                    onCardClick(cards[index].id?:0)
+                    onCardClick(cards[index].id ?: 0)
                 }
             }
 
@@ -58,10 +63,8 @@ fun CardDetail(
 ) {
 
     val thumbnailCoil = rememberAsyncImagePainter(
-        model = ImageRequest
-            .Builder(LocalContext.current)
-            .data(posterPath ?: Constant.DUMMY_IMAGE_URI)
-            .placeholder(R.drawable.ic_placeholder)
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(posterPath ?: Constant.DUMMY_IMAGE_URI).placeholder(R.drawable.ic_placeholder)
             .build(),
         contentScale = ContentScale.FillBounds,
     )
@@ -77,13 +80,16 @@ fun CardDetail(
             contentDescription = "This is the thumbnail content",
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
-                .weight(1F)
+                .weight(0.5F)
                 .fillMaxWidth()
         )
-        Text(
+        androidx.compose.material.Text(
             text = title ?: "",
-            modifier = Modifier.padding(16.dp),
-            maxLines = 1,
+            modifier = Modifier.padding(8.dp),
+            minLines = 2,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            style = StylesX.labelMedium
         )
     }
 }

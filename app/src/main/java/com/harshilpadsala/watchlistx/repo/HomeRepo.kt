@@ -7,10 +7,11 @@ import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.detail.TVShowDetails
 import com.harshilpadsala.watchlistx.data.res.list.Content
-import com.harshilpadsala.watchlistx.data.res.list.Movie
+import com.harshilpadsala.watchlistx.data.res.list.GenreList
+import com.harshilpadsala.watchlistx.data.res.list.MovieContent
 import com.harshilpadsala.watchlistx.data.res.list.MovieCredits
 import com.harshilpadsala.watchlistx.data.res.list.MovieImages
-import com.harshilpadsala.watchlistx.data.res.list.TVShow
+import com.harshilpadsala.watchlistx.data.res.list.TVContent
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -21,10 +22,10 @@ import retrofit2.http.Path
 
 interface HomeRepo {
     @GET("3/discover/movie")
-    suspend fun getAllMovies() : Response<Content<Movie>>
+    suspend fun getAllMovies() : Response<Content<MovieContent>>
 
     @GET("3/discover/tv")
-    suspend fun getAllTv() : Response<Content<TVShow>>
+    suspend fun getAllTv() : Response<Content<TVContent>>
 
     @GET("3/movie/{movieId}")
     suspend fun getMovieDetails(@Path("movieId") movieId : Long) : Response<MovieDetails>
@@ -67,6 +68,9 @@ interface HomeRepo {
 
     @DELETE("3/tv/{tvId}/rating")
     suspend fun deleteTvRating(@Path("tvId") tvId : Long) : Response<UpdateResponse>
+
+    @GET("3/genre/movie/list")
+    suspend fun genres() : Response<GenreList>
 
 
 }

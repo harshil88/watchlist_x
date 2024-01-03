@@ -1,11 +1,11 @@
 package com.harshilpadsala.watchlistx.state
 
-import com.harshilpadsala.watchlistx.data.res.list.Movie
+import com.harshilpadsala.watchlistx.data.res.list.MovieContent
 
 sealed interface SearchUiState {
     object Loading : SearchUiState
     data class Success(
-        val recentQueries: List<Movie> = emptyList(),
+        val recentQueries: List<MovieContent> = emptyList(),
     ) : SearchUiState
 
     data class Failure(

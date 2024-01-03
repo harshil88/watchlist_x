@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.data.res.list
 
 import com.google.gson.annotations.SerializedName
+import com.harshilpadsala.watchlistx.data.res.detail.CardModel
 
 data class Content<T>(
     val page: Int?,
@@ -10,5 +11,13 @@ data class Content<T>(
     @SerializedName("total_results")
     val totalResults: Int?
 )
+
+fun Content<MovieContent>.toCardList() : List<CardModel> =
+    this.results?.map {
+        it.toCardComponent()
+    }?.toList()?: listOf()
+
+
+
 
 

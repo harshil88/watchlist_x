@@ -6,14 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.harshilpadsala.watchlistx.Constant
-import com.harshilpadsala.watchlistx.data.res.list.TVShow
+import com.harshilpadsala.watchlistx.data.res.list.TVContent
 import utils.PaddingX
 
 @Composable
 fun HorizontalTVList(
-    shows: List<TVShow>,
+    shows: List<TVContent>,
     modifier: Modifier,
-    onMovieClick: (TVShow) -> Unit,
+    onMovieClick: (TVContent) -> Unit,
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp)

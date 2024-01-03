@@ -1,7 +1,7 @@
 package com.harshilpadsala.watchlistx.data.res.detail
 
 import com.google.gson.annotations.SerializedName
-import com.harshilpadsala.watchlistx.data.Genre
+import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 
 data class MovieDetails(
@@ -9,7 +9,7 @@ data class MovieDetails(
     @SerializedName("backdrop_path") val backdropPath: String?,
     @SerializedName("belongs_to_collection") val belongsToCollection: CollectionDetails?,
     val budget: Int?,
-    val genres: List<Genre>?,
+    val genres: List<GenreContent>?,
     val homepage: String?,
     val id: Int?,
     @SerializedName("imdb_id") val imdbId: String?,
@@ -64,7 +64,7 @@ data class MovieDetailPresenter(
     val overview: String?,
     val voteAverage: Double?,
     val voteCount: Int?,
-    val genres: List<Genre>?,
+    val genres: List<GenreContent>?,
     val images : List<String>?,
     val movieStats: MovieStats?,
 )

@@ -12,7 +12,7 @@ data class TVShowDetails(
     val episodeRunTime: List<Int>?,
     @SerializedName("first_air_date")
     val firstAirDate: String?,
-    val genres: List<Genre>?,
+    val genres: List<GenreContent>?,
     val homepage: String?,
     val id: Int?,
     @SerializedName("in_production")
@@ -66,7 +66,7 @@ data class Creator(
     val profilePath: String?
 )
 
-data class Genre(
+data class GenreContent(
     val id: Int?,
     val name: String?
 )

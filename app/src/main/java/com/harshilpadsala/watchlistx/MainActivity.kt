@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
@@ -57,7 +58,11 @@ fun WXApp(appState: WXAppState) {
     Scaffold(bottomBar = {
         MainBottomNav(appState)
     }) {
-        WatchListXNavigation(navController = appState.navController)
+        paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                WatchListXNavigation(navController = appState.navController)
+            }
+
     }
 }
 

@@ -13,25 +13,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.harshilpadsala.watchlistx.data.Genre
+import com.harshilpadsala.watchlistx.compose.components.base_x.GenreChipX
+import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
+
+//todo :- Add on Chip Click
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun GenresRow(genres : List<Genre> , modifier: Modifier){
+fun GenresRow(
+    genres: List<GenreContent>,
+    modifier: Modifier = Modifier,
+    onGenreClick: (Int) -> Unit = {}
+) {
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier
+        horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
     ) {
-        repeat(genres.size){
-            index ->
-            Chip(onClick = { /*TODO*/ } , enabled = false , colors = ChipDefaults.chipColors(
-                disabledBackgroundColor = Darkness.midnight,
-                disabledContentColor = Darkness.light,
-
-            )) {
-                Text(text = genres[index].name?:"")
-            }
+        genres.map { genre ->
+            GenreChipX(
+                text = genre.name ?: "Unknown Genre",
+                onGenreClick = { onGenreClick(genre.id ?: 0) })
         }
     }
 }

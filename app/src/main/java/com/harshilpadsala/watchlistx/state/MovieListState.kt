@@ -3,10 +3,10 @@ package com.harshilpadsala.watchlistx.state
 import com.harshilpadsala.watchlistx.data.UpdateResponse
 import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
 import com.harshilpadsala.watchlistx.data.res.list.Content
-import com.harshilpadsala.watchlistx.data.res.list.Movie
+import com.harshilpadsala.watchlistx.data.res.list.MovieContent
 import com.harshilpadsala.watchlistx.data.res.list.MovieCredits
 import com.harshilpadsala.watchlistx.data.res.list.MovieImages
-import com.harshilpadsala.watchlistx.data.res.list.TVShow
+import com.harshilpadsala.watchlistx.data.res.list.TVContent
 
 sealed class MovieListState
 
@@ -14,8 +14,8 @@ object InitialState : MovieListState()
 
 object LoadingState : MovieListState()
 
-data class MovieListSuccess(val response : Content<Movie>?) : MovieListState()
-data class TVListSuccess(val response : Content<TVShow>?) : MovieListState()
+data class MovieListSuccess(val response : Content<MovieContent>?) : MovieListState()
+data class TVListSuccess(val response : Content<TVContent>?) : MovieListState()
 
 data class MovieDetailSuccess(val response : MovieDetails?) : MovieListState()
 
