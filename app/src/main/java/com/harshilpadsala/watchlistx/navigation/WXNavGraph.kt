@@ -79,7 +79,7 @@ fun WatchListXNavigation(navController: NavHostController) {
                 movieId = 1100795,
                 movieName = "Some Movie Name",
                 posterPath = "gj74sUGsPMg5qDQooh8GTs4MvbP.jpg",
-                isRated = false,
+                isRated = true,
                 ratings = 10,
             )
 

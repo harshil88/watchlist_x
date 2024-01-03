@@ -121,7 +121,17 @@ fun RatingScreen(
                     modifier = Modifier.padding(
                         vertical = 16.dp
                     ), text = buildAnnotatedString {
-                        append(text = "Your Rating : ")
+                        Log.i("RatingTextDebug" , ratingUiState.isRated.toString())
+                        Log.i("RatingTextDebug" , ratingUiState.currentRating.toString())
+                        Log.i("RatingTextDebug" , ratingState.intValue.toString())
+
+
+                        if(ratingUiState.isRated == true && ratingState.intValue == ratingUiState.currentRating){
+                            append(text = "Your Rating : ")
+                        }
+                        else{
+                            append(text = "Submit Rating : ")
+                        }
                         withStyle(
                             style = StylesX.labelLarge.copy(color = Darkness.light).toSpanStyle()
                         ) {
@@ -132,7 +142,8 @@ fun RatingScreen(
 
                 RatingStarRow(rating = ratingState)
 
-                WXButton(text = "Rate",
+                WXButton(
+                    text = "Rate",
                     enabled = ratingUiState.currentRating != ratingState.intValue,
                     modifier = Modifier.padding(
                         start = 20.dp, end = 20.dp, bottom = 8.dp, top = 16.dp
@@ -142,7 +153,8 @@ fun RatingScreen(
                     })
 
                 if (ratingUiState.isRated == false) {
-                    WXButton(text = "Delete",
+                    WXButton(
+                        text = "Delete",
                         modifier = buttonModifier,
                         containerColor = Darkness.danger,
                         contentColor = Darkness.light,
@@ -150,13 +162,15 @@ fun RatingScreen(
                             onDeleteRating()
                         })
                 } else {
-                    WXButton(text = "Cancel",
+                    WXButton(
+                        text = "Cancel",
                         modifier = buttonModifier,
                         containerColor = Darkness.midnight,
                         contentColor = Darkness.light,
                         onClick = {
                             onCancelPress()
-                        })
+                        }
+                    )
                 }
 
 
