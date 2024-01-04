@@ -13,7 +13,7 @@ class DiscoverMovieUseCase @Inject constructor(
     private val discoverRepo: DiscoverRepo
 ) {
 
-    operator fun invoke(movieList: MovieList, page: Int): Flow<ResultX<Content<MovieContent>?>> {
+    operator fun invoke(movieList: MovieList, page: Int = 1): Flow<ResultX<Content<MovieContent>?>> {
         return flow {
             kotlin.runCatching {
                 runCatching {

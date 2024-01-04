@@ -1,15 +1,21 @@
 package com.harshilpadsala.watchlistx.compose
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +34,7 @@ import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.HomeUiState
 import com.harshilpadsala.watchlistx.vm.HomeViewModel
 
+//todo : Question -> A deeper understanding of scopes
 
 @Composable
 fun HomeRoute(
@@ -38,33 +45,49 @@ fun HomeRoute(
 
     val uiState = rememberUpdatedState(newValue = viewModel.uiState.value)
 
-    HomeScreen(uiState = uiState.value)
+    HomeScreen(uiState = uiState.value, onRefresh = viewModel::onRefresh)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    onRefresh: () -> Unit,
 ) {
+
+
+    val refreshingState =
+        rememberPullRefreshState(refreshing = uiState.refreshing, onRefresh = onRefresh)
+
     if (uiState.loading == true) {
         FullScreenLoaderX()
     } else {
-        MediaList(uiState = uiState)
+        Box(
+            modifier = Modifier.pullRefresh(refreshingState).fillMaxSize()
+        ) {
+            MediaList(
+                uiState = uiState,
+            )
+            PullRefreshIndicator(uiState.refreshing, refreshingState, Modifier.align(Alignment.TopCenter))
+
+        }
+
+
     }
-
-
 }
+
 
 @Composable
 fun MediaList(uiState: HomeUiState) {
 
 
-    LazyColumn {
+
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
 
 
         if (!uiState.nowPlayingMovieList.isNullOrEmpty()) {
             item {
-                ListContent(
-                    title = "Now Playing",
+                ListContent(title = "Now Playing",
                     cards = uiState.nowPlayingMovieList!!,
                     onCardClick = {},
                     onShowMoreClick = {})
@@ -73,8 +96,7 @@ fun MediaList(uiState: HomeUiState) {
 
         if (!uiState.popularMovieList.isNullOrEmpty()) {
             item {
-                ListContent(
-                    title = "Popular",
+                ListContent(title = "Popular",
                     cards = uiState.popularMovieList!!,
                     onCardClick = {},
                     onShowMoreClick = {})
@@ -99,8 +121,7 @@ fun MediaList(uiState: HomeUiState) {
 
         if (!uiState.topRatedMovieList.isNullOrEmpty()) {
             item {
-                ListContent(
-                    title = "Top Rated",
+                ListContent(title = "Top Rated",
                     cards = uiState.topRatedMovieList!!,
                     onCardClick = {},
                     onShowMoreClick = {})
@@ -109,11 +130,9 @@ fun MediaList(uiState: HomeUiState) {
 
         if (!uiState.upcomingMovieList.isNullOrEmpty()) {
             item {
-                ListContent(
-                    title = "Upcoming",
+                ListContent(title = "Upcoming",
                     cards = uiState.upcomingMovieList!!,
-                    onCardClick = {
-                    },
+                    onCardClick = {},
                     onShowMoreClick = {})
             }
         }
@@ -123,6 +142,10 @@ fun MediaList(uiState: HomeUiState) {
         }
 
     }
+
+
+
+
 }
 
 

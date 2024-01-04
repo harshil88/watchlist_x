@@ -57,12 +57,10 @@ class MainActivity : ComponentActivity() {
 fun WXApp(appState: WXAppState) {
     Scaffold(bottomBar = {
         MainBottomNav(appState)
-    }) {
-        paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
-                WatchListXNavigation(navController = appState.navController)
-            }
-
+    }) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            WatchListXNavigation(navController = appState.navController)
+        }
     }
 }
 
@@ -75,12 +73,13 @@ fun MainBottomNav(appState: WXAppState) {
     val navStackBackEntry by appState.navController.currentBackStackEntryAsState()
     val currentDestination = navStackBackEntry?.destination
 
-
     if (appState.shouldShowBottomBar) {
         BottomNavigation(
             backgroundColor = Darkness.night
         ) {
-            WXNavItem.values().forEach { item ->
+            WXNavItem.values().forEach {
+
+                    item ->
 
                 val isSelected =
                     currentDestination?.hierarchy?.any { it.route == item.name } == true
@@ -96,7 +95,6 @@ fun MainBottomNav(appState: WXAppState) {
                             text = item.name.titleCase(), style = StylesX.labelMedium.copy(
                                 color = if (isSelected) Darkness.rise else Darkness.grey
                             ), modifier = Modifier.padding(top = 8.dp)
-
                         )
                     },
                     icon = {
