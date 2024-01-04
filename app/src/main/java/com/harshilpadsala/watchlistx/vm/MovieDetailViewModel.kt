@@ -78,8 +78,7 @@ class MovieDetailViewModel @Inject constructor(
     fun toggleWatchList(value: Boolean) {
         viewModelScope.launch {
             watchListUseCase.invoke(
-                mediaType = MediaType.Movie,
-                mediaId = tempMovieId,
+                movieId = tempMovieId,
                 watchListOperation = WatchListOperation.Watchlist,
                 wishList = value,
             ).collect {
@@ -95,8 +94,7 @@ class MovieDetailViewModel @Inject constructor(
         favouriteUiState.value = FavouriteUiState.Loading
         viewModelScope.launch {
             watchListUseCase.invoke(
-                mediaType = MediaType.Movie,
-                mediaId = tempMovieId,
+                movieId = tempMovieId,
                 watchListOperation = WatchListOperation.Favourites,
                 wishList = value,
             ).collect {

@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
+import android.util.Log
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.res.list.Content
@@ -24,6 +25,8 @@ class DiscoverMovieUseCase @Inject constructor(
                         MovieList.Upcoming -> discoverRepo.upcoming(page = page)
                     }
                 }.onSuccess {
+                    Log.i("Movie Stat Debug" , "Reaching In EMIT")
+
                     emit(ResultX.Success(data = it.body()))
                 }.onFailure {
                     emit(ResultX.Error(message = it.message))

@@ -1,14 +1,17 @@
 package com.harshilpadsala.watchlistx.compose.components
 
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.Text
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,12 +28,15 @@ import utils.PaddingX
 
 
 //todo : Remove padding at the end of the card list
+//todo : NUNI -> Remove Corner Splashes Using
+
 @Composable
 fun CardListComponent(
     cards: List<CardModel>,
     modifier: Modifier = Modifier,
-    onCardClick: (Int) -> Unit,
-) {
+    onCardClick: (CardModel) -> Unit,
+    onLongCardClick: (CardModel) -> Unit = {},
+    ) {
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -44,23 +50,23 @@ fun CardListComponent(
                 CardDetail(
                     title = cards[index].title,
                     posterPath = cards[index].imageUri,
-                ) {
-                    onCardClick(cards[index].id ?: 0)
-                }
+                    onClick = { onCardClick(cards[index]) },
+                    onLongClick = { onLongCardClick(cards[index]) }
+                )
             }
-
         }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardDetail(
     title: String?,
     posterPath: String?,
     onClick: () -> Unit,
-) {
+    onLongClick: () -> Unit,
+    ) {
 
     val thumbnailCoil = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
@@ -68,22 +74,25 @@ fun CardDetail(
             .build(),
         contentScale = ContentScale.FillBounds,
     )
-
     Card(
         modifier = Modifier
             .height(218.dp)
-            .width(128.dp),
-        onClick = onClick,
+            .width(128.dp)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick =onLongClick,
+            )
     ) {
         Image(
+            modifier = Modifier
+                .weight(0.5F)
+                .fillMaxWidth(),
             painter = thumbnailCoil,
             contentDescription = "This is the thumbnail content",
             contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .weight(0.5F)
-                .fillMaxWidth()
         )
-        androidx.compose.material.Text(
+
+        Text(
             text = title ?: "",
             modifier = Modifier.padding(8.dp),
             minLines = 2,
@@ -92,4 +101,6 @@ fun CardDetail(
             style = StylesX.labelMedium
         )
     }
+
+
 }

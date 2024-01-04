@@ -1,41 +1,66 @@
 package com.harshilpadsala.watchlistx.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.ListItem
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.CardListComponent
 import com.harshilpadsala.watchlistx.compose.components.GenresRow
+import com.harshilpadsala.watchlistx.compose.components.base_x.AsyncImageX
 import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
+import com.harshilpadsala.watchlistx.compose.components.base_x.ListItemX
 import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.data.res.detail.CardModel
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.HomeUiState
 import com.harshilpadsala.watchlistx.vm.HomeViewModel
+import com.harshilpadsala.watchlistx.vm.MovieStatsUiState
+import kotlinx.coroutines.launch
+import utils.ToastX
 
 //todo : Question -> A deeper understanding of scopes
+//todo : Furthur Optimization -> For Different Types Of Movie API Calls Use Enums
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeRoute(
     onMediaClick: (MediaType, Int) -> Unit,
@@ -44,42 +69,99 @@ fun HomeRoute(
 ) {
 
     val uiState = rememberUpdatedState(newValue = viewModel.uiState.value)
+    val movieStatsUiState = rememberUpdatedState(newValue = viewModel.movieStatsUiState.value)
+    val scope = rememberCoroutineScope()
 
-    HomeScreen(uiState = uiState.value, onRefresh = viewModel::onRefresh)
+    val refreshingState = rememberPullRefreshState(
+        refreshing = uiState.value.refreshing, onRefresh = viewModel::onRefresh
+    )
+
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+    )
+
+    movieStatsUiState.value.successMessage.let {
+        if(it!=null){
+            ToastX(message = it)
+            viewModel.resetMovieStats()
+
+        }
+    }
+
+    movieStatsUiState.value.errorMessage.let {
+        if(it!=null){
+            ToastX(message = it)
+            viewModel.resetMovieStats()
+
+        }
+    }
+
+    HomeScreen(uiState = uiState.value,
+        movieStatsUiState = movieStatsUiState.value,
+        sheetState = sheetState,
+        refreshingState = refreshingState,
+        onFavouriteClick = viewModel::favourite,
+        onWatchListClick = viewModel::wishList,
+        onLongCardClick = { movieDetails ->
+            scope.launch {
+                sheetState.show()
+                viewModel.movieStats(movieDetails)
+            }
+        })
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    onRefresh: () -> Unit,
+    movieStatsUiState: MovieStatsUiState,
+    sheetState: ModalBottomSheetState,
+    refreshingState: PullRefreshState,
+    onLongCardClick: (CardModel) -> Unit,
+    onFavouriteClick: (Boolean , Int) -> Unit,
+    onWatchListClick: (Boolean , Int) -> Unit,
 ) {
 
 
-    val refreshingState =
-        rememberPullRefreshState(refreshing = uiState.refreshing, onRefresh = onRefresh)
-
-    if (uiState.loading == true) {
-        FullScreenLoaderX()
-    } else {
-        Box(
-            modifier = Modifier.pullRefresh(refreshingState).fillMaxSize()
-        ) {
-            MediaList(
-                uiState = uiState,
+    ModalBottomSheetLayout(sheetState = sheetState, sheetContent = {
+        if (movieStatsUiState.loading == true) {
+            FullScreenLoaderX(
+                modifier = Modifier
+                    .fillMaxHeight(0.5F)
+                    .background(Darkness.night)
             )
-            PullRefreshIndicator(uiState.refreshing, refreshingState, Modifier.align(Alignment.TopCenter))
-
+        } else if (movieStatsUiState.movieStats != null) {
+            MovieStatsSheetContent(
+                isWatchListed = movieStatsUiState.movieStats?.watchlist ?: false,
+                isFavourite = movieStatsUiState.movieStats?.favorite ?: false,
+                cardModel = movieStatsUiState.selectedMovieDetail,
+                onFavouriteClick = onFavouriteClick,
+                onWatchListClick = onWatchListClick,
+            )
         }
-
-
-    }
+    }, content = {
+        if (uiState.loading == true) {
+            FullScreenLoaderX()
+        } else {
+            Box(
+                modifier = Modifier
+                    .pullRefresh(refreshingState)
+                    .fillMaxSize()
+            ) {
+                MediaList(
+                    uiState = uiState, onLongCardClick = onLongCardClick
+                )
+                PullRefreshIndicator(
+                    uiState.refreshing, refreshingState, Modifier.align(Alignment.TopCenter)
+                )
+            }
+        }
+    })
 }
 
 
 @Composable
-fun MediaList(uiState: HomeUiState) {
-
+fun MediaList(uiState: HomeUiState, onLongCardClick: (CardModel) -> Unit) {
 
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -90,7 +172,9 @@ fun MediaList(uiState: HomeUiState) {
                 ListContent(title = "Now Playing",
                     cards = uiState.nowPlayingMovieList!!,
                     onCardClick = {},
-                    onShowMoreClick = {})
+                    onShowMoreClick = {},
+                    onLongCardClick = onLongCardClick
+                )
             }
         }
 
@@ -99,7 +183,9 @@ fun MediaList(uiState: HomeUiState) {
                 ListContent(title = "Popular",
                     cards = uiState.popularMovieList!!,
                     onCardClick = {},
-                    onShowMoreClick = {})
+                    onShowMoreClick = {},
+                    onLongCardClick = onLongCardClick
+                )
             }
         }
 
@@ -124,7 +210,9 @@ fun MediaList(uiState: HomeUiState) {
                 ListContent(title = "Top Rated",
                     cards = uiState.topRatedMovieList!!,
                     onCardClick = {},
-                    onShowMoreClick = {})
+                    onShowMoreClick = {},
+                    onLongCardClick = onLongCardClick
+                )
             }
         }
 
@@ -133,7 +221,9 @@ fun MediaList(uiState: HomeUiState) {
                 ListContent(title = "Upcoming",
                     cards = uiState.upcomingMovieList!!,
                     onCardClick = {},
-                    onShowMoreClick = {})
+                    onShowMoreClick = {},
+                    onLongCardClick = onLongCardClick
+                )
             }
         }
 
@@ -144,8 +234,6 @@ fun MediaList(uiState: HomeUiState) {
     }
 
 
-
-
 }
 
 
@@ -154,9 +242,11 @@ fun ListContent(
     title: String,
     cards: List<CardModel>,
     modifier: Modifier = Modifier,
-    onCardClick: (Int) -> Unit,
+    onCardClick: (CardModel) -> Unit,
+    onLongCardClick: (CardModel) -> Unit,
     onShowMoreClick: () -> Unit,
-) {
+
+    ) {
     Column {
         Row(
             modifier = Modifier
@@ -178,7 +268,147 @@ fun ListContent(
         }
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
-        CardListComponent(cards = cards, modifier = modifier, onCardClick = onCardClick)
+        CardListComponent(
+            cards = cards,
+            modifier = modifier,
+            onCardClick = { cardModel: CardModel -> },
+            onLongCardClick = onLongCardClick
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun MovieStatsSheetContent(
+    isFavourite: Boolean,
+    isWatchListed: Boolean,
+    cardModel: CardModel?,
+    onFavouriteClick: (Boolean , Int) -> Unit,
+    onWatchListClick: (Boolean , Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight(0.5F)
+            .background(color = Darkness.night)
+    ) {
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        ListItem( text = {
+            Text(
+                text = cardModel?.title ?: "", style = StylesX.titleLarge,
+            )
+        }, icon = {
+            AsyncImageX(
+                imageSrc = cardModel?.imageUri ?: "",
+                modifier = Modifier
+                    .height(72.dp)
+                    .width(40.dp)
+            )
+        })
+
+        Divider(
+            modifier = Modifier
+                .padding(vertical = 24.dp, horizontal = 20.dp)
+                .height(2.dp)
+                .background(Darkness.grey)
+        )
+
+        ListItem(
+            modifier = Modifier
+                .clickable {
+                    onWatchListClick(!isWatchListed, cardModel?.id ?: 0)
+                }
+                .background(color = Darkness.night),
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Bookmark,
+                    tint = if (isWatchListed) Darkness.rise else Darkness.grey,
+                    contentDescription = "Watchlist Toggle",
+                )
+            },
+            text = {
+                Text(
+                    text = if (isWatchListed) "Remove From Watchlist" else "Add To Watchlist",
+                    style = StylesX.labelMedium.copy(color = Darkness.grey)
+                )
+            },
+        )
+        ListItem(
+            modifier = Modifier
+                .clickable {
+                    onFavouriteClick(!isFavourite, cardModel?.id ?: 0)
+                }
+                .background(color = Darkness.night),
+            icon = {
+                Icon(
+                    imageVector = Icons.Outlined.Favorite,
+                    tint = if (isFavourite) Darkness.love else Darkness.grey,
+                    contentDescription = "Watchlist Toggle",
+                )
+            },
+            text = {
+                Text(
+                    text = if (isFavourite) "Remove From Favourite" else "Add To Favourite",
+                    style = StylesX.labelMedium.copy(color = Darkness.grey)
+                )
+            },
+        )
+//        ListItem(
+//            modifier = Modifier.clickable {
+//
+//            },
+//            icon = {
+//                Icon(
+//                    imageVector = Icons.Filled.Star, contentDescription = "Watchlist Toggle"
+//                )
+//            },
+//            text = { Text(
+//                text = if (movieStatsUiState.movieStats?.rated == true) "Your Rating : ${movieStatsUiState.movieStats.r}" else "Remove From Favourite"
+//            )},
+//        )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Preview
+@Composable
+fun MovieStatsSheetContentPreview() {
+    Column {
+        ListItem(
+            modifier = Modifier.clickable {
+
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Bookmark, contentDescription = "Watchlist Toggle"
+                )
+            },
+            text = { Text(text = "Add To Watchlist") },
+
+            )
+        ListItem(
+            modifier = Modifier.clickable {
+
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Favorite, contentDescription = "Watchlist Toggle"
+                )
+            },
+            text = { Text(text = "Add To Favourites") },
+        )
+        ListItem(
+            modifier = Modifier.clickable {
+
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Star, contentDescription = "Watchlist Toggle"
+                )
+            },
+            text = { Text(text = "Rating") },
+        )
     }
 }
 

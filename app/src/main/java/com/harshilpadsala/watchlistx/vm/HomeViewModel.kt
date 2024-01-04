@@ -1,16 +1,22 @@
 package com.harshilpadsala.watchlistx.vm
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
+import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.res.detail.CardModel
+import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 import com.harshilpadsala.watchlistx.data.res.list.TVContent
 import com.harshilpadsala.watchlistx.data.res.list.toCardList
+import com.harshilpadsala.watchlistx.domain.usecase.AddToWatchListUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.DiscoverMovieUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.GenreUseCase
+import com.harshilpadsala.watchlistx.domain.usecase.MediaAccountStatsUseCase
+import com.harshilpadsala.watchlistx.domain.usecase.WatchListOperation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,6 +24,8 @@ import javax.inject.Inject
 
 
 //todo : See that movie lists api call can be furthur optimized
+
+
 //todo : Make extension function to stop loading or refreshikng
 
 data class HomeUiState(
@@ -32,14 +40,26 @@ data class HomeUiState(
     var discoverTvList: List<TVContent>? = null,
 )
 
+data class MovieStatsUiState(
+    var loading : Boolean? = null,
+    var movieStats: MovieStats? = null,
+    var selectedMovieDetail : CardModel? = null,
+    var successMessage : String? = null,
+    var errorMessage : String? = null
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val discoverMovieUseCase: DiscoverMovieUseCase, private val genreUseCase: GenreUseCase
+    private val discoverMovieUseCase: DiscoverMovieUseCase,
+    private val genreUseCase: GenreUseCase,
+    private val movieStatsUseCase : MediaAccountStatsUseCase,
+    private val addToWatchListUseCase: AddToWatchListUseCase
 
 ) : ViewModel() {
 
 
     val uiState = mutableStateOf(HomeUiState())
+    val movieStatsUiState = mutableStateOf(MovieStatsUiState())
 
     init {
         uiState.value = HomeUiState(
@@ -55,6 +75,9 @@ class HomeViewModel @Inject constructor(
         nowPlaying()
     }
 
+    fun resetMovieStats(){
+        movieStatsUiState.value = MovieStatsUiState()
+    }
 
     private fun nowPlaying(){
         viewModelScope.launch {
@@ -163,6 +186,74 @@ class HomeViewModel @Inject constructor(
                         )
                     }
 
+                    is ResultX.Error -> {}
+                }
+            }
+        }
+    }
+
+    fun movieStats(cardModel : CardModel){
+        movieStatsUiState.value = MovieStatsUiState(loading = true)
+        viewModelScope.launch {
+            movieStatsUseCase.invoke(
+                mediaType = MediaType.Movie,
+                mediaId = cardModel.id?:0,
+            ).collect {
+                when (it) {
+                    is ResultX.Success -> {
+                        movieStatsUiState.value = movieStatsUiState.value.copy(
+                            movieStats = it.data,
+                            loading = false,
+                            selectedMovieDetail = cardModel
+                        )
+                    }
+                    is ResultX.Error -> {}
+                }
+            }
+        }
+    }
+
+    fun favourite(favourite : Boolean , movieId : Int){
+        movieStatsUiState.value = MovieStatsUiState(loading = true)
+        viewModelScope.launch {
+            addToWatchListUseCase.invoke(
+                movieId = movieId,
+                watchListOperation = WatchListOperation.Favourites,
+                wishList = favourite,
+
+            ).collect {
+                when (it) {
+                    is ResultX.Success -> {
+                        movieStatsUiState.value = movieStatsUiState.value.copy(
+                            loading = false,
+                            successMessage = it.data?.statusMessage
+                        )
+                    }
+                    is ResultX.Error -> {
+
+                    }
+                }
+
+            }
+        }
+    }
+
+
+    fun wishList(wishList : Boolean , movieId : Int){
+        movieStatsUiState.value = MovieStatsUiState(loading = true)
+        viewModelScope.launch {
+            addToWatchListUseCase.invoke(
+                movieId = movieId,
+                watchListOperation = WatchListOperation.Watchlist,
+                wishList = wishList,
+                ).collect {
+                when (it) {
+                    is ResultX.Success -> {
+                        movieStatsUiState.value = movieStatsUiState.value.copy(
+                            loading = false,
+                            successMessage = it.data?.statusMessage
+                        )
+                    }
                     is ResultX.Error -> {}
                 }
             }

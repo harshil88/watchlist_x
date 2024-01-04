@@ -1,12 +1,11 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
 import com.harshilpadsala.watchlistx.base.ResultX
-import com.harshilpadsala.watchlistx.constants.MediaType
+import com.harshilpadsala.watchlistx.data.UpdateResponse
 import com.harshilpadsala.watchlistx.data.req.ToggleFavouriteRequest
 import com.harshilpadsala.watchlistx.repo.HomeRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.util.Locale
 import javax.inject.Inject
 
 enum class WatchListOperation{
@@ -23,12 +22,12 @@ class AddToWatchListUseCase @Inject constructor(
 
     val accountId = 12375371L
 
-    operator fun invoke(mediaType: MediaType, mediaId : Int, watchListOperation: WatchListOperation, wishList : Boolean): Flow<ResultX<String>> {
+    operator fun invoke(movieId : Int, watchListOperation: WatchListOperation, wishList : Boolean): Flow<ResultX<UpdateResponse>> {
         return flow {
 
             val request = ToggleFavouriteRequest(
-                mediaType = mediaType.name.lowercase(Locale.ROOT),
-                mediaId = mediaId,
+                mediaType = "movie",
+                mediaId = movieId,
                 watchlist = if(watchListOperation == WatchListOperation.Watchlist) wishList else null,
                 favorite = if(watchListOperation == WatchListOperation.Favourites) wishList else null,
             )
@@ -40,7 +39,7 @@ class AddToWatchListUseCase @Inject constructor(
                         WatchListOperation.Favourites -> homeRepo.toggleFavourite(accountId = accountId , request = request)
                     }
                 }.onSuccess {
-                    emit(ResultX.Success(data = it.message()))
+                    emit(ResultX.Success(data = it.body()))
                 }.onFailure {
                     emit(ResultX.Error(message = it.message))
                 }

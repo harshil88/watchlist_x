@@ -51,7 +51,7 @@ interface HomeRepo {
     @GET("3/tv/{tvId}/credits")
     suspend fun getTvCredits(@Path("tvId") tvId : Long) : Response<MovieCredits>
 
-    @POST("3/account/{accountId}/favourite")
+    @POST("3/account/{accountId}/favorite")
     suspend fun toggleFavourite(@Path("accountId") accountId : Long , @Body request : ToggleFavouriteRequest) : Response<UpdateResponse>
 
     @POST("3/account/{accountId}/watchlist")
