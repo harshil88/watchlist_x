@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.vm
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,7 +32,7 @@ class RatingViewModel @Inject constructor(
 
     init {
         val ratingJson = state.get<String>(ratingArgs)
-        ratingArgsModel = Gson().fromJson(ratingJson, RatingArgsModel::class.java)
+        ratingArgsModel = Gson().fromJson(Uri.decode(ratingJson), RatingArgsModel::class.java)
         uiState = ratingArgsModel.toRatingUiState()
     }
 

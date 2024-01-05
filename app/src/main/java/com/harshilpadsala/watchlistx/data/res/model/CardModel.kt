@@ -14,6 +14,6 @@ fun CardModel.toRatingArgsModel(value: Double?) : RatingArgsModel =
         movieName = this.title,
         posterPath = this.imageUri,
         ratings = value?.toInt(),
-        isRated = null,
+        isRated = value != null,
     )
 

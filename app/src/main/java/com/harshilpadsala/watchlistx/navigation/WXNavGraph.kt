@@ -1,5 +1,7 @@
 package com.harshilpadsala.watchlistx.navigation
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -35,7 +37,16 @@ fun WatchListXNavigation(navController: NavHostController) {
                 onMediaClick = { mediaType, i ->
             }, onGenreClick = {}, 
                 onRatingClick = {ratingArgsModel ->
-                    navController.navigateUp()}
+
+
+
+                    val convertedToJson = Gson().toJson(
+                        ratingArgsModel)
+                    val encodedUri = Uri.encode(convertedToJson)
+
+                    navController.navigate("$ratingRoute/$encodedUri")
+
+                }
                 )
         }
 
@@ -57,8 +68,10 @@ fun WatchListXNavigation(navController: NavHostController) {
                 ) {
                     type = NavType.StringType
                     defaultValue = ""
-                })
-        ) {
+                }
+            )
+        )
+        {
             RatingRoute(
                 onBackPress = {
                     navController.navigateUp()
@@ -67,7 +80,8 @@ fun WatchListXNavigation(navController: NavHostController) {
         }
 
         composable(
-            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(navArgument(
+            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(
+                navArgument(
                 name = movieIdNavArg,
             ) {
                 type = NavType.LongType
@@ -88,7 +102,6 @@ fun WatchListXNavigation(navController: NavHostController) {
             )
 
             val convertedToJson = Gson().toJson(ratingArgsModel)
-
 
             MovieDetailRoute(
                 onBackClick = {},

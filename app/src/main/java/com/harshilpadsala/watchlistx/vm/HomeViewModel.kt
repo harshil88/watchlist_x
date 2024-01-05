@@ -26,6 +26,9 @@ import javax.inject.Inject
 
 //todo : Make extension function to stop loading or refreshikng
 
+
+//todo : Bug On Favourite Click loader Issues
+
 data class HomeUiState(
     var loading: Boolean? = null,
     var refreshing: Boolean = false,
