@@ -68,7 +68,7 @@ import utils.ToastX
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeRoute(
-    onMediaClick: (MediaType, Int) -> Unit,
+    onMediaClick: (Int) -> Unit,
     onGenreClick: (Int) -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
@@ -110,12 +110,13 @@ fun HomeRoute(
         refreshingState = refreshingState,
         onFavouriteClick = viewModel::favourite,
         onWatchListClick = viewModel::wishList,
-        onRatingClick = {ratingArgsModel ->
-                        scope.launch {
-                            sheetState.hide()
-                        }
+        onRatingClick = { ratingArgsModel ->
+            scope.launch {
+                sheetState.hide()
+            }
             onRatingClick(ratingArgsModel)
         },
+        onCardClick = onMediaClick,
         onLongCardClick = { movieDetails ->
             scope.launch {
                 sheetState.show()
@@ -131,6 +132,7 @@ fun HomeScreen(
     movieStatsUiState: MovieStatsUiState,
     sheetState: ModalBottomSheetState,
     refreshingState: PullRefreshState,
+    onCardClick: (Int) -> Unit,
     onLongCardClick: (CardModel) -> Unit,
     onFavouriteClick: (Boolean, Int) -> Unit,
     onWatchListClick: (Boolean, Int) -> Unit,
@@ -166,7 +168,9 @@ fun HomeScreen(
                     .fillMaxSize()
             ) {
                 MediaList(
-                    uiState = uiState, onLongCardClick = onLongCardClick
+                    uiState = uiState,
+                    onCardClick = onCardClick ,
+                    onLongCardClick = onLongCardClick
                 )
                 PullRefreshIndicator(
                     uiState.refreshing, refreshingState, Modifier.align(Alignment.TopCenter)
@@ -178,7 +182,10 @@ fun HomeScreen(
 
 
 @Composable
-fun MediaList(uiState: HomeUiState, onLongCardClick: (CardModel) -> Unit) {
+fun MediaList(
+    uiState: HomeUiState,
+    onCardClick : (Int) -> Unit,
+    onLongCardClick: (CardModel) -> Unit) {
 
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -188,7 +195,7 @@ fun MediaList(uiState: HomeUiState, onLongCardClick: (CardModel) -> Unit) {
             item {
                 ListContent(title = "Now Playing",
                     cards = uiState.nowPlayingMovieList!!,
-                    onCardClick = {},
+                    onCardClick = onCardClick,
                     onShowMoreClick = {},
                     onLongCardClick = onLongCardClick
                 )
@@ -199,8 +206,8 @@ fun MediaList(uiState: HomeUiState, onLongCardClick: (CardModel) -> Unit) {
             item {
                 ListContent(title = "Popular",
                     cards = uiState.popularMovieList!!,
-                    onCardClick = {},
-                    onShowMoreClick = {},
+                    onCardClick = onCardClick,
+                    onShowMoreClick = {  },
                     onLongCardClick = onLongCardClick
                 )
             }
@@ -226,7 +233,7 @@ fun MediaList(uiState: HomeUiState, onLongCardClick: (CardModel) -> Unit) {
             item {
                 ListContent(title = "Top Rated",
                     cards = uiState.topRatedMovieList!!,
-                    onCardClick = {},
+                    onCardClick = onCardClick,
                     onShowMoreClick = {},
                     onLongCardClick = onLongCardClick
                 )
@@ -237,7 +244,7 @@ fun MediaList(uiState: HomeUiState, onLongCardClick: (CardModel) -> Unit) {
             item {
                 ListContent(title = "Upcoming",
                     cards = uiState.upcomingMovieList!!,
-                    onCardClick = {},
+                    onCardClick = onCardClick,
                     onShowMoreClick = {},
                     onLongCardClick = onLongCardClick
                 )
@@ -259,7 +266,7 @@ fun ListContent(
     title: String,
     cards: List<CardModel>,
     modifier: Modifier = Modifier,
-    onCardClick: (CardModel) -> Unit,
+    onCardClick: (Int) -> Unit,
     onLongCardClick: (CardModel) -> Unit,
     onShowMoreClick: () -> Unit,
 ) {
@@ -287,7 +294,7 @@ fun ListContent(
         CardListComponent(
             cards = cards,
             modifier = modifier,
-            onCardClick = { cardModel: CardModel -> },
+            onCardClick = { cardModel -> onCardClick(cardModel.id?:0) },
             onLongCardClick = onLongCardClick
         )
     }

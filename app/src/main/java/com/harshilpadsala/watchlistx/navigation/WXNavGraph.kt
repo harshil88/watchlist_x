@@ -34,16 +34,11 @@ fun WatchListXNavigation(navController: NavHostController) {
     ) {
         composable(WXNavItem.HOME.name) {
             HomeRoute(
-                onMediaClick = { mediaType, i ->
-            }, onGenreClick = {}, 
+                onMediaClick = {mediaId -> navController.navigate("$movieDetailRoute/$mediaId")}, onGenreClick = {},
                 onRatingClick = {ratingArgsModel ->
-
-
-
                     val convertedToJson = Gson().toJson(
                         ratingArgsModel)
                     val encodedUri = Uri.encode(convertedToJson)
-
                     navController.navigate("$ratingRoute/$encodedUri")
 
                 }

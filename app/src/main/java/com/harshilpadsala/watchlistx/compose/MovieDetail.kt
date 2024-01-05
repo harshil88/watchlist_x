@@ -68,15 +68,15 @@ fun MovieDetailRoute(
         onFavClick = viewModel::toggleFavourite,
         onWatchListClick = viewModel::toggleWatchList,
         onRatingClick = {
-                      onRatingClick(
-                          RatingArgsModel(
-                              movieId = 901362,
-                              movieName = "Trolls Band Together",
-                              posterPath = "/ui4DrH1cKk2vkHshcUcGt2lKxCm.jpg",
-                              isRated = false,
-                              ratings = 0
-                          )
-                      )
+            onRatingClick(
+                RatingArgsModel(
+                    movieId = 901362,
+                    movieName = "Trolls Band Together",
+                    posterPath = "/ui4DrH1cKk2vkHshcUcGt2lKxCm.jpg",
+                    isRated = false,
+                    ratings = 0
+                )
+            )
         },
         onBackPress = {},
     )
@@ -118,8 +118,7 @@ fun MovieDetailScreen(
                         )
                     }
                 })
-            }
-            ) { paddingValues ->
+            }) { paddingValues ->
 
                 LazyColumn(
                     modifier = Modifier.padding(top = paddingValues.calculateTopPadding() + 16.dp)
