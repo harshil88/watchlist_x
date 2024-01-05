@@ -25,7 +25,6 @@ class DiscoverMovieUseCase @Inject constructor(
                         MovieList.Upcoming -> discoverRepo.upcoming(page = page)
                     }
                 }.onSuccess {
-                    Log.i("Movie Stat Debug" , "Reaching In EMIT")
 
                     emit(ResultX.Success(data = it.body()))
                 }.onFailure {

@@ -1,6 +1,5 @@
 package com.harshilpadsala.watchlistx.compose.components
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -22,7 +21,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.harshilpadsala.watchlistx.Constant
 import com.harshilpadsala.watchlistx.R
-import com.harshilpadsala.watchlistx.data.res.detail.CardModel
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import utils.PaddingX
 

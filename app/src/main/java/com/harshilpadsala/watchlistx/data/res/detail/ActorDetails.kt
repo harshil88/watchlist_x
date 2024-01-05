@@ -2,6 +2,7 @@ package com.harshilpadsala.watchlistx.data.res.detail
 
 import com.google.gson.annotations.SerializedName
 import com.harshilpadsala.watchlistx.Constant.TMDB_IMAGE_URI_HIGH
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
 
 data class ActorDetails(
     val adult: Boolean?,
@@ -29,11 +30,7 @@ data class ActorDetails(
     }
 }
 
-data class CardModel(
-    val id: Int?,
-    val title: String?,
-    val imageUri : String?,
-)
+
 
 fun ActorDetails.toCardComponent() : CardModel = CardModel(
     id = this.id,

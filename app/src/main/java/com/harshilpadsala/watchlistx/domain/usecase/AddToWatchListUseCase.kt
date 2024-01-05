@@ -22,7 +22,11 @@ class AddToWatchListUseCase @Inject constructor(
 
     val accountId = 12375371L
 
-    operator fun invoke(movieId : Int, watchListOperation: WatchListOperation, wishList : Boolean): Flow<ResultX<UpdateResponse>> {
+    operator fun invoke(
+        movieId : Int,
+        watchListOperation: WatchListOperation,
+        wishList : Boolean
+    ): Flow<ResultX<UpdateResponse>> {
         return flow {
 
             val request = ToggleFavouriteRequest(

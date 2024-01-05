@@ -2,8 +2,7 @@ package com.harshilpadsala.watchlistx.data.res.list
 
 import com.google.gson.annotations.SerializedName
 import com.harshilpadsala.watchlistx.Constant
-import com.harshilpadsala.watchlistx.data.res.detail.ActorDetails
-import com.harshilpadsala.watchlistx.data.res.detail.CardModel
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 
 data class MovieContent(
@@ -46,6 +45,8 @@ fun MovieContent.toCardComponent() : CardModel = CardModel(
     title = this.title,
     imageUri = Constant.TMDB_IMAGE_URI_HIGH +  this.posterPath,
 )
+
+
 
 
 

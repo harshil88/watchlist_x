@@ -1,7 +1,7 @@
 package com.harshilpadsala.watchlistx.data.res.list
 
 import com.google.gson.annotations.SerializedName
-import com.harshilpadsala.watchlistx.data.res.detail.CardModel
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
 
 data class Content<T>(
     val page: Int?,

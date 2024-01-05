@@ -46,9 +46,10 @@ import com.harshilpadsala.watchlistx.compose.components.CardListComponent
 import com.harshilpadsala.watchlistx.compose.components.GenresRow
 import com.harshilpadsala.watchlistx.compose.components.base_x.AsyncImageX
 import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
-import com.harshilpadsala.watchlistx.compose.components.base_x.ListItemX
 import com.harshilpadsala.watchlistx.constants.MediaType
-import com.harshilpadsala.watchlistx.data.res.detail.CardModel
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
+import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
+import com.harshilpadsala.watchlistx.data.res.model.toRatingArgsModel
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.HomeUiState
@@ -58,13 +59,18 @@ import kotlinx.coroutines.launch
 import utils.ToastX
 
 //todo : Question -> A deeper understanding of scopes
+
 //todo : Furthur Optimization -> For Different Types Of Movie API Calls Use Enums
+
+//todo : NUNI -> While Using Swipe To Refresh, The First List Of Now Playing gets scrolled to first item, not happening with other
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeRoute(
     onMediaClick: (MediaType, Int) -> Unit,
     onGenreClick: (Int) -> Unit,
+    onRatingClick: (RatingArgsModel) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -77,21 +83,23 @@ fun HomeRoute(
     )
 
     val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
+        initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true
     )
 
+    if (!sheetState.isVisible) {
+        viewModel.resetMovieStats()
+    }
+
     movieStatsUiState.value.successMessage.let {
-        if(it!=null){
+        if (it != null) {
             ToastX(message = it)
-            viewModel.resetMovieStats()
 
         }
     }
 
     movieStatsUiState.value.errorMessage.let {
-        if(it!=null){
+        if (it != null) {
             ToastX(message = it)
-            viewModel.resetMovieStats()
 
         }
     }
@@ -102,6 +110,12 @@ fun HomeRoute(
         refreshingState = refreshingState,
         onFavouriteClick = viewModel::favourite,
         onWatchListClick = viewModel::wishList,
+        onRatingClick = {ratingArgsModel ->
+                        scope.launch {
+                            sheetState.hide()
+                        }
+            onRatingClick(ratingArgsModel)
+        },
         onLongCardClick = { movieDetails ->
             scope.launch {
                 sheetState.show()
@@ -118,8 +132,9 @@ fun HomeScreen(
     sheetState: ModalBottomSheetState,
     refreshingState: PullRefreshState,
     onLongCardClick: (CardModel) -> Unit,
-    onFavouriteClick: (Boolean , Int) -> Unit,
-    onWatchListClick: (Boolean , Int) -> Unit,
+    onFavouriteClick: (Boolean, Int) -> Unit,
+    onWatchListClick: (Boolean, Int) -> Unit,
+    onRatingClick: (RatingArgsModel) -> Unit,
 ) {
 
 
@@ -134,9 +149,11 @@ fun HomeScreen(
             MovieStatsSheetContent(
                 isWatchListed = movieStatsUiState.movieStats?.watchlist ?: false,
                 isFavourite = movieStatsUiState.movieStats?.favorite ?: false,
+                ratings = movieStatsUiState.movieStats?.ratings?.value,
                 cardModel = movieStatsUiState.selectedMovieDetail,
                 onFavouriteClick = onFavouriteClick,
                 onWatchListClick = onWatchListClick,
+                onRatingClick = onRatingClick
             )
         }
     }, content = {
@@ -245,8 +262,7 @@ fun ListContent(
     onCardClick: (CardModel) -> Unit,
     onLongCardClick: (CardModel) -> Unit,
     onShowMoreClick: () -> Unit,
-
-    ) {
+) {
     Column {
         Row(
             modifier = Modifier
@@ -283,8 +299,10 @@ fun MovieStatsSheetContent(
     isFavourite: Boolean,
     isWatchListed: Boolean,
     cardModel: CardModel?,
-    onFavouriteClick: (Boolean , Int) -> Unit,
-    onWatchListClick: (Boolean , Int) -> Unit,
+    ratings: Double?,
+    onFavouriteClick: (Boolean, Int) -> Unit,
+    onWatchListClick: (Boolean, Int) -> Unit,
+    onRatingClick: (RatingArgsModel) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -294,14 +312,13 @@ fun MovieStatsSheetContent(
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        ListItem( text = {
+        ListItem(text = {
             Text(
                 text = cardModel?.title ?: "", style = StylesX.titleLarge,
             )
         }, icon = {
             AsyncImageX(
-                imageSrc = cardModel?.imageUri ?: "",
-                modifier = Modifier
+                imageSrc = cardModel?.imageUri ?: "", modifier = Modifier
                     .height(72.dp)
                     .width(40.dp)
             )
@@ -309,7 +326,7 @@ fun MovieStatsSheetContent(
 
         Divider(
             modifier = Modifier
-                .padding(vertical = 24.dp, horizontal = 20.dp)
+                .padding(vertical = 8.dp, horizontal = 20.dp)
                 .height(2.dp)
                 .background(Darkness.grey)
         )
@@ -354,19 +371,26 @@ fun MovieStatsSheetContent(
                 )
             },
         )
-//        ListItem(
-//            modifier = Modifier.clickable {
-//
-//            },
-//            icon = {
-//                Icon(
-//                    imageVector = Icons.Filled.Star, contentDescription = "Watchlist Toggle"
-//                )
-//            },
-//            text = { Text(
-//                text = if (movieStatsUiState.movieStats?.rated == true) "Your Rating : ${movieStatsUiState.movieStats.r}" else "Remove From Favourite"
-//            )},
-//        )
+        ListItem(
+            modifier = Modifier.clickable {
+
+                if (cardModel != null) {
+                    onRatingClick(cardModel.toRatingArgsModel(value = ratings))
+                }
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Star, contentDescription = "Watchlist Toggle",
+                    tint = if (ratings != null) Darkness.rise else Darkness.grey,
+                )
+            },
+            text = {
+                Text(
+                    text = if (ratings != null) "Your Ratings : $ratings" else "Give Ratings",
+                    style = StylesX.labelMedium.copy(color = Darkness.grey)
+                )
+            },
+        )
     }
 }
 
@@ -409,6 +433,18 @@ fun MovieStatsSheetContentPreview() {
             },
             text = { Text(text = "Rating") },
         )
+        ListItem(
+            modifier = Modifier.clickable {
+
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Star, contentDescription = "Watchlist Toggle"
+                )
+            },
+            text = { Text(text = "Rating") },
+        )
+
     }
 }
 

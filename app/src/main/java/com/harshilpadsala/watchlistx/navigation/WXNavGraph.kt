@@ -31,8 +31,12 @@ fun WatchListXNavigation(navController: NavHostController) {
         navController = navController, startDestination = WXNavItem.HOME.name
     ) {
         composable(WXNavItem.HOME.name) {
-            HomeRoute(onMediaClick = { mediaType, i ->
-            }, onGenreClick = {})
+            HomeRoute(
+                onMediaClick = { mediaType, i ->
+            }, onGenreClick = {}, 
+                onRatingClick = {ratingArgsModel ->
+                    navController.navigateUp()}
+                )
         }
 
         composable(WXNavItem.DISCOVER.name) {

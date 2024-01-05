@@ -30,8 +30,8 @@ import com.harshilpadsala.watchlistx.compose.components.GenresRow
 import com.harshilpadsala.watchlistx.compose.components.ImagePager
 import com.harshilpadsala.watchlistx.compose.components.RatingRow
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
-import com.harshilpadsala.watchlistx.data.res.detail.CardModel
 import com.harshilpadsala.watchlistx.data.res.detail.toCardComponent
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 import com.harshilpadsala.watchlistx.state.movie_detail.CreditsUiState
 import com.harshilpadsala.watchlistx.state.movie_detail.FavouriteUiState

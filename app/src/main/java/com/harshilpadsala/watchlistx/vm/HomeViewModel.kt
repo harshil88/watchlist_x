@@ -1,24 +1,22 @@
 package com.harshilpadsala.watchlistx.vm
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
-import com.harshilpadsala.watchlistx.data.res.detail.CardModel
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 import com.harshilpadsala.watchlistx.data.res.list.TVContent
 import com.harshilpadsala.watchlistx.data.res.list.toCardList
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.domain.usecase.AddToWatchListUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.DiscoverMovieUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.GenreUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaAccountStatsUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.WatchListOperation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,20 +39,19 @@ data class HomeUiState(
 )
 
 data class MovieStatsUiState(
-    var loading : Boolean? = null,
+    var loading: Boolean? = null,
     var movieStats: MovieStats? = null,
-    var selectedMovieDetail : CardModel? = null,
-    var successMessage : String? = null,
-    var errorMessage : String? = null
+    var selectedMovieDetail: CardModel? = null,
+    var successMessage: String? = null,
+    var errorMessage: String? = null
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val discoverMovieUseCase: DiscoverMovieUseCase,
     private val genreUseCase: GenreUseCase,
-    private val movieStatsUseCase : MediaAccountStatsUseCase,
+    private val movieStatsUseCase: MediaAccountStatsUseCase,
     private val addToWatchListUseCase: AddToWatchListUseCase
-
 ) : ViewModel() {
 
 
@@ -63,23 +60,23 @@ class HomeViewModel @Inject constructor(
 
     init {
         uiState.value = HomeUiState(
-            loading  = true,
+            loading = true,
         )
         nowPlaying()
     }
 
-    fun onRefresh(){
+    fun onRefresh() {
         uiState.value = HomeUiState(
             refreshing = true,
         )
         nowPlaying()
     }
 
-    fun resetMovieStats(){
+    fun resetMovieStats() {
         movieStatsUiState.value = MovieStatsUiState()
     }
 
-    private fun nowPlaying(){
+    private fun nowPlaying() {
         viewModelScope.launch {
             discoverMovieUseCase.invoke(
                 movieList = MovieList.NowPlaying,
@@ -192,12 +189,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun movieStats(cardModel : CardModel){
+    fun movieStats(cardModel: CardModel) {
         movieStatsUiState.value = MovieStatsUiState(loading = true)
         viewModelScope.launch {
             movieStatsUseCase.invoke(
                 mediaType = MediaType.Movie,
-                mediaId = cardModel.id?:0,
+                mediaId = cardModel.id ?: 0,
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
@@ -207,28 +204,28 @@ class HomeViewModel @Inject constructor(
                             selectedMovieDetail = cardModel
                         )
                     }
+
                     is ResultX.Error -> {}
                 }
             }
         }
     }
 
-    fun favourite(favourite : Boolean , movieId : Int){
-        movieStatsUiState.value = MovieStatsUiState(loading = true)
+    fun favourite(favourite: Boolean, movieId: Int) {
         viewModelScope.launch {
             addToWatchListUseCase.invoke(
                 movieId = movieId,
                 watchListOperation = WatchListOperation.Favourites,
                 wishList = favourite,
 
-            ).collect {
+                ).collect {
                 when (it) {
                     is ResultX.Success -> {
                         movieStatsUiState.value = movieStatsUiState.value.copy(
-                            loading = false,
                             successMessage = it.data?.statusMessage
                         )
                     }
+
                     is ResultX.Error -> {
 
                     }
@@ -239,14 +236,14 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    fun wishList(wishList : Boolean , movieId : Int){
+    fun wishList(wishList: Boolean, movieId: Int) {
         movieStatsUiState.value = MovieStatsUiState(loading = true)
         viewModelScope.launch {
             addToWatchListUseCase.invoke(
                 movieId = movieId,
                 watchListOperation = WatchListOperation.Watchlist,
                 wishList = wishList,
-                ).collect {
+            ).collect {
                 when (it) {
                     is ResultX.Success -> {
                         movieStatsUiState.value = movieStatsUiState.value.copy(
@@ -254,6 +251,7 @@ class HomeViewModel @Inject constructor(
                             successMessage = it.data?.statusMessage
                         )
                     }
+
                     is ResultX.Error -> {}
                 }
             }
