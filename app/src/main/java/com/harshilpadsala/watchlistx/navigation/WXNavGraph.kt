@@ -14,17 +14,17 @@ import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.HomeRoute
 import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
 import com.harshilpadsala.watchlistx.compose.RatingRoute
+import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.constants.WXNavItem
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 
 private const val movieDetailRoute = "movieDetailRoute"
 private const val ratingRoute = "ratingRoute"
 
+
 const val movieIdNavArg = "movieId"
-const val movieNameNavArg = "movieName"
-const val isRatedNavArg = "isRated"
-const val ratingsNavArg = "ratings"
 const val ratingArgs = "ratingArgs"
+const val movieListTypeArg = "movieListTypeArg"
 
 
 @Composable
@@ -34,18 +34,29 @@ fun WatchListXNavigation(navController: NavHostController) {
     ) {
         composable(WXNavItem.HOME.name) {
             HomeRoute(
-                onMediaClick = {mediaId -> navController.navigate("$movieDetailRoute/$mediaId")}, onGenreClick = {},
-                onRatingClick = {ratingArgsModel ->
+                onMediaClick = { mediaId -> navController.navigate("$movieDetailRoute/$mediaId") },
+                onGenreClick = {},
+                onRatingClick = { ratingArgsModel ->
                     val convertedToJson = Gson().toJson(
-                        ratingArgsModel)
+                        ratingArgsModel
+                    )
                     val encodedUri = Uri.encode(convertedToJson)
                     navController.navigate("$ratingRoute/$encodedUri")
-
-                }
-                )
+                },
+                onShowMoreClick = { movieList ->
+                                  navController.navigate("${WXNavItem.DISCOVER.name}?$movieListTypeArg={${MovieList.NowPlaying}}")
+                },
+            )
         }
 
-        composable(WXNavItem.DISCOVER.name) {
+        composable("${WXNavItem.DISCOVER.name}?$movieListTypeArg={$movieListTypeArg}", arguments = listOf(navArgument(
+            name = movieListTypeArg,
+        ) {
+            defaultValue = MovieList.NowPlaying
+            type = NavType.EnumType(
+                MovieList::class.java
+            )
+        })) {
             DiscoverRoute(
                 onMediaClick = {},
                 onSearchClick = {},
@@ -55,18 +66,14 @@ fun WatchListXNavigation(navController: NavHostController) {
         composable(WXNavItem.FAVOURITE.name) { FavouriteScreen() }
 
 
-        composable(
-            "$ratingRoute/{$ratingArgs}", arguments = listOf(
+        composable("$ratingRoute/{$ratingArgs}", arguments = listOf(
 
-                navArgument(
-                    name = ratingArgs
-                ) {
-                    type = NavType.StringType
-                    defaultValue = ""
-                }
-            )
-        )
-        {
+            navArgument(
+                name = ratingArgs
+            ) {
+                type = NavType.StringType
+                defaultValue = ""
+            })) {
             RatingRoute(
                 onBackPress = {
                     navController.navigateUp()
@@ -75,8 +82,7 @@ fun WatchListXNavigation(navController: NavHostController) {
         }
 
         composable(
-            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(
-                navArgument(
+            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(navArgument(
                 name = movieIdNavArg,
             ) {
                 type = NavType.LongType

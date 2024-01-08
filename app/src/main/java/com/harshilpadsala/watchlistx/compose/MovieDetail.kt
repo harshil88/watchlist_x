@@ -2,19 +2,25 @@ package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,6 +37,7 @@ import com.harshilpadsala.watchlistx.compose.components.GenresRow
 import com.harshilpadsala.watchlistx.compose.components.ImagePager
 import com.harshilpadsala.watchlistx.compose.components.RatingRow
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
+import com.harshilpadsala.watchlistx.compose.components.WXToggleIconButton
 import com.harshilpadsala.watchlistx.data.res.detail.toCardComponent
 import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
@@ -59,14 +67,16 @@ fun MovieDetailRoute(
 
     //Todo : Add Dynamic on Movie on Rating Press
 
+    //Todo : Learn more about flexible row layouts
+
+    //Todo : Bug About Row Arrangement Of Action Buttons
+
     MovieDetailScreen(
         movieDetailUiState = movieDetailUiState.value,
         watchListUiState = watchListUiState.value,
         favouriteUiState = favouriteUiState.value,
         ratingUiState = ratingUiState.value,
         creditsUiState = creditsUiState.value,
-        onFavClick = viewModel::toggleFavourite,
-        onWatchListClick = viewModel::toggleWatchList,
         onRatingClick = {
             onRatingClick(
                 RatingArgsModel(
@@ -78,6 +88,9 @@ fun MovieDetailRoute(
                 )
             )
         },
+        onListClick = {},
+        onFavouriteClick = {},
+        onWatchListClick = viewModel::toggleWatchList,
         onBackPress = {},
     )
 }
@@ -92,8 +105,9 @@ fun MovieDetailScreen(
     favouriteUiState: FavouriteUiState,
     ratingUiState: WatchlistUiState,
     creditsUiState: CreditsUiState,
-    onFavClick: (Boolean) -> Unit,
+    onFavouriteClick: (Boolean) -> Unit,
     onWatchListClick: (Boolean) -> Unit,
+    onListClick: (Boolean) -> Unit,
     onRatingClick: () -> Unit,
     onBackPress: () -> Unit,
 ) {
@@ -109,16 +123,12 @@ fun MovieDetailScreen(
 
 
             Scaffold(topBar = {
-                TopBarX(title = movieDetail?.title ?: "", onBackPress = onBackPress, actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            Icons.Outlined.Favorite,
-                            contentDescription = "Navigate Backwards",
-                            tint = if (isFavourite) Darkness.love else Darkness.light
-                        )
-                    }
-                })
-            }) { paddingValues ->
+                TopBarX(
+                    title = movieDetail?.title ?: "",
+                    onBackPress = onBackPress,
+                )
+            }) {
+                    paddingValues ->
 
                 LazyColumn(
                     modifier = Modifier.padding(top = paddingValues.calculateTopPadding() + 16.dp)
@@ -142,10 +152,13 @@ fun MovieDetailScreen(
                             overflow = TextOverflow.Ellipsis
                         )
 
-                        WatchListButton(
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-                            watchListUiState = watchListUiState,
-                            onWatchListClick = onWatchListClick
+                        ActionButtonsRow(
+                            isFavourite = movieDetail?.movieStats?.favorite?:false,
+                            isWatchListed = movieDetail?.movieStats?.watchlist?:false,
+                                isListed = true,
+                            onWatchListClick = onWatchListClick,
+                            onFavouriteClick = onFavouriteClick,
+                            onListClick = onListClick,
                         )
 
                         RatingRow(
@@ -170,6 +183,65 @@ fun MovieDetailScreen(
 
 }
 
+@Composable
+fun ActionButtonsRow(
+    isFavourite : Boolean,
+    isWatchListed : Boolean,
+    isListed : Boolean,
+    onFavouriteClick: (Boolean) -> Unit,
+    onWatchListClick: (Boolean) -> Unit,
+    onListClick: (Boolean) -> Unit
+
+
+){
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .padding(
+                horizontal = 20.dp, vertical = 20.dp
+            )
+            .fillMaxWidth()
+    ) {
+
+        val maxWidthModifier = Modifier.weight(1F)
+
+        WXToggleIconButton(
+            modifier = maxWidthModifier,
+            state = isWatchListed,
+            icon = Icons.Filled.Bookmark,
+            onStateColor = Darkness.rise,
+            onClick = {
+                onWatchListClick(!isWatchListed)
+            }
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        WXToggleIconButton(
+            modifier = maxWidthModifier,
+
+            state = isFavourite,
+            icon = Icons.Filled.Favorite,
+            onStateColor = Darkness.love,
+            onClick = {
+                onFavouriteClick(!isFavourite)
+            }
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        WXToggleIconButton(
+            state = isListed,
+            icon = Icons.Filled.List,
+            onStateColor = Darkness.life,
+            onClick = {
+                onListClick(!isListed)
+            }
+        )
+
+    }
+}
+
 
 @Composable
 fun CreditsRow(credits: List<CardModel>) {
@@ -184,63 +256,27 @@ fun CreditsRow(credits: List<CardModel>) {
 }
 
 
-@Composable
-fun WatchListButton(
-    modifier: Modifier = Modifier,
-    watchListUiState: WatchlistUiState,
-    onWatchListClick: (Boolean) -> Unit,
-) {
-    ElevatedButton(
-        onClick = {
-            if (watchListUiState !is WatchlistUiState.Loading) {
-                onWatchListClick(!watchListUiState.currentValue)
-            }
-        },
-        modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(vertical = 12.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (watchListUiState.currentValue) Darkness.stillness else Darkness.rise,
-        ),
-        shape = RoundedCornerShape(4.dp),
-        border = BorderStroke(
-            2.dp, Darkness.rise
-        )
-    ) {
-        when (watchListUiState) {
-            is WatchlistUiState.Loading -> LoaderX()
-            is WatchlistUiState.Success -> if (watchListUiState.currentValue) AddedToWatchListContent() else NotAddedToWatchListContent()
-            is WatchlistUiState.Error -> if (watchListUiState.currentValue) AddedToWatchListContent() else NotAddedToWatchListContent()
-        }
-    }
-}
 
-@Composable
-fun NotAddedToWatchListContent() {
-    Icon(
-        Icons.Filled.Add, contentDescription = "Add to Watchlist Icon", tint = Darkness.stillness
-    )
-    Text(
-        text = "Add to Watchlist", modifier = Modifier.padding(
-            start = 24.dp
-        ), style = StylesX.titleMedium.copy(color = Darkness.stillness), maxLines = 1
-    )
-}
 
-@Composable
-fun AddedToWatchListContent() {
-    Icon(
-        Icons.Filled.Add, contentDescription = "Add to Watchlist Icon", tint = Darkness.stillness
-    )
-    Text(
-        text = "Add to Watchlist", modifier = Modifier.padding(
-            start = 24.dp
-        ), style = StylesX.titleMedium.copy(color = Darkness.stillness), maxLines = 1
-    )
-}
+
 
 @Composable
 fun ShowRatingDialog() {
     Dialog(
         onDismissRequest = { },
     ) {}
+}
+
+
+@Preview
+@Composable
+fun ActionButtonsRowPreview(){
+    ActionButtonsRow(
+        isFavourite = true,
+        isWatchListed = false,
+        isListed = false,
+        onFavouriteClick = {},
+        onListClick = {},
+        onWatchListClick = {},
+    )
 }

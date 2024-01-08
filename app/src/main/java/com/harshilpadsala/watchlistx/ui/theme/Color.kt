@@ -20,4 +20,5 @@ object Darkness{
     val rise = Color.Yellow
     val water = Color.Transparent
     val danger = Color.Red
+    val life = Color.Green
 }

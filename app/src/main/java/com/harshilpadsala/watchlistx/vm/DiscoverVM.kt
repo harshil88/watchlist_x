@@ -1,122 +1,107 @@
 package com.harshilpadsala.watchlistx.vm
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
-import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
-import com.harshilpadsala.watchlistx.constants.TvList
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.domain.usecase.DiscoverMovieUseCase
-import com.harshilpadsala.watchlistx.domain.usecase.DiscoverTvUseCase
-import com.harshilpadsala.watchlistx.domain.usecase.SearchMovieUseCase
-import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
+import com.harshilpadsala.watchlistx.navigation.movieListTypeArg
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+//todo : Learn more about saved state handle and configuration changes and recomposition
+
+data class DiscoverUiState(
+    var isLoading : Boolean? = null,
+    var movies : MutableList<ListItemXData>?= null,
+    var currentPage : Int = 1,
+    var hasReachedEnd : Boolean = false,
+    var selectedMovieList : MovieList? = null,
+    var isFailure : Boolean = false
+){
+
+}
+
 @HiltViewModel
 class DiscoverVM @Inject constructor(
-    private val searchMovieUseCase: SearchMovieUseCase,
     private val discoverMovieUseCase: DiscoverMovieUseCase,
-    private val discoverTvUseCase: DiscoverTvUseCase,
+    val state : SavedStateHandle,
 ) : ViewModel() {
 
-    val selectedMediaType =
-        mutableStateOf(MediaType.Movie)
+    val discoverUiState = mutableStateOf(DiscoverUiState())
 
-    var isTabChanged = false
+
+
 
 
     val movieChipState =
         mutableStateOf(MovieList.Popular)
 
-    val tvChipState =
-        mutableStateOf(TvList.Popular)
 
 
 
-    val popularMovieListSuccessState =
-        mutableStateOf<DiscoverMovieUiState>(DiscoverMovieUiState.Initial)
 
-    var currentPage = 1
-
-    var data = mutableListOf<ListItemXData>()
-
-    var resetCalled = false
-    var isPageLoading = false
 
     init {
-        discoverMovieList(MovieList.Popular)
-    }
-
-    fun reset(){
-        resetCalled = true
-        currentPage = 1
-        data.clear()
-    }
-
-    fun onTabChange(mediaType: MediaType){
-        reset()
-        isTabChanged = true
-        selectedMediaType.value = mediaType
-        if (mediaType == MediaType.Movie) {
-            discoverMovieList(movieChipState.value)
-        } else {
-            discoverTvList(tvChipState.value)
-
+        val selectedMovieList = state.get<MovieList>(movieListTypeArg)
+        if(selectedMovieList!=null){
+            discoverMovieList(selectedMovieList)
         }
+
     }
 
-    fun toggleSheet(index: Int){
-        reset()
-        if (selectedMediaType.value == MediaType.Movie) {
-            movieChipState.value = MovieList.values()[index]
-            discoverMovieList(movieChipState.value)
 
-        } else {
-            discoverTvList(tvChipState.value)
-            tvChipState.value = TvList.values()[index]
-        }
-    }
+//    fun toggleSheet(index: Int){
+//        if (selectedMediaType.value == MediaType.Movie) {
+//            movieChipState.value = MovieList.values()[index]
+//            discoverMovieList(movieChipState.value)
+//        }
+//    }
 
-    fun shouldCallNextPage(){
-        if(!isPageLoading){
-            if(selectedMediaType.value == MediaType.Movie){
-                discoverMovieList(movieChipState.value)
-            }
-            else{
-                discoverTvList(tvChipState.value)
-            }
+    fun nextPage(){
+        if(discoverUiState.value.isLoading == false){
+            discoverUiState.value = discoverUiState.value.copy(isLoading = true)
+            discoverMovieList(movieList = MovieList.NowPlaying)
         }
     }
 
 
 
     private fun discoverMovieList(movieList: MovieList) {
-        isPageLoading = true
+
         viewModelScope.launch {
-            discoverMovieUseCase.invoke(movieList, currentPage).collect {
+            delay(2000)
+            discoverMovieUseCase.invoke(movieList, discoverUiState.value.currentPage).collect {
                 when (it) {
 
                     is ResultX.Success -> {
-                        isTabChanged = false
-                        isPageLoading = false
-                        val newElements = it.data?.results?.map { movie -> movie.toListItemX()}?.toList()?: listOf()
-                        data.addAll(newElements)
-                        popularMovieListSuccessState.value =
-                        DiscoverMovieUiState.SuccessUiState(movies =  data , currentPage =  currentPage , mediaType = MediaType.Movie)
-                        currentPage+=1
+                        val alreadyPresentMovies = discoverUiState.value.movies
+                        val newMovies = it.data?.results?.map {item -> item.toListItemX() }?.toMutableList()?: mutableListOf()
+
+                        alreadyPresentMovies?.addAll(newMovies)
+
+                        val updatedPage = discoverUiState.value.currentPage + 1
+
+                        discoverUiState.value = discoverUiState.value.copy(
+                            isLoading = false,
+                            movies = alreadyPresentMovies ?: newMovies,
+                            currentPage = updatedPage,
+                            selectedMovieList = movieList,
+                        )
+
                     }
 
                     is ResultX.Error ->{
-                        isTabChanged = false
-                        isPageLoading = false
-                        popularMovieListSuccessState.value =
-
-                        DiscoverMovieUiState.PopularMovieFailureUiState(message = it.message ?: "")
+                        discoverUiState.value = discoverUiState.value.copy(
+                            isLoading = false,
+                            isFailure = true,
+                        )
                 }
 
                 }
@@ -124,35 +109,7 @@ class DiscoverVM @Inject constructor(
         }
     }
 
-    private fun discoverTvList(tvList: TvList) {
-        isPageLoading = true
-        viewModelScope.launch {
-            discoverTvUseCase.invoke(tvList, currentPage).collect {
-                when (it) {
 
 
-                    is ResultX.Success -> {
 
-                        isPageLoading = false
-                        val newElements = it.data?.results?.map { movie -> movie.toListItemX()}?.toList()?: listOf()
-                        data.addAll(newElements)
-                        popularMovieListSuccessState.value =
-                            DiscoverMovieUiState.SuccessUiState(movies =  data ,  currentPage =  currentPage , mediaType = MediaType.Tv)
-                        currentPage+=1
-                    }
-
-                    is ResultX.Error -> {
-
-                        isPageLoading = false
-                        popularMovieListSuccessState.value =
-
-                            DiscoverMovieUiState.PopularMovieFailureUiState(message = it.message ?: "")
-                    }
-                }
-            }
-        }
-    }
-
-    fun searchMovies(search: String) {
-    }
 }

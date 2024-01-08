@@ -47,6 +47,7 @@ import com.harshilpadsala.watchlistx.compose.components.GenresRow
 import com.harshilpadsala.watchlistx.compose.components.base_x.AsyncImageX
 import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
 import com.harshilpadsala.watchlistx.constants.MediaType
+import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 import com.harshilpadsala.watchlistx.data.res.model.toRatingArgsModel
@@ -71,6 +72,7 @@ fun HomeRoute(
     onMediaClick: (Int) -> Unit,
     onGenreClick: (Int) -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
+    onShowMoreClick: (MovieList) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -117,6 +119,7 @@ fun HomeRoute(
             onRatingClick(ratingArgsModel)
         },
         onCardClick = onMediaClick,
+        onShowMoreClick = onShowMoreClick,
         onLongCardClick = { movieDetails ->
             scope.launch {
                 sheetState.show()
@@ -137,6 +140,7 @@ fun HomeScreen(
     onFavouriteClick: (Boolean, Int) -> Unit,
     onWatchListClick: (Boolean, Int) -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
+    onShowMoreClick: (MovieList) -> Unit
 ) {
 
 
@@ -168,9 +172,7 @@ fun HomeScreen(
                     .fillMaxSize()
             ) {
                 MediaList(
-                    uiState = uiState,
-                    onCardClick = onCardClick ,
-                    onLongCardClick = onLongCardClick
+                    uiState = uiState, onCardClick = onCardClick, onLongCardClick = onLongCardClick , onShowMoreClick = onShowMoreClick
                 )
                 PullRefreshIndicator(
                     uiState.refreshing, refreshingState, Modifier.align(Alignment.TopCenter)
@@ -184,19 +186,23 @@ fun HomeScreen(
 @Composable
 fun MediaList(
     uiState: HomeUiState,
-    onCardClick : (Int) -> Unit,
-    onLongCardClick: (CardModel) -> Unit) {
-
+    onCardClick: (Int) -> Unit,
+    onLongCardClick: (CardModel) -> Unit,
+    onShowMoreClick: (MovieList) -> Unit
+) {
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
 
 
         if (!uiState.nowPlayingMovieList.isNullOrEmpty()) {
             item {
-                ListContent(title = "Now Playing",
+                ListContent(
+                    title = "Now Playing",
                     cards = uiState.nowPlayingMovieList!!,
                     onCardClick = onCardClick,
-                    onShowMoreClick = {},
+                    onShowMoreClick = {
+                        onShowMoreClick(MovieList.NowPlaying)
+                    },
                     onLongCardClick = onLongCardClick
                 )
             }
@@ -207,9 +213,8 @@ fun MediaList(
                 ListContent(title = "Popular",
                     cards = uiState.popularMovieList!!,
                     onCardClick = onCardClick,
-                    onShowMoreClick = {  },
-                    onLongCardClick = onLongCardClick
-                )
+                    onShowMoreClick = { onShowMoreClick(MovieList.Popular) },
+                    onLongCardClick = onLongCardClick)
             }
         }
 
@@ -231,10 +236,13 @@ fun MediaList(
 
         if (!uiState.topRatedMovieList.isNullOrEmpty()) {
             item {
-                ListContent(title = "Top Rated",
+                ListContent(
+                    title = "Top Rated",
                     cards = uiState.topRatedMovieList!!,
                     onCardClick = onCardClick,
-                    onShowMoreClick = {},
+                    onShowMoreClick = {
+                        onShowMoreClick(MovieList.TopRated)
+                    },
                     onLongCardClick = onLongCardClick
                 )
             }
@@ -242,10 +250,13 @@ fun MediaList(
 
         if (!uiState.upcomingMovieList.isNullOrEmpty()) {
             item {
-                ListContent(title = "Upcoming",
+                ListContent(
+                    title = "Upcoming",
                     cards = uiState.upcomingMovieList!!,
                     onCardClick = onCardClick,
-                    onShowMoreClick = {},
+                    onShowMoreClick = {
+                        onShowMoreClick(MovieList.Upcoming)
+                    },
                     onLongCardClick = onLongCardClick
                 )
             }
@@ -294,7 +305,7 @@ fun ListContent(
         CardListComponent(
             cards = cards,
             modifier = modifier,
-            onCardClick = { cardModel -> onCardClick(cardModel.id?:0) },
+            onCardClick = { cardModel -> onCardClick(cardModel.id ?: 0) },
             onLongCardClick = onLongCardClick
         )
     }

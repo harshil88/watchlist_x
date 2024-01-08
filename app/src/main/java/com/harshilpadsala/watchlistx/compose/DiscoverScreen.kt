@@ -1,50 +1,50 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.Constant
+import com.harshilpadsala.watchlistx.compose.components.TopBarX
 import com.harshilpadsala.watchlistx.compose.components.base_x.ListItemX
-import com.harshilpadsala.watchlistx.compose.components.base_x.SearchFieldComponent
 import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.constants.TvList
@@ -52,10 +52,12 @@ import com.harshilpadsala.watchlistx.constants.isScrolledToEnd
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
-import com.harshilpadsala.watchlistx.ui.theme.StylesX
+import com.harshilpadsala.watchlistx.vm.DiscoverUiState
 import com.harshilpadsala.watchlistx.vm.DiscoverVM
-import kotlinx.coroutines.launch
-import utils.LoaderX
+
+//todo : Learn when and why to use rememberUpdatedState
+
+//todo : Bug Padding Values in Top Bar
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
@@ -66,6 +68,8 @@ fun DiscoverRoute(
     modifier: Modifier = Modifier,
     viewModel: DiscoverVM = hiltViewModel()
 ) {
+
+    val uiState = rememberUpdatedState(newValue = viewModel.discoverUiState.value)
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
@@ -81,18 +85,26 @@ fun DiscoverRoute(
     }
 
 
-    val uiState = viewModel.popularMovieListSuccessState
 
-    if (endOfListReached) {
-        viewModel.shouldCallNextPage()
+    if (
+        endOfListReached
+        && lazyListState.isScrollInProgress
+        && uiState.value.isLoading == false
+        && !uiState.value.hasReachedEnd) {
+        viewModel.nextPage()
     }
 
-    LaunchedEffect(endOfListReached) {
-        if (viewModel.resetCalled) {
-            viewModel.resetCalled = false
-            lazyListState.scrollToItem(0)
-        }
-    }
+    Log.i("FunnyUiState" , "Updating Ui State")
+    Log.i("FunnyUiState" , uiState.value.movies.toString())
+    Log.i("FunnyUiState" , uiState.value.currentPage.toString())
+    Log.i("FunnyUiState" , uiState.value.movies.toString())
+
+    DiscoverScreen(
+        uiState = uiState.value,
+        lazyListState = lazyListState,
+        onBackClick = {},
+        onFilterListClick = {},
+    )
 
 
 //    LaunchedEffect(endOfListReached) {
@@ -115,31 +127,69 @@ fun DiscoverRoute(
 //    }
 
 
-    DiscoverScreen(
-        uiState = uiState.value,
-        lazyListState = lazyListState,
-        modalBottomSheetState = sheetState,
-        movieChipState = viewModel.movieChipState.value,
-        tvChipState = viewModel.tvChipState.value,
-        selectedMediaType = viewModel.selectedMediaType.value,
-        onChipClick = {
-            scope.launch {
-                sheetState.show()
-            }
-        },
-        onItemClick = onMediaClick,
-        onTabItemClick = {
-            viewModel.onTabChange(it)
-            viewModel.resetCalled = true
-        },
-        onSearchClick = onSearchClick,
-        sheetItemClick = {
-            scope.launch {
-                sheetState.hide()
-                viewModel.toggleSheet(it)
-            }
+//    DiscoverScreen(uiState = uiState.value,
+//        lazyListState = lazyListState,
+//        modalBottomSheetState = sheetState,
+//        movieChipState = viewModel.movieChipState.value,
+//        tvChipState = viewModel.tvChipState.value,
+//        selectedMediaType = viewModel.selectedMediaType.value,
+//        onChipClick = {
+//            scope.launch {
+//                sheetState.show()
+//            }
+//        },
+//        onItemClick = onMediaClick,
+//        onTabItemClick = {
+//            viewModel.onTabChange(it)
+//            viewModel.resetCalled = true
+//        },
+//        onSearchClick = onSearchClick,
+//        sheetItemClick = {
+//            scope.launch {
+//                sheetState.hide()
+//                viewModel.toggleSheet(it)
+//            }
+//        })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun DiscoverScreen(
+    uiState: DiscoverUiState,
+    onBackClick: () -> Unit,
+    onFilterListClick: () -> Unit,
+    lazyListState: LazyListState,
+) {
+    Scaffold(
+        topBar = {
+//            TopBarX(title = "Discover Movies", actions = {
+//                IconButton(onClick = onFilterListClick) {
+//                    Icon(
+//                        imageVector = Icons.Filled.FilterList,
+//                        contentDescription = "Go To Discover Movie Filters Screen",
+//                        tint = Darkness.light,
+//                    )
+//                }
+//            }, onBackPress = onBackClick
+//            )
         }
-    )
+    ) { paddingValues ->
+        Log.i("PaddingDebug", paddingValues.calculateTopPadding().toString())
+        Spacer(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()))
+
+        Log.i("FunnyUiState CurrentPage", uiState.currentPage.toString())
+        Log.i("FunnyUiState List Length", uiState.movies?.size.toString())
+
+
+        if (uiState.movies != null) {
+            MoviesList(
+                hasReachedEnd = false,
+                movies = uiState.movies!!,
+                lazyListState = lazyListState,
+                onItemClick = {})
+        }
+    }
 }
 
 
@@ -180,7 +230,7 @@ fun DiscoverRoute(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun DiscoverScreen(
+internal fun DiscoverSscreen(
     uiState: DiscoverMovieUiState,
     modalBottomSheetState: ModalBottomSheetState,
     selectedMediaType: MediaType,
@@ -255,12 +305,6 @@ fun DiscoverPage(
     ) {
 
 
-        SearchFieldComponent(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
-        )
-
-        CategoryTabBar(onTabItemClick)
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -276,40 +320,36 @@ fun DiscoverPage(
             })
         }
 
-        PopularMovieUiState(
-            uiState = uiState, lazyListState = lazyListState, onItemClick = onItemClick
-        )
-
 
     }
 }
 
-@SuppressLint("CoroutineCreationDuringComposition")
+//@SuppressLint("CoroutineCreationDuringComposition")
+//@Composable
+//fun PopularMovieUiState(
+//    uiState: DiscoverMovieUiState, lazyListState: LazyListState, onItemClick: (Int) -> Unit
+//) {
+//    when (uiState) {
+//        is DiscoverMovieUiState.Initial, DiscoverMovieUiState.Loading -> LoaderX()
+//        is DiscoverMovieUiState.PopularMovieFailureUiState -> {
+//            Text(text = "Something went wrong")
+//        }
+//
+//        is DiscoverMovieUiState.SuccessUiState -> {
+//
+//
+//            PopularMovieUiState(
+//                hasReachedEnd = uiState.hasReachedEnd,
+//                movies = uiState.movies,
+//                lazyListState = lazyListState,
+//                onItemClick = onItemClick
+//            )
+//        }
+//    }
+//}
+
 @Composable
-fun PopularMovieUiState(
-    uiState: DiscoverMovieUiState, lazyListState: LazyListState, onItemClick: (Int) -> Unit
-) {
-    when (uiState) {
-        is DiscoverMovieUiState.Initial, DiscoverMovieUiState.Loading -> LoaderX()
-        is DiscoverMovieUiState.PopularMovieFailureUiState -> {
-            Text(text = "Something went wrong")
-        }
-
-        is DiscoverMovieUiState.SuccessUiState -> {
-
-
-            PopularMovieUiState(
-                hasReachedEnd = uiState.hasReachedEnd,
-                movies = uiState.movies,
-                lazyListState = lazyListState,
-                onItemClick = onItemClick
-            )
-        }
-    }
-}
-
-@Composable
-fun PopularMovieUiState(
+fun MoviesList(
     hasReachedEnd: Boolean,
     movies: List<ListItemXData>,
     lazyListState: LazyListState,
@@ -354,38 +394,53 @@ fun PopularMovieUiState(
 }
 
 
+//@Composable
+//fun CategoryTabBar(onTabItemClick: (MediaType) -> Unit) {
+//
+//    val selectedTabIndex = remember {
+//        mutableIntStateOf(0)
+//    }
+//
+//    TabRow(selectedTabIndex = selectedTabIndex.intValue, divider = {}, indicator = { tabPositions ->
+//
+//        Box(
+//            modifier = Modifier
+//                .tabIndicatorOffset(tabPositions[selectedTabIndex.intValue])
+//                .height(1.dp)
+//                .width(2.dp)
+//                .background(color = Darkness.light),
+//        )
+//
+//    }) {
+//        MediaType.values().mapIndexed { index, category ->
+//            Tab(selected = selectedTabIndex.intValue == index, onClick = {
+//                if (selectedTabIndex.intValue != index) {
+//                    selectedTabIndex.intValue = index
+//                    onTabItemClick(category)
+//                }
+//            }) {
+//                Text(
+//                    modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
+//                    text = category.name,
+//                    style = StylesX.labelMedium.copy(color = if (selectedTabIndex.intValue == index) Darkness.light else Darkness.grey)
+//                )
+//            }
+//        }
+//    }
+//}
+
+@Preview
 @Composable
-fun CategoryTabBar(onTabItemClick: (MediaType) -> Unit) {
-
-    val selectedTabIndex = remember {
-        mutableIntStateOf(0)
-    }
-
-    TabRow(selectedTabIndex = selectedTabIndex.intValue, divider = {}, indicator = { tabPositions ->
-
-        Box(
-            modifier = Modifier
-                .tabIndicatorOffset(tabPositions[selectedTabIndex.intValue])
-                .height(1.dp)
-                .width(2.dp)
-                .background(color = Darkness.light),
-        )
-
-    }) {
-        MediaType.values().mapIndexed { index, category ->
-            Tab(selected = selectedTabIndex.intValue == index, onClick = {
-                if (selectedTabIndex.intValue != index) {
-                    selectedTabIndex.intValue = index
-                    onTabItemClick(category)
-                }
-            }) {
-                Text(
-                    modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
-                    text = category.name,
-                    style = StylesX.labelMedium.copy(color = if (selectedTabIndex.intValue == index) Darkness.light else Darkness.grey)
-                )
-            }
+fun DiscoverScreenPreview() {
+    TopBarX(title = "Discover Movies", actions = {
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+                imageVector = Icons.Filled.FilterList,
+                contentDescription = "Go To Discover Movie Filters Screen",
+                tint = Darkness.light,
+            )
         }
-    }
+    }, onBackPress = {}
+    )
 }
 
