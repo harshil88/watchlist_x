@@ -184,7 +184,7 @@ fun DiscoverScreen(
 
         if (uiState.movies != null) {
             MoviesList(
-                hasReachedEnd = false,
+                hasReachedEnd = uiState.hasReachedEnd,
                 movies = uiState.movies!!,
                 lazyListState = lazyListState,
                 onItemClick = {})

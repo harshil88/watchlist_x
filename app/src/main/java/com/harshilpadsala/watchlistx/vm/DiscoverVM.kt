@@ -36,16 +36,10 @@ class DiscoverVM @Inject constructor(
 
     val discoverUiState = mutableStateOf(DiscoverUiState())
 
-
-
-
+    var currentPage = 1
 
     val movieChipState =
         mutableStateOf(MovieList.Popular)
-
-
-
-
 
 
     init {
@@ -53,7 +47,6 @@ class DiscoverVM @Inject constructor(
         if(selectedMovieList!=null){
             discoverMovieList(selectedMovieList)
         }
-
     }
 
 
@@ -77,7 +70,7 @@ class DiscoverVM @Inject constructor(
 
         viewModelScope.launch {
             delay(2000)
-            discoverMovieUseCase.invoke(movieList, discoverUiState.value.currentPage).collect {
+            discoverMovieUseCase.invoke(movieList,currentPage).collect {
                 when (it) {
 
                     is ResultX.Success -> {
@@ -86,14 +79,18 @@ class DiscoverVM @Inject constructor(
 
                         alreadyPresentMovies?.addAll(newMovies)
 
-                        val updatedPage = discoverUiState.value.currentPage + 1
 
                         discoverUiState.value = discoverUiState.value.copy(
                             isLoading = false,
                             movies = alreadyPresentMovies ?: newMovies,
-                            currentPage = updatedPage,
+                            currentPage = currentPage,
                             selectedMovieList = movieList,
+                            hasReachedEnd = it.data?.totalPages == currentPage
                         )
+
+                        if(!discoverUiState.value.hasReachedEnd){
+                            currentPage+=1
+                        }
 
                     }
 
