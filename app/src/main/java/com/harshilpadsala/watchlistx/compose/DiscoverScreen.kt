@@ -175,11 +175,7 @@ fun DiscoverScreen(
 //            )
         }
     ) { paddingValues ->
-        Log.i("PaddingDebug", paddingValues.calculateTopPadding().toString())
         Spacer(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()))
-
-        Log.i("FunnyUiState CurrentPage", uiState.currentPage.toString())
-        Log.i("FunnyUiState List Length", uiState.movies?.size.toString())
 
 
         if (uiState.movies != null) {

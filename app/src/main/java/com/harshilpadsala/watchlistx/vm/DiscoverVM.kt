@@ -18,33 +18,29 @@ import javax.inject.Inject
 //todo : Learn more about saved state handle and configuration changes and recomposition
 
 data class DiscoverUiState(
-    var isLoading : Boolean? = null,
-    var movies : MutableList<ListItemXData>?= null,
-    var currentPage : Int = 1,
-    var hasReachedEnd : Boolean = false,
-    var selectedMovieList : MovieList? = null,
-    var isFailure : Boolean = false
-){
-
-}
+    var isLoading: Boolean? = null,
+    var movies: MutableList<ListItemXData>? = null,
+    var currentPage: Int = 1,
+    var hasReachedEnd: Boolean = false,
+    var selectedMovieList: MovieList? = null,
+    var isFailure: Boolean = false
+)
 
 @HiltViewModel
 class DiscoverVM @Inject constructor(
     private val discoverMovieUseCase: DiscoverMovieUseCase,
-    val state : SavedStateHandle,
+    val state: SavedStateHandle,
 ) : ViewModel() {
 
     val discoverUiState = mutableStateOf(DiscoverUiState())
+    private var currentPage = 1
 
-    var currentPage = 1
-
-    val movieChipState =
-        mutableStateOf(MovieList.Popular)
+    val movieChipState = mutableStateOf(MovieList.Popular)
 
 
     init {
         val selectedMovieList = state.get<MovieList>(movieListTypeArg)
-        if(selectedMovieList!=null){
+        if (selectedMovieList != null) {
             discoverMovieList(selectedMovieList)
         }
     }
@@ -57,25 +53,25 @@ class DiscoverVM @Inject constructor(
 //        }
 //    }
 
-    fun nextPage(){
-        if(discoverUiState.value.isLoading == false){
+    fun nextPage() {
+        if (discoverUiState.value.isLoading == false) {
             discoverUiState.value = discoverUiState.value.copy(isLoading = true)
             discoverMovieList(movieList = MovieList.NowPlaying)
         }
     }
 
 
-
     private fun discoverMovieList(movieList: MovieList) {
 
         viewModelScope.launch {
-            delay(2000)
-            discoverMovieUseCase.invoke(movieList,currentPage).collect {
+            discoverMovieUseCase.invoke(movieList, currentPage).collect {
                 when (it) {
 
                     is ResultX.Success -> {
                         val alreadyPresentMovies = discoverUiState.value.movies
-                        val newMovies = it.data?.results?.map {item -> item.toListItemX() }?.toMutableList()?: mutableListOf()
+                        val newMovies =
+                            it.data?.results?.map { item -> item.toListItemX() }?.toMutableList()
+                                ?: mutableListOf()
 
                         alreadyPresentMovies?.addAll(newMovies)
 
@@ -88,25 +84,24 @@ class DiscoverVM @Inject constructor(
                             hasReachedEnd = it.data?.totalPages == currentPage
                         )
 
-                        if(!discoverUiState.value.hasReachedEnd){
-                            currentPage+=1
+                        if (!discoverUiState.value.hasReachedEnd) {
+                            currentPage += 1
                         }
 
                     }
 
-                    is ResultX.Error ->{
+                    is ResultX.Error -> {
                         discoverUiState.value = discoverUiState.value.copy(
                             isLoading = false,
                             isFailure = true,
+                            movies = null,
                         )
-                }
+                    }
 
                 }
             }
         }
     }
-
-
 
 
 }
