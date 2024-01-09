@@ -2,6 +2,7 @@ package com.harshilpadsala.watchlistx
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,8 @@ import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.ui.theme.WatchlistXTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.ZoneId
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -70,6 +73,9 @@ fun WXApp(appState: WXAppState) {
 @Composable
 fun MainBottomNav(appState: WXAppState) {
 
+
+    ExperimentsWithTruth()
+
     val navStackBackEntry by appState.navController.currentBackStackEntryAsState()
     val currentDestination = navStackBackEntry?.destination
 
@@ -83,6 +89,7 @@ fun MainBottomNav(appState: WXAppState) {
 
                 val isSelected =
                     currentDestination?.hierarchy?.any { it.route == item.name } == true
+
                 BottomNavigationItem(
                     selected = isSelected,
                     onClick = {
@@ -108,5 +115,17 @@ fun MainBottomNav(appState: WXAppState) {
             }
         }
     }
+}
+
+
+@SuppressLint("NewApi")
+fun ExperimentsWithTruth(){
+
+
+
+
+
+
+
 }
 

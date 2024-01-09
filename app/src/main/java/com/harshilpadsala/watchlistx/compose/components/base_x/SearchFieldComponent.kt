@@ -36,7 +36,9 @@ fun TextFieldComponent(
         trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick?.invoke() },
+            .clickable {
+                onClick?.invoke()
+                       },
         value = textController.value,
         enabled = onClick==null,
         placeholder =placeholder,

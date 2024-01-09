@@ -1,7 +1,11 @@
 package com.harshilpadsala.watchlistx.compose
 
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -15,22 +19,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
 import com.harshilpadsala.watchlistx.compose.components.base_x.TextFieldComponent
+import com.harshilpadsala.watchlistx.constants.DateX
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.FilterViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 
+
+//Todo : Bug-Fix-Default-Dates-Not-Being-Shown
+
 enum class DateRangeType {
     From, To
 }
 
 
+@SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterRoute(
@@ -44,8 +54,14 @@ fun FilterRoute(
         mutableStateOf(false)
     }
 
-    val fromDatePickerState = rememberDatePickerState()
-    val toDatePickerState = rememberDatePickerState()
+    val fromDatePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = 1704738600,
+        initialDisplayedMonthMillis = 1704738600
+    )
+
+    val toDatePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = DateX.getCurrentDateTimeStamp()
+    )
 
 
     FilterScreen(
@@ -54,6 +70,7 @@ fun FilterRoute(
         fromDatePickerState = fromDatePickerState,
         toDatePickerState = toDatePickerState
     )
+
 }
 
 
@@ -69,11 +86,32 @@ fun FilterScreen(
 
     Scaffold(topBar = { TopBarX(title = "Filter", onBackPress = {}) }) { paddingValues ->
 
-        DateSelectorRow(
-            paddingValues = paddingValues,
-            fromDatePickerState = fromDatePickerState,
-            toDatePickerState = toDatePickerState,
-        )
+
+     Column {
+
+         Text(
+             modifier = Modifier.padding(
+                 top = paddingValues.calculateTopPadding() + 20.dp,
+                 start = 20.dp,
+                 ),
+             text = "Release Date" , style = StylesX.labelMedium.copy(color = Darkness.light))
+
+
+         DateSelectorRow(
+             paddingValues = paddingValues,
+             fromDatePickerState = fromDatePickerState,
+             toDatePickerState = toDatePickerState,
+         )
+
+         Text(
+             modifier = Modifier.padding(
+                 top = 16.dp,
+                 start = 20.dp,
+             ),
+             text = "Genres" , style = StylesX.labelMedium.copy(color = Darkness.light))
+
+
+     }
     }
 }
 
@@ -87,11 +125,11 @@ fun DateSelectorRow(
 
 
     val fromDate = remember {
-        mutableStateOf(fromDatePickerState.selectedDateMillis.toString())
+        mutableStateOf("1704738600")
     }
 
     val toDate = remember {
-        mutableStateOf(toDatePickerState.selectedDateMillis.toString())
+        mutableStateOf("1704738600")
     }
 
 
@@ -104,10 +142,11 @@ fun DateSelectorRow(
 
 
 
-    Row {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         TextFieldComponent(
             modifier = Modifier
-                .padding(top = paddingValues.calculateTopPadding(), start = 16.dp)
                 .weight(1F),
             textController = fromDate,
             onClick = {
@@ -122,9 +161,7 @@ fun DateSelectorRow(
 
         TextFieldComponent(
             modifier = Modifier
-                .padding(
-                    top = paddingValues.calculateTopPadding(), start = 16.dp, end = 16.dp
-                )
+
                 .weight(1F),
             textController = toDate,
             onClick = {
@@ -137,6 +174,7 @@ fun DateSelectorRow(
             },
         )
     }
+
 
 
 
