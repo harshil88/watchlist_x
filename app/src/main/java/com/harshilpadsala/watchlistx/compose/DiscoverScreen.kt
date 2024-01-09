@@ -1,12 +1,10 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -64,7 +62,7 @@ import com.harshilpadsala.watchlistx.vm.DiscoverVM
 @Composable
 fun DiscoverRoute(
     onMediaClick: (Int) -> Unit,
-    onSearchClick: () -> Unit,
+    onFilterClick : () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DiscoverVM = hiltViewModel()
 ) {
@@ -86,24 +84,15 @@ fun DiscoverRoute(
 
 
 
-    if (
-        endOfListReached
-        && lazyListState.isScrollInProgress
-        && uiState.value.isLoading == false
-        && !uiState.value.hasReachedEnd) {
+    if (endOfListReached && lazyListState.isScrollInProgress && uiState.value.isLoading == false && !uiState.value.hasReachedEnd) {
         viewModel.nextPage()
     }
-
-    Log.i("FunnyUiState" , "Updating Ui State")
-    Log.i("FunnyUiState" , uiState.value.movies.toString())
-    Log.i("FunnyUiState" , uiState.value.currentPage.toString())
-    Log.i("FunnyUiState" , uiState.value.movies.toString())
 
     DiscoverScreen(
         uiState = uiState.value,
         lazyListState = lazyListState,
         onBackClick = {},
-        onFilterListClick = {},
+        onFilterListClick = onFilterClick,
     )
 
 
@@ -163,27 +152,28 @@ fun DiscoverScreen(
 ) {
     Scaffold(
         topBar = {
-//            TopBarX(title = "Discover Movies", actions = {
-//                IconButton(onClick = onFilterListClick) {
-//                    Icon(
-//                        imageVector = Icons.Filled.FilterList,
-//                        contentDescription = "Go To Discover Movie Filters Screen",
-//                        tint = Darkness.light,
-//                    )
-//                }
-//            }, onBackPress = onBackClick
-//            )
-        }
-    ) { paddingValues ->
-        Spacer(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()))
-
-
+        TopBarX(
+            title = "Discover Movies", actions = {
+                IconButton(onClick = onFilterListClick) {
+                    Icon(
+                        imageVector = Icons.Filled.FilterList,
+                        contentDescription = "Go To Discover Movie Filters Screen",
+                        tint = Darkness.light,
+                    )
+                }
+            }, onBackPress = onBackClick
+        )
+    }) { paddingValues ->
         if (uiState.movies != null) {
             MoviesList(
                 hasReachedEnd = uiState.hasReachedEnd,
                 movies = uiState.movies!!,
                 lazyListState = lazyListState,
-                onItemClick = {})
+                modifier = Modifier.padding(
+                    start = 16.dp, top = paddingValues.calculateTopPadding() + 16.dp, end = 16.dp
+                ),
+                onItemClick = {},
+            )
         }
     }
 }
@@ -348,14 +338,13 @@ fun DiscoverPage(
 fun MoviesList(
     hasReachedEnd: Boolean,
     movies: List<ListItemXData>,
+    modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     onItemClick: (Int) -> Unit
 ) {
 
     LazyColumn(
-        modifier = Modifier.padding(
-            start = 16.dp, top = 16.dp, end = 16.dp
-        ), state = lazyListState
+        modifier = modifier, state = lazyListState
     ) {
         items(
             count = if (!hasReachedEnd) movies.size + 1 else movies.size
@@ -436,7 +425,6 @@ fun DiscoverScreenPreview() {
                 tint = Darkness.light,
             )
         }
-    }, onBackPress = {}
-    )
+    }, onBackPress = {})
 }
 

@@ -66,7 +66,6 @@ class DiscoverVM @Inject constructor(
         viewModelScope.launch {
             discoverMovieUseCase.invoke(movieList, currentPage).collect {
                 when (it) {
-
                     is ResultX.Success -> {
                         val alreadyPresentMovies = discoverUiState.value.movies
                         val newMovies =

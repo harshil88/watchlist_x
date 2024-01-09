@@ -95,18 +95,17 @@ fun HomeRoute(
     movieStatsUiState.value.successMessage.let {
         if (it != null) {
             ToastX(message = it)
-
         }
     }
 
     movieStatsUiState.value.errorMessage.let {
         if (it != null) {
             ToastX(message = it)
-
         }
     }
 
-    HomeScreen(uiState = uiState.value,
+    HomeScreen(
+        uiState = uiState.value,
         movieStatsUiState = movieStatsUiState.value,
         sheetState = sheetState,
         refreshingState = refreshingState,
@@ -142,8 +141,6 @@ fun HomeScreen(
     onRatingClick: (RatingArgsModel) -> Unit,
     onShowMoreClick: (MovieList) -> Unit
 ) {
-
-
     ModalBottomSheetLayout(sheetState = sheetState, sheetContent = {
         if (movieStatsUiState.loading == true) {
             FullScreenLoaderX(
