@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.repo
 
 import com.harshilpadsala.watchlistx.data.res.list.Content
+import com.harshilpadsala.watchlistx.data.res.list.KeywordContent
 import com.harshilpadsala.watchlistx.data.res.list.MovieContent
 import com.harshilpadsala.watchlistx.data.res.list.TVContent
 import retrofit2.Response
@@ -38,23 +39,11 @@ interface DiscoverRepo {
         @Query("page") page: Int = 1,
         ): Response<Content<MovieContent>>
 
-    @GET("3/tv/airing_today")
-    suspend fun airingToday(
-        @Query("page") page: Int = 1,
-        ): Response<Content<TVContent>>
 
-    @GET("3/tv/on_the_air")
-    suspend fun onTheAir(
+    @GET("3/search/keyword")
+    suspend fun searchKeywords(
         @Query("page") page: Int = 1,
-        ): Response<Content<TVContent>>
+        @Query("query") query: String,
+    ): Response<Content<KeywordContent>>
 
-    @GET("3/tv/popular")
-    suspend fun popularTV(
-        @Query("page") page: Int = 1,
-        ): Response<Content<TVContent>>
-
-    @GET("3/tv/top_rated")
-    suspend fun topRatedTV(
-        @Query("page") page: Int = 1,
-        ): Response<Content<TVContent>>
 }

@@ -14,20 +14,7 @@ class DiscoverTvUseCase @Inject constructor(
 ) {
     operator fun invoke(tvList: TvList, page: Int): Flow<ResultX<Content<TVContent>?>> {
         return flow {
-            kotlin.runCatching {
-                runCatching {
-                    when (tvList) {
-                        TvList.AiringToday -> discoverRepo.airingToday(page = page)
-                        TvList.OnTheAir -> discoverRepo.onTheAir(page = page)
-                        TvList.Popular -> discoverRepo.popularTV(page = page)
-                        TvList.TopRated -> discoverRepo.topRatedTV(page = page)
-                    }
-                }.onSuccess {
-                    emit(ResultX.Success(data = it.body()))
-                }.onFailure {
-                    emit(ResultX.Error(message = it.message))
-                }
-            }
+
         }
     }
 }

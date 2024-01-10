@@ -28,11 +28,14 @@ fun TextFieldComponent(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
+    leadingIcon: (@Composable () -> Unit)? = null,
     label: (@Composable () -> Unit)? = null,
     placeholder: (@Composable () -> Unit)? = null,
     textController: MutableState<String> = mutableStateOf(""),
 ) {
-    OutlinedTextField(trailingIcon = trailingIcon,
+    OutlinedTextField(
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
             .clickable {

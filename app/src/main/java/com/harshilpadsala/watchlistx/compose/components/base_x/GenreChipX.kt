@@ -10,21 +10,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GenreChipX(text: String, selected: Boolean = false, onGenreClick: () -> Unit) {
+fun GenreChipX(
+    text: String,
+    modifier : Modifier = Modifier,
+    selected: Boolean = false,
+    selectable : Boolean = true,
+    onGenreClick: () -> Unit,
+    ) {
 
     val isSelected = remember {
         mutableStateOf(selected)
     }
 
     FilterChip(
+        modifier = modifier,
         onClick = {
-            isSelected.value = !isSelected.value
-                  onGenreClick()
+            if(selectable){
+                isSelected.value = !isSelected.value
+            }
+            onGenreClick()
         },
         border = FilterChipDefaults.filterChipBorder(
             borderColor = Darkness.water
