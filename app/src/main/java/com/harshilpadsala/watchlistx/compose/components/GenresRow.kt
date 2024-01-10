@@ -24,6 +24,7 @@ fun GenresRow(
     ) {
         genres.map { genre ->
             GenreChipX(
+                selected = false,
                 text = genre.name ?: "Unknown Genre",
                 onGenreClick = { onGenreClick(genre.id ?: 0) })
         }

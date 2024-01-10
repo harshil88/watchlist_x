@@ -26,24 +26,22 @@ import com.harshilpadsala.watchlistx.ui.theme.StylesX
 @Composable
 fun TextFieldComponent(
     modifier: Modifier = Modifier,
-    onClick : (() -> Unit)? = null,
-    trailingIcon : (@Composable () -> Unit)? = null,
-    label : (@Composable () -> Unit)? = null,
-    placeholder: (@Composable () -> Unit)?= null,
-    textController : MutableState<String> = mutableStateOf(""),
-){
-    OutlinedTextField(
-        trailingIcon = trailingIcon,
+    onClick: (() -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    label: (@Composable () -> Unit)? = null,
+    placeholder: (@Composable () -> Unit)? = null,
+    textController: MutableState<String> = mutableStateOf(""),
+) {
+    OutlinedTextField(trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
             .clickable {
                 onClick?.invoke()
-                       },
+            },
         value = textController.value,
-        enabled = onClick==null,
-        placeholder =placeholder,
-        onValueChange = {
-            value ->
+        enabled = onClick == null,
+        placeholder = placeholder,
+        onValueChange = { value ->
             textController.value = value
         },
         label = label,
@@ -61,14 +59,20 @@ fun TextFieldComponent(
 
 @Preview
 @Composable
-fun DateSearchComponent(){
+fun DateSearchComponent() {
     val searchController = remember {
         mutableStateOf("")
     }
 
-        TextFieldComponent(
-            label = { Text(text = "From" , style = StylesX.labelMedium.copy(color = Darkness.light))},
-            trailingIcon =  { Icon(imageVector = Icons.Filled.DateRange, contentDescription = "Date Range Icon" , tint = Darkness.light)},
-            textController = searchController
-        )
+    TextFieldComponent(
+        label = { Text(text = "From", style = StylesX.labelMedium.copy(color = Darkness.light)) },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = "Date Range Icon",
+                tint = Darkness.light
+            )
+        },
+        textController = searchController
+    )
 }

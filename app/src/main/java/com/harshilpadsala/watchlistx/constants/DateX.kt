@@ -32,11 +32,6 @@ object DateX {
 
     @SuppressLint("NewApi")
     fun getCurrentDateTimeStamp() : Long {
-        Log.i("PrintDate", currentDate.toString())
-        Log.i("PrintDate", currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString())
-
-
-
     return currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant().epochSecond
 }
 
