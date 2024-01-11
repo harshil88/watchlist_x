@@ -2,14 +2,18 @@ package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.ModalBottomSheetLayout
@@ -24,7 +28,6 @@ import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -37,6 +40,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
@@ -80,8 +85,13 @@ fun FilterRoute(
         mutableStateOf("")
     }
 
+    val searchFocusRequester = FocusRequester()
+
+    val focusManager = LocalFocusManager.current
+
     val keywordSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
     )
 
     val shouldShowDatePicker = remember {
@@ -96,34 +106,49 @@ fun FilterRoute(
         initialSelectedDateMillis = DateX.getCurrentDateTimeStamp()
     )
 
-    LaunchedEffect(searchController.value){
-        viewModel.searchKeywords(searchController.value)
+    LaunchedEffect(searchController.value) {
+        //viewModel.searchKeywords(searchController.value)
+        viewModel.searchKeywordsWithDebouncing(searchController.value)
     }
 
-    Log.i("SheetDebug" , "UiStateValue $filterUiState")
+    LaunchedEffect(keywordSheetState.isVisible){
+        if(!keywordSheetState.isVisible){
+            focusManager.clearFocus()
+            searchController.value = ""
+        }
+    }
 
 
-    FilterScreen(
-        filterUiState = filterUiState.value,
+
+    FilterScreen(filterUiState = filterUiState.value,
         keywordSheetState = keywordSheetState,
-        dateInitialController =  dateInitialController,
-        searchController =  searchController,
+        dateInitialController = dateInitialController,
+        searchController = searchController,
         onBackClick = onBackClick,
         fromDatePickerState = fromDatePickerState,
         toDatePickerState = toDatePickerState,
-        onSelectKeywordClick = {
+        onSearchKeywordClick = {
             scope.launch {
-                if(!keywordSheetState.isVisible){
+                if (!keywordSheetState.isVisible) {
                     keywordSheetState.show()
+                    searchFocusRequester.requestFocus()
                 }
             }
 
         },
-        selectedKeywordsCallback = {},
-    )
-
-
-
+        selectedKeywordsCallback = {
+            Log.i("SelectedGendersCallback", it.toString())
+        },
+        focusRequester = searchFocusRequester,
+        onSelectKeywordClick = {
+            focusManager.clearFocus()
+            if (keywordSheetState.isVisible) {
+                scope.launch {
+                    keywordSheetState.hide()
+              }
+                viewModel.addKeyword(it)
+            }
+        })
 }
 
 
@@ -132,24 +157,33 @@ fun FilterRoute(
 fun FilterScreen(
     filterUiState: FilterUiState,
     keywordSheetState: ModalBottomSheetState,
+    focusRequester: FocusRequester,
     searchController: MutableState<String>,
     dateInitialController: MutableState<String>,
     fromDatePickerState: DatePickerState,
     toDatePickerState: DatePickerState,
-    onSelectKeywordClick: () -> Unit,
-    selectedKeywordsCallback: (List<Int>) -> Unit,
+    onSearchKeywordClick: () -> Unit,
+    onSelectKeywordClick: (KeywordContent) -> Unit,
+    selectedKeywordsCallback: (List<KeywordContent>) -> Unit,
     onBackClick: () -> Unit,
 ) {
 
 
-    Scaffold(topBar = { TopBarX(title = "Filter", onBackPress = {}) }) { paddingValues ->
+    ModalBottomSheetLayout(
+        modifier = Modifier.fillMaxHeight(),
+        sheetShape = RoundedCornerShape(
+        topStart = 16.dp,
+        topEnd = 16.dp,
+    ), sheetState = keywordSheetState, sheetContent = {
+        SearchKeywordSheetContent(
+            searchController = searchController,
+            searchResults = filterUiState.searchKeywords ?: listOf(),
+            onSelectKeywordClick = onSelectKeywordClick,
+            focusRequester = focusRequester,
+        )
+    }, content = {
 
-        ModalBottomSheetLayout(sheetState = keywordSheetState, sheetContent = {
-            SearchKeywordSheetContent(
-                searchController = searchController,
-                searchResults = filterUiState.keywords ?: listOf()
-            )
-        }, content = {
+        Scaffold(topBar = { TopBarX(title = "Filter", onBackPress = {}) }) { paddingValues ->
             Column {
                 DateSelectorRow(
                     paddingValues = paddingValues,
@@ -162,22 +196,22 @@ fun FilterScreen(
                             vertical = 16.dp,
                         ),
                         genres = filterUiState.genres!!,
-                        selectedGendersCallback = {
-                            Log.i("SelectedGendersCallback", it.toString())
-                        },
+                        selectedGendersCallback = {},
                     )
                 }
 
+
                 KeywordFilterChips(
-                    keywords = filterUiState.keywords?: listOf(),
+                    keywords = filterUiState.selectedKeywords,
                     selectedKeywordsCallback = selectedKeywordsCallback,
-                    onSelectKeywordClick = onSelectKeywordClick,
+                    onSearchKeywordClick = onSearchKeywordClick,
                 )
 
             }
-        })
+        }
+    })
 
-    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -296,47 +330,57 @@ fun GenderFilterChips(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchKeywordSheetContent(
+    focusRequester: FocusRequester,
     searchController: MutableState<String>,
     searchResults: List<KeywordContent>,
+    onSelectKeywordClick: (KeywordContent) -> Unit,
 ) {
 
 
-    MaterialTheme {
-        Column {
-            TextFieldComponent(
-                textController = searchController, leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Keyword",
-                    tint = Darkness.light,
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .background(Darkness.night)
+    ) {
+        TextFieldComponent(
+            focusRequester = focusRequester,
+            textController = searchController, modifier = Modifier.padding(
+            16.dp
+        ), leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search Keyword",
+                tint = Darkness.light,
+            )
+        }, placeholder = {
+            Text(
+                text = "Search Keyword", style = StylesX.labelMedium.copy(
+                    color = Darkness.light
                 )
-            }, placeholder = {
-                Text(
-                    text = "Search Keyword", style = StylesX.labelMedium.copy(
-                        color = Darkness.light
-                    )
-                )
-            })
+            )
+        })
 
-            LazyColumn {
-                items(count = searchResults.size) { index ->
-                    ListItem(text = {
-                        Text(text = searchResults[index].name ?: "", style = StylesX.labelMedium)
-                    })
-                }
+        LazyColumn {
+            items(count = searchResults.size) { index ->
+                ListItem(modifier = Modifier.clickable {
+                    onSelectKeywordClick(searchResults[index])
+                }, text = {
+                    Text(text = searchResults[index].name ?: "", style = StylesX.labelMedium)
+                })
             }
         }
     }
 }
 
+
 @Composable
 fun KeywordFilterChips(
     keywords: List<KeywordContent>,
-    onSelectKeywordClick : () -> Unit,
-    selectedKeywordsCallback: (List<Int>) -> Unit,
+    onSearchKeywordClick: () -> Unit,
+    selectedKeywordsCallback: (List<KeywordContent>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedKeywords = mutableListOf<Int>()
+    val selectedKeywords = keywords.toMutableList()
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
@@ -346,33 +390,31 @@ fun KeywordFilterChips(
                 GenreChipX(modifier = Modifier.padding(
                     start = if (index == 0) 20.dp else 0.dp,
                 ),
-                    selected = selectedKeywords.contains(keyword.id),
+                    selected = selectedKeywords.contains(keyword),
                     text = keyword.name ?: "Unknown Keyword",
                     onGenreClick = {
-                       if(keyword.id != -1){
-                           if (selectedKeywords.contains(keyword.id)) {
-                               selectedKeywords.remove(keyword.id)
-                           } else {
-                               keyword.id?.let { selectedKeywords.add(keyword.id) }
-                           }
-                           selectedKeywordsCallback(selectedKeywords)
-                       }
-                        else{
-                            onSelectKeywordClick()
+                        if (keyword.id != -1) {
+                            if (selectedKeywords.contains(keyword)) {
+                                selectedKeywords.remove(keyword)
+                            } else {
+                                keyword.id?.let { selectedKeywords.add(keyword) }
+                            }
+                            selectedKeywordsCallback(selectedKeywords)
+                        } else {
+                            onSearchKeywordClick()
                         }
-                    }
-                )
+                    })
             }
         }
         item {
             GenreChipX(
                 modifier = Modifier.padding(
-             start =  if(keywords.isEmpty()) 20.dp else 0.dp,
-            ),
+                    start = if (keywords.isEmpty()) 20.dp else 0.dp,
+                ),
                 selectable = false,
                 selected = false,
                 text = "Add Keywords",
-                onGenreClick = onSelectKeywordClick,
+                onGenreClick = onSearchKeywordClick,
             )
         }
     }
