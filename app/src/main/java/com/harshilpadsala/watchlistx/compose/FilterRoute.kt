@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -104,9 +105,6 @@ fun FilterRoute(
         initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true
     )
 
-    val shouldShowDatePicker = remember {
-        mutableStateOf(false)
-    }
 
     val fromDatePickerState = rememberDatePickerState(
         initialSelectedDateMillis = 1704738600, initialDisplayedMonthMillis = 1704738600
@@ -127,6 +125,7 @@ fun FilterRoute(
             searchController.value = ""
         }
     }
+
 
 
 
@@ -159,7 +158,8 @@ fun FilterRoute(
                 }
                 viewModel.addKeyword(it)
             }
-        })
+        }
+    )
 }
 
 

@@ -24,6 +24,7 @@ data class FilterUiState(
     var genres: List<GenreContent>? = null,
     var searchKeywords: List<KeywordContent>? = null,
     var selectedKeywords: List<KeywordContent> = listOf(),
+    var shouldShowDatePicker : Boolean = false,
     )
 
 @HiltViewModel

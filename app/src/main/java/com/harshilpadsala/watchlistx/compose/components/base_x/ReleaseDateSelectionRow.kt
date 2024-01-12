@@ -27,6 +27,9 @@ fun DateSelectorRow(
     paddingValues: PaddingValues,
     fromDatePickerState: DatePickerState,
     toDatePickerState: DatePickerState,
+    userRatings : Int? = 0,
+    userVoteCount : Int ?= 0,
+    runtime : Int? = 0,
 ) {
 
 
