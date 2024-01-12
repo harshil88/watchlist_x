@@ -1,52 +1,38 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.RichTooltipBox
-import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberRichTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
@@ -54,12 +40,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.GenderFilterChips
 import com.harshilpadsala.watchlistx.compose.components.KeywordFilterChips
+import com.harshilpadsala.watchlistx.compose.components.RangeSliderX
+import com.harshilpadsala.watchlistx.compose.components.SingleSliderX
+import com.harshilpadsala.watchlistx.compose.components.SliderCategory
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
 import com.harshilpadsala.watchlistx.compose.components.base_x.DateSelectorRow
-import com.harshilpadsala.watchlistx.compose.components.base_x.GenreChipX
 import com.harshilpadsala.watchlistx.compose.components.base_x.TextFieldComponent
-import com.harshilpadsala.watchlistx.constants.DateX
-import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 import com.harshilpadsala.watchlistx.data.res.list.KeywordContent
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
@@ -67,11 +53,10 @@ import com.harshilpadsala.watchlistx.vm.FilterUiState
 import com.harshilpadsala.watchlistx.vm.FilterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
 
 
 //Todo : Bug-Fix-Default-Dates-Not-Being-Shown
+//Todo : Bug-In-Add-Keywords-Flow-Proper-State-Not-Being-Maintained
 
 enum class DateRangeType {
     From, To
@@ -124,12 +109,12 @@ fun FilterRoute(
         }
     }
 
-    FilterScreen(
-        filterUiState = filterUiState.value,
+    FilterScreen(filterUiState = filterUiState.value,
         keywordSheetState = keywordSheetState,
         dateInitialController = dateInitialController,
         searchController = searchController,
         onBackClick = onBackClick,
+        onFloatingButtonClick = {},
         fromDatePickerState = fromDatePickerState,
         toDatePickerState = toDatePickerState,
         scope = scope,
@@ -161,6 +146,8 @@ fun FilterRoute(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun FilterScreen(
+    onBackClick: () -> Unit,
+    onFloatingButtonClick : () -> Unit,
     filterUiState: FilterUiState,
     keywordSheetState: ModalBottomSheetState,
     focusRequester: FocusRequester,
@@ -172,10 +159,9 @@ fun FilterScreen(
     onSearchKeywordClick: () -> Unit,
     onSelectKeywordClick: (KeywordContent) -> Unit,
     selectedKeywordsCallback: (List<KeywordContent>) -> Unit,
-    onBackClick: () -> Unit,
-    onUserScoreChange: () -> Unit,
-    onUserVotesChange: () -> Unit,
-    onRuntimeChange: () -> Unit,
+    onUserScoreChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    onUserVotesChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    onRuntimeChange: (Float) -> Unit,
 ) {
 
     ModalBottomSheetLayout(modifier = Modifier.fillMaxHeight(), sheetShape = RoundedCornerShape(
@@ -189,42 +175,113 @@ fun FilterScreen(
             focusRequester = focusRequester,
         )
     }, content = {
-        Scaffold(
+        Scaffold(topBar = { TopBarX(title = "Filter", onBackPress = {}) }, floatingActionButton = {
+            FloatingActionButton(onClick = onFloatingButtonClick , backgroundColor = Darkness.rise) {
+                Icon(imageVector = Icons.Filled.Done, contentDescription = "Action Done Button" , tint = Darkness.stillness)
+            }
+        }) { paddingValues ->
 
-            topBar = { TopBarX(title = "Filter", onBackPress = {}) }) { paddingValues ->
+            LazyColumn {
 
-            Column {
-
-                DateSelectorRow(
-                    modifier = Modifier.padding(
-                        top = paddingValues.calculateTopPadding(),
-                        start = 16.dp,
-                        end = 16.dp,
-                    ),
-                    fromDatePickerState = fromDatePickerState,
-                    toDatePickerState = toDatePickerState,
-                )
-
-                if (filterUiState.genres != null) {
-                    GenderFilterChips(
+                item {
+                    DateSelectorRow(
                         modifier = Modifier.padding(
-                            vertical = 16.dp,
+                            top = paddingValues.calculateTopPadding(),
+                            start = 16.dp,
+                            end = 16.dp,
                         ),
-                        genres = filterUiState.genres!!,
-                        selectedGendersCallback = {},
+                        fromDatePickerState = fromDatePickerState,
+                        toDatePickerState = toDatePickerState,
                     )
                 }
 
-                KeywordFilterChips(
-                    keywords = filterUiState.selectedKeywords,
-                    selectedKeywordsCallback = selectedKeywordsCallback,
-                    onSearchKeywordClick = onSearchKeywordClick,
-                )
+                item {
+                    if (filterUiState.genres != null) {
+                        GenderFilterChips(
+                            modifier = Modifier.padding(
+                                vertical = 16.dp,
+                            ),
+                            genres = filterUiState.genres!!,
+                            selectedGendersCallback = {},
+                        )
+                    }
+                }
+
+                item {
+                    KeywordFilterChips(
+                        keywords = filterUiState.selectedKeywords,
+                        selectedKeywordsCallback = selectedKeywordsCallback,
+                        onSearchKeywordClick = onSearchKeywordClick,
+                    )
+                }
+
+                item {
+                    SliderCard(text = "User Score : ") {
+                        RangeSliderX(
+                            initialRange = 5F..8F,
+                            minValue = 0F,
+                            maxValue = 10F,
+                            sliderCategory = SliderCategory.UserScore,
+                            onValueChange = onUserScoreChange,
+                            scope = scope
+                        )
+                    }
+                }
+
+                item {
+                    SliderCard(text = "Minimum User Votes : ") {
+                        SingleSliderX(
+                            initialValue = 120F,
+                            minValue = 0F,
+                            maxValue = 400F,
+                            sliderCategory = SliderCategory.UserVotes,
+                            onValueChange = onRuntimeChange,
+                            scope = scope
+                        )
+                    }
+
+                }
+
+                item {
+                    SliderCard(text = "Runtime : ") {
+                        RangeSliderX(
+                            initialRange = 100F..200F,
+                            minValue = 0F,
+                            maxValue = 500F,
+                            sliderCategory = SliderCategory.Runtime,
+                            onValueChange = onUserVotesChange,
+                            scope = scope
+                        )
+                    }
+                }
 
 
             }
         }
     })
+}
+
+@Composable
+fun SliderCard(
+    text: String,
+    content: @Composable () -> Unit,
+) {
+    Card(
+        modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Darkness.night
+        )
+    ) {
+        Text(
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+            text = text,
+            style = StylesX.titleMedium.copy(color = Darkness.light),
+        )
+
+        content()
+
+
+    }
 }
 
 

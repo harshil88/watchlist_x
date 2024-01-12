@@ -1,5 +1,10 @@
 package com.harshilpadsala.watchlistx.compose.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import kotlinx.coroutines.CoroutineScope
@@ -58,9 +65,19 @@ fun SingleSliderX(
         ),
         thumb = {
             ThumbWithTooltip(
-                text = getToolTipStringAsPerSlider(sliderCategory), tooltipState = tooltipState
+                text = getToolTipStringAsPerSlider(sliderCategory , currentSliderValue.floatValue), tooltipState = tooltipState
             )
         })
+
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().padding(start = 16.dp , end = 16.dp, bottom = 8.dp)
+
+    ) {
+        Text(text = minValue.toInt().toString() , style = StylesX.labelMedium.copy(color = Darkness.light))
+        Text(text = maxValue.toInt().toString() , style = StylesX.labelMedium.copy(color = Darkness.light))
+    }
 
 
 }
@@ -74,7 +91,6 @@ fun RangeSliderX(
     maxValue: Float,
     steps: Int = 0,
     sliderCategory: SliderCategory,
-
     onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
     scope: CoroutineScope,
 
@@ -105,11 +121,22 @@ fun RangeSliderX(
         ),
         startThumb = {
             ThumbWithTooltip(
-                text = getToolTipStringAsPerSlider(sliderCategory), tooltipState = tooltipState
+                text = getToolTipStringAsPerSlider(sliderCategory , currentSliderValue.value.start, currentSliderValue.value.endInclusive ), tooltipState = tooltipState
             )
 
         },
     )
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().padding(start = 16.dp , end = 16.dp, bottom = 8.dp)
+    ) {
+        Text(text = minValue.toInt().toString() , style = StylesX.labelMedium.copy(color = Darkness.light))
+        Text(text = maxValue.toInt().toString() , style = StylesX.labelMedium.copy(color = Darkness.light))
+
+}
+    
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
