@@ -1,7 +1,6 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,13 +8,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -64,8 +60,8 @@ fun RatingRoute(
         ToastX(message = uiState.value.success!!)
     }
 
-    LaunchedEffect(uiState.value.success){
-        if(uiState.value.success!=null){
+    LaunchedEffect(uiState.value.success) {
+        if (uiState.value.success != null) {
             onBackPress()
         }
     }
@@ -93,11 +89,14 @@ fun RatingScreen(
     onCancelPress: () -> Unit,
 ) {
 
-    val buttonModifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 32.dp)
+    val buttonModifier = Modifier.padding(
+        start = 20.dp,
+        end = 20.dp, top = 8.dp, bottom = 32.dp
+    )
 
 
     Scaffold(topBar = {
-        TopBarX(title = ratingUiState.movieName ?: "" , onBackPress = onCancelPress)
+        TopBarX(title = ratingUiState.movieName ?: "", onBackPress = onCancelPress)
     }) { paddingValues ->
         Box(
             contentAlignment = Alignment.Center
@@ -121,15 +120,10 @@ fun RatingScreen(
                     modifier = Modifier.padding(
                         vertical = 16.dp
                     ), text = buildAnnotatedString {
-                        Log.i("RatingTextDebug" , ratingUiState.isRated.toString())
-                        Log.i("RatingTextDebug" , ratingUiState.currentRating.toString())
-                        Log.i("RatingTextDebug" , ratingState.intValue.toString())
-
-
-                        if(ratingUiState.isRated == true && ratingState.intValue == ratingUiState.currentRating){
+                        if (
+                            ratingUiState.isRated == true && ratingState.intValue == ratingUiState.currentRating) {
                             append(text = "Your Rating : ")
-                        }
-                        else{
+                        } else {
                             append(text = "Submit Rating : ")
                         }
                         withStyle(
@@ -150,7 +144,8 @@ fun RatingScreen(
                     ),
                     onClick = {
                         onSubmitRating(ratingState.intValue)
-                    })
+                    }
+                )
 
                 if (ratingUiState.isRated == false) {
                     WXButton(

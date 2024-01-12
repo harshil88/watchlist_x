@@ -22,9 +22,13 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -122,12 +126,14 @@ fun MovieDetailScreen(
             val isWatchListed = movieDetailUiState.data?.movieStats?.watchlist ?: false
 
 
-            Scaffold(topBar = {
+            Scaffold(
+                topBar = {
                 TopBarX(
                     title = movieDetail?.title ?: "",
                     onBackPress = onBackPress,
                 )
-            }) {
+            }
+            ) {
                     paddingValues ->
 
                 LazyColumn(
@@ -280,3 +286,5 @@ fun ActionButtonsRowPreview(){
         onWatchListClick = {},
     )
 }
+
+

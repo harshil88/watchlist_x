@@ -1,6 +1,5 @@
 package com.harshilpadsala.watchlistx.vm
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,15 +10,13 @@ import com.harshilpadsala.watchlistx.domain.usecase.GenreUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.SearchKeywordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+const val SEARCH_DEBOUNCING_DURATION = 1000L
 
 data class FilterUiState(
     var isLoading: Boolean? = null,
@@ -36,14 +33,12 @@ class FilterViewModel @Inject constructor(
 ) : ViewModel() {
 
     val filterUiState = mutableStateOf(FilterUiState())
-    private lateinit var searchQueryFlow: Flow<String>
 
-    @OptIn(FlowPreview::class)
-    private var saQueryFlow = MutableStateFlow<String>("")
+    private var searchQueryFlow = MutableStateFlow("")
 
     init {
         genres()
-        initTemporarySearchCollector()
+        searchQueryCollector()
     }
 
     fun genres() {
@@ -65,7 +60,7 @@ class FilterViewModel @Inject constructor(
 
     fun searchKeywordsWithDebouncing(query: String) {
         viewModelScope.launch {
-            saQueryFlow.value = query
+            searchQueryFlow.value = query
         }
     }
 
@@ -79,14 +74,10 @@ class FilterViewModel @Inject constructor(
         }
     }
 
-    fun removeUnselectedKeywords() {
-
-    }
-
     @OptIn(FlowPreview::class)
-    fun initTemporarySearchCollector() {
+    fun searchQueryCollector() {
         viewModelScope.launch {
-            saQueryFlow.debounce(1000).collect {
+            searchQueryFlow.debounce(SEARCH_DEBOUNCING_DURATION).collect {
                 searchKeywords(it)
             }
         }
@@ -109,5 +100,4 @@ class FilterViewModel @Inject constructor(
             }
         }
     }
-
 }
