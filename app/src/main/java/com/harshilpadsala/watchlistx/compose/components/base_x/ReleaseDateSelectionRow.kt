@@ -1,7 +1,8 @@
 package com.harshilpadsala.watchlistx.compose.components.base_x
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
@@ -14,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.harshilpadsala.watchlistx.compose.DateRangeType
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
@@ -24,21 +26,19 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateSelectorRow(
-    paddingValues: PaddingValues,
     fromDatePickerState: DatePickerState,
     toDatePickerState: DatePickerState,
-    userRatings : Int? = 0,
-    userVoteCount : Int ?= 0,
-    runtime : Int? = 0,
-) {
+    modifier: Modifier = Modifier,
+
+    ) {
 
 
     val fromDate = remember {
-        mutableStateOf("1704738600")
+        mutableStateOf("Select")
     }
 
     val toDate = remember {
-        mutableStateOf("1704738600")
+        mutableStateOf("Select")
     }
 
 
@@ -49,8 +49,10 @@ fun DateSelectorRow(
     val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH)
 
     Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         TextFieldComponent(
             modifier = Modifier.weight(1F),
             textController = fromDate,
@@ -63,6 +65,8 @@ fun DateSelectorRow(
                 )
             },
         )
+
+        Spacer(modifier = Modifier.padding(start = 16.dp))
 
         TextFieldComponent(
             modifier = Modifier.weight(1F),
@@ -83,21 +87,26 @@ fun DateSelectorRow(
             dateRangeType.value = null
         }, confirmButton = {
             ElevatedButton(onClick = {
-                dateRangeType.value = null
                 if (dateRangeType.value == DateRangeType.From) {
-                    fromDate.value =
-                        dateFormat.format(Date(fromDatePickerState.selectedDateMillis!!))
+                    fromDatePickerState.selectedDateMillis?.let {
+                        fromDate.value = dateFormat.format(Date(it))
+                    }
 
                 } else if (dateRangeType.value == DateRangeType.To) {
-                    toDate.value = dateFormat.format(Date(toDatePickerState.selectedDateMillis!!))
+                    toDatePickerState.selectedDateMillis?.let {
+                        toDate.value = dateFormat.format(Date(it))
+                    }
                 }
+
+                dateRangeType.value = null
+
             }) {
                 Text(text = "Done", style = StylesX.labelMedium.copy(color = Darkness.rise))
             }
         }) {
             DatePicker(
                 state = if (dateRangeType.value == DateRangeType.From) fromDatePickerState else toDatePickerState,
-                showModeToggle = false
+                showModeToggle = false,
             )
         }
     }

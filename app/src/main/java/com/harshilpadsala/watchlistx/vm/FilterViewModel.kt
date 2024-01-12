@@ -25,6 +25,7 @@ data class FilterUiState(
     var searchKeywords: List<KeywordContent>? = null,
     var selectedKeywords: List<KeywordContent> = listOf(),
     var shouldShowDatePicker : Boolean = false,
+    var keywordSearchString : String = "",
     )
 
 @HiltViewModel

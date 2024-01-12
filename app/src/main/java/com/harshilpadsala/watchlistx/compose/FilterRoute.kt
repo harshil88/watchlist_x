@@ -107,11 +107,9 @@ fun FilterRoute(
 
 
     val fromDatePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = 1704738600, initialDisplayedMonthMillis = 1704738600
     )
 
     val toDatePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = DateX.getCurrentDateTimeStamp()
     )
 
     LaunchedEffect(searchController.value) {
@@ -126,10 +124,8 @@ fun FilterRoute(
         }
     }
 
-
-
-
-    FilterScreen(filterUiState = filterUiState.value,
+    FilterScreen(
+        filterUiState = filterUiState.value,
         keywordSheetState = keywordSheetState,
         dateInitialController = dateInitialController,
         searchController = searchController,
@@ -158,8 +154,7 @@ fun FilterRoute(
                 }
                 viewModel.addKeyword(it)
             }
-        }
-    )
+        })
 }
 
 
@@ -182,6 +177,7 @@ fun FilterScreen(
     onUserVotesChange: () -> Unit,
     onRuntimeChange: () -> Unit,
 ) {
+
     ModalBottomSheetLayout(modifier = Modifier.fillMaxHeight(), sheetShape = RoundedCornerShape(
         topStart = 16.dp,
         topEnd = 16.dp,
@@ -200,7 +196,11 @@ fun FilterScreen(
             Column {
 
                 DateSelectorRow(
-                    paddingValues = paddingValues,
+                    modifier = Modifier.padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = 16.dp,
+                        end = 16.dp,
+                    ),
                     fromDatePickerState = fromDatePickerState,
                     toDatePickerState = toDatePickerState,
                 )
@@ -222,13 +222,10 @@ fun FilterScreen(
                 )
 
 
-
             }
         }
     })
 }
-
-
 
 
 @OptIn(ExperimentalMaterialApi::class)
