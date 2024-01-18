@@ -1,17 +1,21 @@
 package com.harshilpadsala.watchlistx.vm
 
+import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
+import com.harshilpadsala.watchlistx.data.res.model.FilterParams
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.domain.usecase.DiscoverMovieUseCase
+import com.harshilpadsala.watchlistx.domain.usecase.FilterMoviesUseCase
+import com.harshilpadsala.watchlistx.navigation.filterNavArg
 import com.harshilpadsala.watchlistx.navigation.movieListTypeArg
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,17 +33,26 @@ data class DiscoverUiState(
 @HiltViewModel
 class DiscoverVM @Inject constructor(
     private val discoverMovieUseCase: DiscoverMovieUseCase,
+    private val filterMoviesUseCase: FilterMoviesUseCase,
     val state: SavedStateHandle,
 ) : ViewModel() {
+
 
     val discoverUiState = mutableStateOf(DiscoverUiState())
     private var currentPage = 1
 
     val movieChipState = mutableStateOf(MovieList.Popular)
 
+    private var filterArgs: FilterParams? = null
+
 
     init {
         val selectedMovieList = state.get<MovieList>(movieListTypeArg)
+        val encodedUri = state.get<String>(filterNavArg)
+        val decodedUri = encodedUri.let { Uri.decode(encodedUri) }
+        filterArgs = if (decodedUri != null) {
+            Gson().fromJson(decodedUri, FilterParams::class.java)
+        } else FilterParams()
         if (selectedMovieList != null) {
             discoverMovieList(selectedMovieList)
         }
@@ -64,7 +77,14 @@ class DiscoverVM @Inject constructor(
     private fun discoverMovieList(movieList: MovieList) {
 
         viewModelScope.launch {
-            discoverMovieUseCase.invoke(movieList, currentPage).collect {
+            filterMoviesUseCase.invoke(
+                page = currentPage,
+                dateGte = filterArgs?.dateGte,
+                dateLte = filterArgs?.dateLte,
+                sortBy = filterArgs?.sortBy,
+                withGenres = filterArgs?.withGenres,
+                withKeywords = filterArgs?.withKeywords,
+            ).collect {
                 when (it) {
                     is ResultX.Success -> {
                         val alreadyPresentMovies = discoverUiState.value.movies
@@ -86,7 +106,6 @@ class DiscoverVM @Inject constructor(
                         if (!discoverUiState.value.hasReachedEnd) {
                             currentPage += 1
                         }
-
                     }
 
                     is ResultX.Error -> {

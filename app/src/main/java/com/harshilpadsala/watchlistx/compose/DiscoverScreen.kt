@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +48,7 @@ import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.constants.TvList
 import com.harshilpadsala.watchlistx.constants.isScrolledToEnd
+import com.harshilpadsala.watchlistx.data.res.model.FilterParams
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.state.DiscoverMovieUiState
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
@@ -55,7 +57,7 @@ import com.harshilpadsala.watchlistx.vm.DiscoverVM
 
 //todo : Learn when and why to use rememberUpdatedState
 
-//todo : Bug Padding Values in Top Bar
+//todo : Reduce state calls is at all possible
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterialApi::class)
@@ -64,8 +66,11 @@ fun DiscoverRoute(
     onMediaClick: (Int) -> Unit,
     onFilterClick : () -> Unit,
     modifier: Modifier = Modifier,
+    filterParams : FilterParams? = null,
     viewModel: DiscoverVM = hiltViewModel()
+
 ) {
+
 
     val uiState = rememberUpdatedState(newValue = viewModel.discoverUiState.value)
 
@@ -82,8 +87,6 @@ fun DiscoverRoute(
         }
     }
 
-
-
     if (endOfListReached && lazyListState.isScrollInProgress && uiState.value.isLoading == false && !uiState.value.hasReachedEnd) {
         viewModel.nextPage()
     }
@@ -95,50 +98,6 @@ fun DiscoverRoute(
         onFilterListClick = onFilterClick,
     )
 
-
-//    LaunchedEffect(endOfListReached) {
-//        if (viewModel.selectedMediaType.value == MediaType.Movie) {
-//            if (viewModel.currentPage != 1) {
-//                viewModel.discoverMovieList(viewModel.movieChipState.value)
-//            }
-//        } else {
-//
-//        }
-//    }
-
-
-//    if (uiState.value is DiscoverMovieUiState.SuccessUiState) {
-//        if ((uiState.value as DiscoverMovieUiState.SuccessUiState).currentPage == 1) {
-//            scope.launch {
-//                lazyListState.scrollToItem(0)
-//            }
-//        }
-//    }
-
-
-//    DiscoverScreen(uiState = uiState.value,
-//        lazyListState = lazyListState,
-//        modalBottomSheetState = sheetState,
-//        movieChipState = viewModel.movieChipState.value,
-//        tvChipState = viewModel.tvChipState.value,
-//        selectedMediaType = viewModel.selectedMediaType.value,
-//        onChipClick = {
-//            scope.launch {
-//                sheetState.show()
-//            }
-//        },
-//        onItemClick = onMediaClick,
-//        onTabItemClick = {
-//            viewModel.onTabChange(it)
-//            viewModel.resetCalled = true
-//        },
-//        onSearchClick = onSearchClick,
-//        sheetItemClick = {
-//            scope.launch {
-//                sheetState.hide()
-//                viewModel.toggleSheet(it)
-//            }
-//        })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,7 +122,8 @@ fun DiscoverScreen(
                 }
             }, onBackPress = onBackClick
         )
-    }) { paddingValues ->
+    }) {
+        paddingValues ->
         if (uiState.movies != null) {
             MoviesList(
                 hasReachedEnd = uiState.hasReachedEnd,

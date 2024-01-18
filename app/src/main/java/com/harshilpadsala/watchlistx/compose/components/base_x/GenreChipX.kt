@@ -18,11 +18,11 @@ import com.harshilpadsala.watchlistx.ui.theme.StylesX
 @Composable
 fun GenreChipX(
     text: String,
-    modifier : Modifier = Modifier,
+    modifier: Modifier = Modifier,
     selected: Boolean = false,
-    selectable : Boolean = true,
+    selectable: Boolean = true,
     onGenreClick: () -> Unit,
-    ) {
+) {
 
     val isSelected = remember {
         mutableStateOf(selected)
@@ -48,9 +48,12 @@ fun GenreChipX(
                 )
         },
         label = {
-            Text(text = text, style = StylesX.labelMedium.copy(color = if(isSelected.value) Darkness.night else Darkness.light))
+            Text(
+                text = text,
+                style = StylesX.labelMedium.copy(color = if (isSelected.value) Darkness.night else Darkness.light)
+            )
         }, selected = isSelected.value, colors = FilterChipDefaults.filterChipColors(
-            containerColor =Darkness.night,
+            containerColor = Darkness.night,
             selectedContainerColor = Darkness.rise
         )
     )

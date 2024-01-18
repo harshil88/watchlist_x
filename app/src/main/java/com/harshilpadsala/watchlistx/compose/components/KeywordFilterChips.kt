@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.compose.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -16,7 +17,8 @@ fun KeywordFilterChips(
     selectedKeywordsCallback: (List<KeywordContent>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedKeywords = keywords.toMutableList()
+    //val selectedKeywords = keywords.toMutableList()
+    Log.i("KeywordContentDebug" , keywords.toString())
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
@@ -26,16 +28,19 @@ fun KeywordFilterChips(
                 GenreChipX(modifier = Modifier.padding(
                     start = if (index == 0) 20.dp else 0.dp,
                 ),
-                    selected = selectedKeywords.contains(keyword),
+                    selected = keyword.isSelected,
                     text = keyword.name ?: "Unknown Keyword",
                     onGenreClick = {
                         if (keyword.id != -1) {
-                            if (selectedKeywords.contains(keyword)) {
-                                selectedKeywords.remove(keyword)
-                            } else {
-                                keyword.id?.let { selectedKeywords.add(keyword) }
-                            }
-                            selectedKeywordsCallback(selectedKeywords)
+                            keyword.isSelected = !keyword.isSelected
+                            selectedKeywordsCallback(keywords)
+
+//                            if (selectedKeywords.contains(keyword)) {
+//                                selectedKeywords.remove(keyword)
+//                            } else {
+//                                keyword.id?.let { selectedKeywords.add(keyword) }
+//                            }
+//                            selectedKeywordsCallback(selectedKeywords)
                         } else {
                             onSearchKeywordClick()
                         }

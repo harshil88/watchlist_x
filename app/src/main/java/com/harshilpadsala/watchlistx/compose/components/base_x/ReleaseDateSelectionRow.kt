@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -26,12 +26,10 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateSelectorRow(
-    fromDatePickerState: DatePickerState,
-    toDatePickerState: DatePickerState,
     modifier: Modifier = Modifier,
-
-    ) {
-
+    onFromDateChange: (String) -> Unit,
+    onToDateChange: (String) -> Unit,
+) {
 
     val fromDate = remember {
         mutableStateOf("Select")
@@ -41,12 +39,15 @@ fun DateSelectorRow(
         mutableStateOf("Select")
     }
 
+    val fromDatePickerState = rememberDatePickerState()
+    val toDatePickerState = rememberDatePickerState()
+
 
     val dateRangeType: MutableState<DateRangeType?> = remember {
         mutableStateOf(null)
     }
 
-    val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH)
+    val dateFormat = SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH)
 
     Row(
         modifier = modifier,
@@ -90,11 +91,14 @@ fun DateSelectorRow(
                 if (dateRangeType.value == DateRangeType.From) {
                     fromDatePickerState.selectedDateMillis?.let {
                         fromDate.value = dateFormat.format(Date(it))
+                        onFromDateChange(fromDate.value)
                     }
 
                 } else if (dateRangeType.value == DateRangeType.To) {
                     toDatePickerState.selectedDateMillis?.let {
                         toDate.value = dateFormat.format(Date(it))
+                        onToDateChange(toDate.value)
+
                     }
                 }
 

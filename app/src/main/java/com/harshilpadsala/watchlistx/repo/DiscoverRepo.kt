@@ -10,13 +10,19 @@ import retrofit2.http.Query
 
 interface DiscoverRepo {
 
-    @GET("3/search/movie")
-    suspend fun searchMovies(
-        @Query("query") query: String,
+
+
+    @GET("3/discover/movie")
+    suspend fun discoverMovie(
         @Query("include_adult") includeAdult: Boolean = true,
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
-        @Query("year") year: Int? = null,
+        @Query("primary_release_date.gte") dateGte : String? = null,
+        @Query("primary_release_date.lte") dateLte : String? = null,
+        @Query("sort_by") sortBy : String? = null,
+        @Query("with_genres") withGenres : String? = null,
+        @Query("with_keywords") withKeywords : String? = null,
+
     ): Response<Content<MovieContent>>
 
     @GET("3/movie/now_playing")

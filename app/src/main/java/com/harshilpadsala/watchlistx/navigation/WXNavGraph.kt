@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.navigation
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,6 +17,7 @@ import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
 import com.harshilpadsala.watchlistx.compose.RatingRoute
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.constants.WXNavItem
+import com.harshilpadsala.watchlistx.data.res.model.FilterParams
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 
 private const val movieDetailRoute = "movieDetailRoute"
@@ -24,6 +26,7 @@ private const val filterRoute = "filterRoute"
 
 
 const val movieIdNavArg = "movieId"
+const val filterNavArg = "filterNavArg"
 const val ratingArgs = "ratingArgs"
 const val movieListTypeArg = "movieListTypeArg"
 
@@ -59,12 +62,21 @@ fun WatchListXNavigation(navController: NavHostController) {
                 type = NavType.EnumType(
                     MovieList::class.java
                 )
-            })
-        ) {
+            }))
+        {
+
+                entry ->
+
+            val encodedUri = entry.savedStateHandle.get<String>(filterNavArg)
+            val decodedUri = encodedUri.let { Uri.decode(encodedUri) }
+            val filterArgs = if(decodedUri!=null){ Gson().fromJson(decodedUri, FilterParams::class.java)}else FilterParams()
+
+
             DiscoverRoute(
+                filterParams = filterArgs,
                 onMediaClick = {},
                 onFilterClick = {
-                                navController.navigate(filterRoute)
+                    navController.navigate(filterRoute)
                 },
             )
         }
@@ -73,13 +85,12 @@ fun WatchListXNavigation(navController: NavHostController) {
 
 
         composable(
-            "$ratingRoute/{$ratingArgs}", arguments = listOf(
-                navArgument(
-                    name = ratingArgs
-                ) {
-                    type = NavType.StringType
-                    defaultValue = ""
-                })
+            "$ratingRoute/{$ratingArgs}", arguments = listOf(navArgument(
+                name = ratingArgs
+            ) {
+                type = NavType.StringType
+                defaultValue = ""
+            })
         ) {
             RatingRoute(
                 onBackPress = {
@@ -89,7 +100,8 @@ fun WatchListXNavigation(navController: NavHostController) {
         }
 
         composable(
-            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(navArgument(
+            "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(
+                navArgument(
                 name = movieIdNavArg,
             ) {
                 type = NavType.LongType
@@ -97,7 +109,6 @@ fun WatchListXNavigation(navController: NavHostController) {
             })
 
         ) {
-
 
             //Todo :- Add Real Route parameters
 
@@ -119,12 +130,19 @@ fun WatchListXNavigation(navController: NavHostController) {
             )
         }
 
-        composable(filterRoute){
-            FilterRoute(onApplyClick = { /*TODO*/ } , onBackClick = {
+        composable(
+            filterRoute
+        ) {
+            FilterRoute(onApplyClick = { args ->
+                val jsonParsed = Gson().toJson(args)
+                val encodedUri = Uri.encode(jsonParsed)
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    filterNavArg, encodedUri
+                )
+            }, onBackClick = {
                 navController.navigateUp()
             })
         }
-
 
 
     }
