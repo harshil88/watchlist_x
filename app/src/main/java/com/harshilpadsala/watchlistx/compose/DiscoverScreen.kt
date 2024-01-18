@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.Constant
+import com.harshilpadsala.watchlistx.compose.components.MoviesList
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
 import com.harshilpadsala.watchlistx.compose.components.base_x.ListItemX
 import com.harshilpadsala.watchlistx.constants.MediaType
@@ -294,49 +295,7 @@ fun DiscoverPage(
 //    }
 //}
 
-@Composable
-fun MoviesList(
-    hasReachedEnd: Boolean,
-    movies: List<ListItemXData>,
-    modifier: Modifier = Modifier,
-    lazyListState: LazyListState,
-    onItemClick: (Int) -> Unit
-) {
 
-    LazyColumn(
-        modifier = modifier, state = lazyListState
-    ) {
-        items(
-            count = if (!hasReachedEnd) movies.size + 1 else movies.size
-        ) { index ->
-
-            if (!hasReachedEnd && index == movies.size) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                Box(modifier = Modifier.padding(bottom = 8.dp)) {
-                    ListItemX(
-                        mediaId = movies[index].id,
-                        title = movies[index].title,
-                        voteAverage = movies[index].voteAverage,
-                        thumbnailPath = Constant.TMDB_IMAGE_URI_HIGH + movies[index].posterPath,
-                        originalLanguage = movies[index].originalLanguage,
-                        releaseDate = movies[index].releaseDate,
-                        modifier = Modifier.height(80.dp),
-                        onItemClick = onItemClick,
-                    )
-                }
-            }
-
-
-        }
-    }
-}
 
 
 //@Composable

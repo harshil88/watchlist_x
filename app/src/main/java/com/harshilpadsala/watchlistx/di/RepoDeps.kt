@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.di
 
 import com.harshilpadsala.watchlistx.repo.DiscoverRepo
+import com.harshilpadsala.watchlistx.repo.FavouriteRepo
 import com.harshilpadsala.watchlistx.repo.HomeRepo
 import dagger.Module
 import dagger.Provides
@@ -20,5 +21,9 @@ object RepoDeps {
     @Provides
     @Singleton
     fun providesDiscoverRepo(retrofit: Retrofit) : DiscoverRepo = retrofit.create(DiscoverRepo::class.java)
+
+    @Provides
+    @Singleton
+    fun providesFavouriteRepo(retrofit: Retrofit) : FavouriteRepo = retrofit.create(FavouriteRepo::class.java)
 
 }

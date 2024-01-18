@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.harshilpadsala.watchlistx.compose.DiscoverRoute
+import com.harshilpadsala.watchlistx.compose.FavouriteRoute
 import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.FilterRoute
 import com.harshilpadsala.watchlistx.compose.HomeRoute
@@ -81,7 +82,7 @@ fun WatchListXNavigation(navController: NavHostController) {
             )
         }
 
-        composable(WXNavItem.FAVOURITE.name) { FavouriteScreen() }
+        composable(WXNavItem.FAVOURITE.name) { FavouriteRoute() }
 
 
         composable(

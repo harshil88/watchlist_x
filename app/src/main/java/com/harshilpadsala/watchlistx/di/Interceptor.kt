@@ -7,14 +7,14 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 //Todo : -Better Error Handling In Retrofit
 
-object WatchListXInterceptors : Interceptor{
+object WatchListXInterceptors : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        request = request
-            .newBuilder()
-            .header("Authorization" , "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMDJmNTlmZDk3MDdlY2IxODljNGYzMmM0NGY4MTk5YSIsInN1YiI6IjYyNzhkNzdlNzI0ZGUxMzM1MTJlOWVlNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.2yOgGMZUzVMCRSGH4BKXx5zAHNPO6cB1FM3Mynw3x7s" )
-            .build()
+        request = request.newBuilder().header(
+                "Authorization",
+                "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMDJmNTlmZDk3MDdlY2IxODljNGYzMmM0NGY4MTk5YSIsInN1YiI6IjYyNzhkNzdlNzI0ZGUxMzM1MTJlOWVlNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.2yOgGMZUzVMCRSGH4BKXx5zAHNPO6cB1FM3Mynw3x7s"
+            ).build()
 
 
         return chain.proceed(request)
