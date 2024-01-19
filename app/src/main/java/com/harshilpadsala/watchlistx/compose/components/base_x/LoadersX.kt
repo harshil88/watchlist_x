@@ -15,7 +15,7 @@ fun FullScreenLoaderX(modifier: Modifier = Modifier){
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Darkness.stillness.copy(alpha = 0.5F)),
+            ,
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(

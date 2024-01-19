@@ -43,21 +43,21 @@ object StylesX {
         fontFamily = montserrat,
         fontSize = 20.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Darkness.light
+        color = Darkness.rise
     )
 
     val titleMedium = TextStyle(
         fontFamily = montserrat,
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Darkness.light
+        color = Darkness.rise
     )
 
     val titleSmall = TextStyle(
         fontFamily = montserrat,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Darkness.light,
+        color = Darkness.rise,
     )
 
     val labelSmall = TextStyle(

@@ -20,12 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.MoviesList
+import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenErrorX
+import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
 import com.harshilpadsala.watchlistx.constants.FavouriteType
 import com.harshilpadsala.watchlistx.constants.isScrolledToEnd
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.FavouriteUiState
 import com.harshilpadsala.watchlistx.vm.FavouriteViewModel
+import utils.ErrorX
+import utils.LoaderX
 
 @Composable
 fun FavouriteRoute(
@@ -66,7 +70,10 @@ fun FavouriteRoute(
         favouriteListState = favouriteListState,
         wishListState = wishListState,
         onMovieClick = {},
-        onTabChange = viewModel::changeTab)
+        onError = viewModel::reset,
+        onTabChange = viewModel::changeTab,
+
+        )
 }
 
 
@@ -75,6 +82,7 @@ fun FavouriteScreen(
     favouriteUiState: FavouriteUiState,
     favouriteListState: LazyListState,
     wishListState: LazyListState,
+    onError : (FavouriteType) -> Unit,
     onTabChange: (FavouriteType) -> Unit,
     onMovieClick: (Int) -> Unit,
 ) {
@@ -84,7 +92,39 @@ fun FavouriteScreen(
             onTabChange = onTabChange,
         )
 
-        if (favouriteUiState.favouriteMovies != null && favouriteUiState.currentTabType == FavouriteType.Favourite) {
+        if(favouriteUiState.isFavouriteLoading == null &&
+            favouriteUiState.currentTabType == FavouriteType.Favourite){
+            FullScreenLoaderX()
+        }
+
+        else if(favouriteUiState.isWishlistLoading == null &&
+            favouriteUiState.currentTabType == FavouriteType.Watchlist){
+            FullScreenLoaderX()
+        }
+
+        else if(favouriteUiState.errorForFav !=null &&
+            favouriteUiState.currentTabType == FavouriteType.Favourite
+            ){
+            FullScreenErrorX(
+                text = favouriteUiState.errorForFav!!,
+                onClick = {
+                    onError(FavouriteType.Favourite)
+                }
+            )
+        }
+
+        else if(favouriteUiState.errorForWishlist != null &&
+            favouriteUiState.currentTabType == FavouriteType.Watchlist){
+            FullScreenErrorX(
+                text = favouriteUiState.errorForWishlist!!,
+                onClick = {
+                    onError(FavouriteType.Watchlist)
+                }
+            )
+        }
+
+        else if (favouriteUiState.favouriteMovies != null &&
+            favouriteUiState.currentTabType == FavouriteType.Favourite) {
             FavouriteMoviesList(
                 favouriteUiState = favouriteUiState,
                 favouriteListState = favouriteListState,
@@ -92,7 +132,7 @@ fun FavouriteScreen(
             )
         }
 
-        if (favouriteUiState.watchlistMovies != null&& favouriteUiState.currentTabType == FavouriteType.Watchlist) {
+        else if (favouriteUiState.watchlistMovies != null&& favouriteUiState.currentTabType == FavouriteType.Watchlist) {
             WishListMovieList(
                 favouriteUiState = favouriteUiState,
                 wishListState = wishListState,
