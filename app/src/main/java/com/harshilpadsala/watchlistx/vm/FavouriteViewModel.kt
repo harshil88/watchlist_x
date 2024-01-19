@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.FavouriteType
+import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.res.list.MovieContent
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
@@ -25,7 +26,10 @@ data class FavouriteUiState(
     var favouriteMovies : List<ListItemXData>? = null ,
     var watchlistMovies : List<ListItemXData>? = null ,
     var error : String? = null,
-    var currentTabType : FavouriteType = FavouriteType.Favourite
+    var currentTabType : FavouriteType = FavouriteType.Favourite,
+    var currentFavouritePage : Int = 1,
+    var currentWatchListPage : Int = 1,
+
 )
 
 @HiltViewModel
@@ -50,6 +54,22 @@ class FavouriteViewModel @Inject constructor(
         }
     }
 
+    fun nextPage(favouriteType: FavouriteType) {
+        if(favouriteType == FavouriteType.Favourite){
+            if (favouriteUiState.isFavouriteLoading == false) {
+                favouriteUiState = favouriteUiState.copy(isFavouriteLoading = true)
+                favouriteMovies()
+            }
+        }
+
+        else{
+            if (favouriteUiState.isWishlistLoading == false) {
+                favouriteUiState = favouriteUiState.copy(isWishlistLoading = true)
+                watchListMovies()
+            }
+        }
+    }
+
 
     private fun favouriteMovies(){
         viewModelScope.launch {
@@ -57,9 +77,25 @@ class FavouriteViewModel @Inject constructor(
                 .collect{
                     when(it){
                         is ResultX.Success -> {
+
+                            val alreadyPresentMovies = favouriteUiState.favouriteMovies?.toMutableList()
+                            val newMovies =
+                                it.data?.results?.map { item -> item.toListItemX() }?.toMutableList()
+                                    ?: mutableListOf()
+
+                            alreadyPresentMovies?.addAll(newMovies)
+
                             favouriteUiState = favouriteUiState.copy(
-                                favouriteMovies = it.data?.results?.map {movie->  movie.toListItemX() }?.toList()
+                                isFavouriteLoading = false,
+                                favouriteMovies =  alreadyPresentMovies ?: newMovies,
+                                currentFavouritePage = favCurrentPage,
+                                hasReachedEndForFavourites =  it.data?.totalPages == favCurrentPage
                             )
+
+
+                            if (!favouriteUiState.hasReachedEndForFavourites) {
+                                favCurrentPage += 1
+                            }
                         }
                         is ResultX.Error -> {
                             favouriteUiState.error = it.message
@@ -71,13 +107,28 @@ class FavouriteViewModel @Inject constructor(
 
     private fun watchListMovies(){
         viewModelScope.launch {
-            favoriteMovieUseCase.invoke(favouriteType = FavouriteType.Watchlist , page = favCurrentPage)
+            favoriteMovieUseCase.invoke(favouriteType = FavouriteType.Watchlist , page = wishlistCurrentPage)
                 .collect{
                     when(it){
                         is ResultX.Success -> {
+                            val alreadyPresentMovies = favouriteUiState.watchlistMovies?.toMutableList()
+                            val newMovies =
+                                it.data?.results?.map { item -> item.toListItemX() }?.toMutableList()
+                                    ?: mutableListOf()
+
+                            alreadyPresentMovies?.addAll(newMovies)
+
                             favouriteUiState = favouriteUiState.copy(
-                                watchlistMovies = it.data?.results?.map {movie->  movie.toListItemX() }?.toList()
+                                isWishlistLoading = false,
+                                watchlistMovies =  alreadyPresentMovies ?: newMovies,
+                                currentWatchListPage = wishlistCurrentPage,
+                                hasReachedEndForWatchlist =  it.data?.totalPages == wishlistCurrentPage
                             )
+
+
+                            if (!favouriteUiState.hasReachedEndForWatchlist) {
+                                wishlistCurrentPage += 1
+                            }
                         }
                         is ResultX.Error -> {
                             favouriteUiState.error = it.message

@@ -88,7 +88,10 @@ fun DiscoverRoute(
         }
     }
 
-    if (endOfListReached && lazyListState.isScrollInProgress && uiState.value.isLoading == false && !uiState.value.hasReachedEnd) {
+    if (endOfListReached
+        && lazyListState.isScrollInProgress
+        && uiState.value.isLoading == false &&
+        !uiState.value.hasReachedEnd) {
         viewModel.nextPage()
     }
 
@@ -98,7 +101,6 @@ fun DiscoverRoute(
         onBackClick = {},
         onFilterListClick = onFilterClick,
     )
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

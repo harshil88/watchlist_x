@@ -10,6 +10,7 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.MoviesList
 import com.harshilpadsala.watchlistx.constants.FavouriteType
+import com.harshilpadsala.watchlistx.constants.isScrolledToEnd
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.FavouriteUiState
@@ -33,6 +35,32 @@ fun FavouriteRoute(
     val favouriteListState = rememberLazyListState()
     val wishListState = rememberLazyListState()
     val favouriteUiState = rememberUpdatedState(newValue = viewModel.favouriteUiState)
+
+    val endOfFavouriteListReached by remember {
+        derivedStateOf {
+            favouriteListState.isScrolledToEnd()
+        }
+    }
+
+    val endOfWishListReached by remember {
+        derivedStateOf {
+            wishListState.isScrolledToEnd()
+        }
+    }
+
+    if (endOfFavouriteListReached
+        && favouriteListState.isScrollInProgress
+        && favouriteUiState.value.isFavouriteLoading == false &&
+        !favouriteUiState.value.hasReachedEndForFavourites) {
+        viewModel.nextPage(FavouriteType.Favourite)
+    }
+
+    if (endOfWishListReached
+        && wishListState.isScrollInProgress
+        && favouriteUiState.value.isWishlistLoading == false &&
+        !favouriteUiState.value.hasReachedEndForWatchlist) {
+        viewModel.nextPage(FavouriteType.Watchlist)
+    }
 
     FavouriteScreen(favouriteUiState = favouriteUiState.value,
         favouriteListState = favouriteListState,
@@ -95,7 +123,7 @@ fun WishListMovieList(
     onMovieClick: (Int) -> Unit,
 ) {
     MoviesList(
-        hasReachedEnd = favouriteUiState.hasReachedEndForFavourites,
+        hasReachedEnd = favouriteUiState.hasReachedEndForWatchlist,
         movies = favouriteUiState.watchlistMovies!!,
         lazyListState = wishListState,
         onItemClick = onMovieClick,
