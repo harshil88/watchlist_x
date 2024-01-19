@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.FavouriteType
+import com.harshilpadsala.watchlistx.constants.addX
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.domain.usecase.FavouriteMoviesUseCase
@@ -91,23 +92,13 @@ class FavouriteViewModel @Inject constructor(
     private fun favouriteMovies() {
         viewModelScope.launch {
             favoriteMovieUseCase.invoke(
-                favouriteType = FavouriteType.Favourite,
-                page = favCurrentPage
+                favouriteType = FavouriteType.Favourite, page = favCurrentPage
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
-
-
-                        val alreadyPresentMovies =
-                            favouriteUiState.favouriteMovies?.toMutableList()
-                        val newMovies = it.data?.results?.map { item -> item.toListItemX() }
-                            ?.toMutableList() ?: mutableListOf()
-
-                        alreadyPresentMovies?.addAll(newMovies)
-
                         favouriteUiState = favouriteUiState.copy(
                             isFavouriteLoading = false,
-                            favouriteMovies = alreadyPresentMovies ?: newMovies,
+                            favouriteMovies = favouriteUiState.favouriteMovies.addX(it.data?.toListItemX()),
                             currentFavouritePage = favCurrentPage,
                             hasReachedEndForFavourites = it.data?.totalPages == favCurrentPage,
                         )
@@ -131,21 +122,13 @@ class FavouriteViewModel @Inject constructor(
     private fun watchListMovies() {
         viewModelScope.launch {
             favoriteMovieUseCase.invoke(
-                favouriteType = FavouriteType.Watchlist,
-                page = wishlistCurrentPage
+                favouriteType = FavouriteType.Watchlist, page = wishlistCurrentPage
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
-                        val alreadyPresentMovies =
-                            favouriteUiState.watchlistMovies?.toMutableList()
-                        val newMovies = it.data?.results?.map { item -> item.toListItemX() }
-                            ?.toMutableList() ?: mutableListOf()
-
-                        alreadyPresentMovies?.addAll(newMovies)
-
                         favouriteUiState = favouriteUiState.copy(
                             isWishlistLoading = false,
-                            watchlistMovies = alreadyPresentMovies ?: newMovies,
+                            watchlistMovies =  favouriteUiState.watchlistMovies.addX(it.data?.toListItemX()),
                             currentWatchListPage = wishlistCurrentPage,
                             hasReachedEndForWatchlist = it.data?.totalPages == wishlistCurrentPage
                         )
@@ -161,7 +144,6 @@ class FavouriteViewModel @Inject constructor(
                             errorForWishlist = it.message,
                             isWishlistLoading = false,
                         )
-
                     }
                 }
             }
