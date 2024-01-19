@@ -8,11 +8,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.harshilpadsala.watchlistx.Constant
 import com.harshilpadsala.watchlistx.compose.components.base_x.ListItemX
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
+import com.harshilpadsala.watchlistx.ui.theme.Darkness
 
 @Composable
 fun MoviesList(
@@ -32,11 +34,14 @@ fun MoviesList(
 
             if (!hasReachedEnd && index == movies.size) {
                 Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        color = Darkness.rise
+                    )
                 }
             } else {
                 Box(modifier = Modifier.padding(bottom = 8.dp)) {

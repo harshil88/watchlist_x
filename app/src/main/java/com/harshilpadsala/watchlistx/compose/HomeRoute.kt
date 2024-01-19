@@ -46,7 +46,6 @@ import com.harshilpadsala.watchlistx.compose.components.CardListComponent
 import com.harshilpadsala.watchlistx.compose.components.GenresRow
 import com.harshilpadsala.watchlistx.compose.components.base_x.AsyncImageX
 import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
-import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
@@ -169,7 +168,10 @@ fun HomeScreen(
                     .fillMaxSize()
             ) {
                 MediaList(
-                    uiState = uiState, onCardClick = onCardClick, onLongCardClick = onLongCardClick , onShowMoreClick = onShowMoreClick
+                    uiState = uiState,
+                    onCardClick = onCardClick,
+                    onLongCardClick = onLongCardClick,
+                    onShowMoreClick = onShowMoreClick
                 )
                 PullRefreshIndicator(
                     uiState.refreshing, refreshingState, Modifier.align(Alignment.TopCenter)
@@ -207,11 +209,13 @@ fun MediaList(
 
         if (!uiState.popularMovieList.isNullOrEmpty()) {
             item {
-                ListContent(title = "Popular",
+                ListContent(
+                    title = "Popular",
                     cards = uiState.popularMovieList!!,
                     onCardClick = onCardClick,
                     onShowMoreClick = { onShowMoreClick(MovieList.Popular) },
-                    onLongCardClick = onLongCardClick)
+                    onLongCardClick = onLongCardClick
+                )
             }
         }
 
@@ -262,10 +266,7 @@ fun MediaList(
         item {
             Spacer(modifier = Modifier.padding(top = 24.dp))
         }
-
     }
-
-
 }
 
 
@@ -337,7 +338,8 @@ fun MovieStatsSheetContent(
                     .height(72.dp)
                     .width(40.dp)
             )
-        })
+        }
+        )
 
         Divider(
             modifier = Modifier

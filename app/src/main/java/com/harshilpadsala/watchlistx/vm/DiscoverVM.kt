@@ -1,6 +1,8 @@
 package com.harshilpadsala.watchlistx.vm
 
 import android.net.Uri
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -8,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MovieList
+import com.harshilpadsala.watchlistx.constants.addX
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
 import com.harshilpadsala.watchlistx.data.res.model.FilterParams
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
@@ -21,13 +24,14 @@ import javax.inject.Inject
 
 //todo : Learn more about saved state handle and configuration changes and recomposition
 
+@Immutable
 data class DiscoverUiState(
-    var isLoading: Boolean? = null,
-    var movies: MutableList<ListItemXData>? = null,
-    var currentPage: Int = 1,
-    var hasReachedEnd: Boolean = false,
-    var selectedMovieList: MovieList? = null,
-    var isFailure: Boolean = false
+    val isLoading: Boolean? = null,
+    val movies: List<ListItemXData>? = null,
+    val currentPage: Int = 1,
+    val hasReachedEnd: Boolean = false,
+    val selectedMovieList: MovieList? = null,
+    val isFailure: Boolean = false
 )
 
 @HiltViewModel
@@ -47,15 +51,7 @@ class DiscoverVM @Inject constructor(
 
 
     init {
-        val selectedMovieList = state.get<MovieList>(movieListTypeArg)
-        val encodedUri = state.get<String>(filterNavArg)
-        val decodedUri = encodedUri.let { Uri.decode(encodedUri) }
-        filterArgs = if (decodedUri != null) {
-            Gson().fromJson(decodedUri, FilterParams::class.java)
-        } else FilterParams()
-        if (selectedMovieList != null) {
-            discoverMovieList(selectedMovieList)
-        }
+            discoverMovieList()
     }
 
 
@@ -69,12 +65,12 @@ class DiscoverVM @Inject constructor(
     fun nextPage() {
         if (discoverUiState.value.isLoading == false) {
             discoverUiState.value = discoverUiState.value.copy(isLoading = true)
-            discoverMovieList(movieList = MovieList.NowPlaying)
+            discoverMovieList()
         }
     }
 
 
-    private fun discoverMovieList(movieList: MovieList) {
+    private fun discoverMovieList() {
 
         viewModelScope.launch {
             filterMoviesUseCase.invoke(
@@ -87,19 +83,11 @@ class DiscoverVM @Inject constructor(
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
-                        val alreadyPresentMovies = discoverUiState.value.movies
-                        val newMovies =
-                            it.data?.results?.map { item -> item.toListItemX() }?.toMutableList()
-                                ?: mutableListOf()
-
-                        alreadyPresentMovies?.addAll(newMovies)
-
-
                         discoverUiState.value = discoverUiState.value.copy(
                             isLoading = false,
-                            movies = alreadyPresentMovies ?: newMovies,
+                            movies = discoverUiState.value.movies.addX(it.data?.toListItemX()),
                             currentPage = currentPage,
-                            selectedMovieList = movieList,
+                            selectedMovieList = MovieList.NowPlaying,
                             hasReachedEnd = it.data?.totalPages == currentPage
                         )
 
@@ -115,7 +103,6 @@ class DiscoverVM @Inject constructor(
                             movies = null,
                         )
                     }
-
                 }
             }
         }

@@ -33,6 +33,7 @@ import utils.LoaderX
 
 @Composable
 fun FavouriteRoute(
+    onMovieClick: (Int) -> Unit,
     viewModel: FavouriteViewModel = hiltViewModel(),
 ) {
 
@@ -69,10 +70,9 @@ fun FavouriteRoute(
     FavouriteScreen(favouriteUiState = favouriteUiState.value,
         favouriteListState = favouriteListState,
         wishListState = wishListState,
-        onMovieClick = {},
+        onMovieClick = onMovieClick,
         onError = viewModel::reset,
         onTabChange = viewModel::changeTab,
-
         )
 }
 
@@ -149,6 +149,7 @@ fun FavouriteMoviesList(
     onMovieClick: (Int) -> Unit,
 ) {
     MoviesList(
+        modifier = Modifier.padding(horizontal = 20.dp,),
         hasReachedEnd = favouriteUiState.hasReachedEndForFavourites,
         movies = favouriteUiState.favouriteMovies!!,
         lazyListState = favouriteListState,
@@ -163,6 +164,7 @@ fun WishListMovieList(
     onMovieClick: (Int) -> Unit,
 ) {
     MoviesList(
+        modifier = Modifier.padding(horizontal = 20.dp,),
         hasReachedEnd = favouriteUiState.hasReachedEndForWatchlist,
         movies = favouriteUiState.watchlistMovies!!,
         lazyListState = wishListState,

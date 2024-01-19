@@ -1,7 +1,6 @@
 package com.harshilpadsala.watchlistx.navigation
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -11,7 +10,6 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.harshilpadsala.watchlistx.compose.DiscoverRoute
 import com.harshilpadsala.watchlistx.compose.FavouriteRoute
-import com.harshilpadsala.watchlistx.compose.FavouriteScreen
 import com.harshilpadsala.watchlistx.compose.FilterRoute
 import com.harshilpadsala.watchlistx.compose.HomeRoute
 import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
@@ -48,41 +46,39 @@ fun WatchListXNavigation(navController: NavHostController) {
                     val encodedUri = Uri.encode(convertedToJson)
                     navController.navigate("$ratingRoute/$encodedUri")
                 },
-                onShowMoreClick = { movieList ->
+                onShowMoreClick = {
+                    movieList ->
                     navController.navigate("${WXNavItem.DISCOVER.name}?$movieListTypeArg={${MovieList.NowPlaying}}")
                 },
             )
         }
 
         composable(
-            "${WXNavItem.DISCOVER.name}?$movieListTypeArg={$movieListTypeArg}",
-            arguments = listOf(navArgument(
-                name = movieListTypeArg,
-            ) {
-                defaultValue = MovieList.NowPlaying
-                type = NavType.EnumType(
-                    MovieList::class.java
-                )
-            }))
+            WXNavItem.DISCOVER.name,
+        )
         {
-
                 entry ->
-
             val encodedUri = entry.savedStateHandle.get<String>(filterNavArg)
             val decodedUri = encodedUri.let { Uri.decode(encodedUri) }
-            val filterArgs = if(decodedUri!=null){ Gson().fromJson(decodedUri, FilterParams::class.java)}else FilterParams()
+            val filterArgs = if (decodedUri != null) {
+                Gson().fromJson(decodedUri, FilterParams::class.java)
+            } else FilterParams()
 
 
             DiscoverRoute(
                 filterParams = filterArgs,
-                onMediaClick = {},
+                onMovieClick = {},
                 onFilterClick = {
                     navController.navigate(filterRoute)
                 },
             )
         }
 
-        composable(WXNavItem.FAVOURITE.name) { FavouriteRoute() }
+        composable(WXNavItem.FAVOURITE.name) {
+            FavouriteRoute(
+                onMovieClick = {}
+            )
+        }
 
 
         composable(
@@ -103,11 +99,11 @@ fun WatchListXNavigation(navController: NavHostController) {
         composable(
             "$movieDetailRoute/{$movieIdNavArg}", arguments = listOf(
                 navArgument(
-                name = movieIdNavArg,
-            ) {
-                type = NavType.LongType
-                defaultValue = 5L
-            })
+                    name = movieIdNavArg,
+                ) {
+                    type = NavType.LongType
+                    defaultValue = 5L
+                })
 
         ) {
 
@@ -134,7 +130,8 @@ fun WatchListXNavigation(navController: NavHostController) {
         composable(
             filterRoute
         ) {
-            FilterRoute(onApplyClick = { args ->
+            FilterRoute(
+                onApplyClick = { args ->
                 val jsonParsed = Gson().toJson(args)
                 val encodedUri = Uri.encode(jsonParsed)
                 navController.previousBackStackEntry?.savedStateHandle?.set(

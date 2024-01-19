@@ -18,8 +18,9 @@ fun Number.fromStatusToOperationType(): OperationStatus = when (this) {
 
 
 fun <T> List<T>?.addX(newElements: List<T>?): List<T> {
-    this?.toMutableList()?.addAll(newElements ?: listOf())
-    return this ?: newElements?: listOf()
+    val tempList = this?.toMutableList()?: mutableListOf()
+    tempList.addAll(newElements?: listOf())
+    return tempList.toList()
 }
 
 
