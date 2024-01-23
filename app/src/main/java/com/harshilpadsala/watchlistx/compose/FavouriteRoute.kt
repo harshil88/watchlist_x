@@ -181,7 +181,8 @@ fun FavouriteTabRow(
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    TabRow(modifier = modifier,
+    TabRow(
+        modifier = modifier,
         selectedTabIndex = selectedTabIndex,
         backgroundColor = Darkness.water,
         indicator = { tabPositions ->
@@ -192,7 +193,8 @@ fun FavouriteTabRow(
             )
         }) {
         FavouriteType.values().mapIndexed { index, tab ->
-            Tab(modifier = Modifier.padding(vertical = 8.dp),
+            Tab(
+                modifier = Modifier.padding(vertical = 8.dp),
                 selected = index == selectedTabIndex,
                 onClick = {
                     if(selectedTabIndex!=index){

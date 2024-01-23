@@ -13,7 +13,6 @@ import com.harshilpadsala.watchlistx.data.res.model.FilterParams
 import com.harshilpadsala.watchlistx.domain.usecase.FilterMoviesUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.GenreUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.SearchKeywordsUseCase
-import com.harshilpadsala.watchlistx.navigation.filterNavArg
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

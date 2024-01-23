@@ -1,13 +1,10 @@
 package com.harshilpadsala.watchlistx.vm
 
-import android.net.Uri
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.constants.addX
@@ -16,8 +13,6 @@ import com.harshilpadsala.watchlistx.data.res.model.FilterParams
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.domain.usecase.DiscoverMovieUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.FilterMoviesUseCase
-import com.harshilpadsala.watchlistx.navigation.filterNavArg
-import com.harshilpadsala.watchlistx.navigation.movieListTypeArg
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

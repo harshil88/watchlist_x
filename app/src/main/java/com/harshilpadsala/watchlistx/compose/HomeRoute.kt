@@ -123,7 +123,8 @@ fun HomeRoute(
                 sheetState.show()
                 viewModel.movieStats(movieDetails)
             }
-        })
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -328,7 +329,8 @@ fun MovieStatsSheetContent(
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        ListItem(text = {
+        ListItem(
+            text = {
             Text(
                 text = cardModel?.title ?: "", style = StylesX.titleLarge,
             )
@@ -368,6 +370,7 @@ fun MovieStatsSheetContent(
                 )
             },
         )
+
         ListItem(
             modifier = Modifier
                 .clickable {
@@ -388,6 +391,7 @@ fun MovieStatsSheetContent(
                 )
             },
         )
+
         ListItem(
             modifier = Modifier.clickable {
 

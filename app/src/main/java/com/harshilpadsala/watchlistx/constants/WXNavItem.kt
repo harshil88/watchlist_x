@@ -13,7 +13,7 @@ import com.harshilpadsala.watchlistx.R
 
 
 enum class WXNavItem(
-    val icon : ImageVector
+    val icon : ImageVector,
 ){
     HOME(icon = Icons.Filled.Home),
     DISCOVER(icon = Icons.Filled.Movie),

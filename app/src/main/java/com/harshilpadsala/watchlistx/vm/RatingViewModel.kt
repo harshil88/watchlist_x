@@ -14,7 +14,6 @@ import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 import com.harshilpadsala.watchlistx.data.res.model.toRatingUiState
 import com.harshilpadsala.watchlistx.domain.usecase.RateMediaUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.RatingOperation
-import com.harshilpadsala.watchlistx.navigation.ratingArgs
 import com.harshilpadsala.watchlistx.state.RatingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -31,7 +30,7 @@ class RatingViewModel @Inject constructor(
     private val ratingArgsModel: RatingArgsModel
 
     init {
-        val ratingJson = state.get<String>(ratingArgs)
+        val ratingJson = state.get<String>("ratingArgs")
         ratingArgsModel = Gson().fromJson(Uri.decode(ratingJson), RatingArgsModel::class.java)
         uiState = ratingArgsModel.toRatingUiState()
     }

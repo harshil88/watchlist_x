@@ -145,7 +145,10 @@ class MovieDetailViewModel @Inject constructor(
         detailResponse: ResultX<MovieDetails>,
         imagesResponse: ResultX<MovieImages>
     ): MovieDetailUiState {
-        if (statsResponse is ResultX.Success && detailResponse is ResultX.Success && imagesResponse is ResultX.Success) {
+        if (
+            statsResponse is ResultX.Success
+            && detailResponse is ResultX.Success
+            && imagesResponse is ResultX.Success) {
             getMediaCredits()
             if (statsResponse.data?.favorite == true) {
                 favouriteUiState.value = FavouriteUiState.AddedToFav
