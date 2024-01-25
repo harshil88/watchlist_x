@@ -1,34 +1,22 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -128,13 +116,12 @@ fun MovieDetailScreen(
 
             Scaffold(
                 topBar = {
-                TopBarX(
-                    title = movieDetail?.title ?: "",
-                    onBackPress = onBackPress,
-                )
-            }
-            ) {
-                    paddingValues ->
+                    TopBarX(
+                        title = movieDetail?.title ?: "",
+                        onBackPress = onBackPress,
+                    )
+                }
+            ) { paddingValues ->
 
                 LazyColumn(
                     modifier = Modifier.padding(top = paddingValues.calculateTopPadding() + 16.dp)
@@ -159,9 +146,9 @@ fun MovieDetailScreen(
                         )
 
                         ActionButtonsRow(
-                            isFavourite = movieDetail?.movieStats?.favorite?:false,
-                            isWatchListed = movieDetail?.movieStats?.watchlist?:false,
-                                isListed = true,
+                            isFavourite = movieDetail?.movieStats?.favorite ?: false,
+                            isWatchListed = movieDetail?.movieStats?.watchlist ?: false,
+                            isListed = true,
                             onWatchListClick = onWatchListClick,
                             onFavouriteClick = onFavouriteClick,
                             onListClick = onListClick,
@@ -191,15 +178,15 @@ fun MovieDetailScreen(
 
 @Composable
 fun ActionButtonsRow(
-    isFavourite : Boolean,
-    isWatchListed : Boolean,
-    isListed : Boolean,
+    isFavourite: Boolean,
+    isWatchListed: Boolean,
+    isListed: Boolean,
     onFavouriteClick: (Boolean) -> Unit,
     onWatchListClick: (Boolean) -> Unit,
     onListClick: (Boolean) -> Unit
 
 
-){
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
@@ -262,10 +249,6 @@ fun CreditsRow(credits: List<CardModel>) {
 }
 
 
-
-
-
-
 @Composable
 fun ShowRatingDialog() {
     Dialog(
@@ -276,7 +259,7 @@ fun ShowRatingDialog() {
 
 @Preview
 @Composable
-fun ActionButtonsRowPreview(){
+fun ActionButtonsRowPreview() {
     ActionButtonsRow(
         isFavourite = true,
         isWatchListed = false,

@@ -75,7 +75,6 @@ fun FilterRoute(
 ) {
 
 
-
     val filterUiState = rememberUpdatedState(newValue = viewModel.filterUiState)
 
     val scope = rememberCoroutineScope()
@@ -95,9 +94,6 @@ fun FilterRoute(
     val keywordSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true
     )
-
-
-
 
     LaunchedEffect(searchController.value) {
         viewModel.searchKeywordsWithDebouncing(searchController.value)
@@ -216,9 +212,7 @@ fun FilterScreen(
                     tint = Darkness.stillness
                 )
             }
-        }) {
-
-                paddingValues ->
+        }) { paddingValues ->
 
             LazyColumn {
 
@@ -228,8 +222,7 @@ fun FilterScreen(
                             top = paddingValues.calculateTopPadding(),
                             start = 16.dp,
                             end = 16.dp,
-                        ), onFromDateChange = onFromDateChange,
-                        onToDateChange = onToDateChange
+                        ), onFromDateChange = onFromDateChange, onToDateChange = onToDateChange
                     )
                 }
 
@@ -256,7 +249,7 @@ fun FilterScreen(
                 item {
                     SliderCard(text = "User Score : ") {
                         RangeSliderX(
-                            initialRange = DefaultsX.VOTE_AVERAGE_GTE ..DefaultsX.VOTE_AVERAGE_LTE,
+                            initialRange = DefaultsX.VOTE_AVERAGE_GTE..DefaultsX.VOTE_AVERAGE_LTE,
                             minValue = 0F,
                             maxValue = 10F,
                             sliderCategory = SliderCategory.UserScore,
@@ -269,7 +262,7 @@ fun FilterScreen(
                 item {
                     SliderCard(text = "Minimum User Votes : ") {
                         SingleSliderX(
-                            initialValue =  DefaultsX.VOTE_COUNT_GTE,
+                            initialValue = DefaultsX.VOTE_COUNT_GTE,
                             minValue = 0F,
                             maxValue = 400F,
                             sliderCategory = SliderCategory.UserVotes,
@@ -282,7 +275,7 @@ fun FilterScreen(
                 item {
                     SliderCard(text = "Runtime : ") {
                         RangeSliderX(
-                            initialRange =  DefaultsX.WITH_RUNTIME_GTE ..DefaultsX.WITH_RUNTIME_LTE,
+                            initialRange = DefaultsX.WITH_RUNTIME_GTE..DefaultsX.WITH_RUNTIME_LTE,
                             minValue = 0F,
                             maxValue = 500F,
                             sliderCategory = SliderCategory.Runtime,

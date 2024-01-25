@@ -122,14 +122,14 @@ class FilterViewModel @Inject constructor(
     private fun searchKeywords(query: String) {
         viewModelScope.launch {
             searchKeywordsUseCase.invoke(query).collect {
-                when (it) {
+                filterUiState = when (it) {
                     is ResultX.Success -> {
-                        filterUiState = filterUiState.copy(
+                        filterUiState.copy(
                             searchKeywords = it.data?.results
                         )
                     }
 
-                    is ResultX.Error -> filterUiState = filterUiState.copy(
+                    is ResultX.Error -> filterUiState.copy(
                         error = it.message,
                     )
                 }

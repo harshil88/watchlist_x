@@ -2,10 +2,8 @@ package com.harshilpadsala.watchlistx.domain.usecase
 
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.FavouriteType
-import com.harshilpadsala.watchlistx.constants.MovieList
 import com.harshilpadsala.watchlistx.data.res.list.Content
 import com.harshilpadsala.watchlistx.data.res.list.MovieContent
-import com.harshilpadsala.watchlistx.repo.DiscoverRepo
 import com.harshilpadsala.watchlistx.repo.FavouriteRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

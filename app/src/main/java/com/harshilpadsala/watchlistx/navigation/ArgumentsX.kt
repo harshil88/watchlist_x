@@ -5,4 +5,5 @@ object ArgumentsX {
     const val filter = "filter"
     const val rating = "rating"
     const val movieList = "movieList"
+    const val movieCategory = "movieCategory"
 }

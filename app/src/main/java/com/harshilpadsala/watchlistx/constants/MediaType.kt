@@ -5,7 +5,7 @@ enum class MediaType{
     Tv(),
 }
 
-enum class MovieList{
+enum class MovieCategory{
     NowPlaying,
     Popular,
     TopRated,

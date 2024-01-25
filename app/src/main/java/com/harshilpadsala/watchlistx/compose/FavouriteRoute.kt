@@ -28,8 +28,8 @@ import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.FavouriteUiState
 import com.harshilpadsala.watchlistx.vm.FavouriteViewModel
-import utils.ErrorX
-import utils.LoaderX
+
+//Todo : Handle Empty List Case
 
 @Composable
 fun FavouriteRoute(
@@ -53,27 +53,22 @@ fun FavouriteRoute(
         }
     }
 
-    if (endOfFavouriteListReached
-        && favouriteListState.isScrollInProgress
-        && favouriteUiState.value.isFavouriteLoading == false &&
-        !favouriteUiState.value.hasReachedEndForFavourites) {
+    if (endOfFavouriteListReached && favouriteListState.isScrollInProgress && favouriteUiState.value.isFavouriteLoading == false && !favouriteUiState.value.hasReachedEndForFavourites) {
         viewModel.nextPage(FavouriteType.Favourite)
     }
 
-    if (endOfWishListReached
-        && wishListState.isScrollInProgress
-        && favouriteUiState.value.isWishlistLoading == false &&
-        !favouriteUiState.value.hasReachedEndForWatchlist) {
+    if (endOfWishListReached && wishListState.isScrollInProgress && favouriteUiState.value.isWishlistLoading == false && !favouriteUiState.value.hasReachedEndForWatchlist) {
         viewModel.nextPage(FavouriteType.Watchlist)
     }
 
-    FavouriteScreen(favouriteUiState = favouriteUiState.value,
+    FavouriteScreen(
+        favouriteUiState = favouriteUiState.value,
         favouriteListState = favouriteListState,
         wishListState = wishListState,
         onMovieClick = onMovieClick,
         onError = viewModel::reset,
         onTabChange = viewModel::changeTab,
-        )
+    )
 }
 
 
@@ -82,7 +77,7 @@ fun FavouriteScreen(
     favouriteUiState: FavouriteUiState,
     favouriteListState: LazyListState,
     wishListState: LazyListState,
-    onError : (FavouriteType) -> Unit,
+    onError: (FavouriteType) -> Unit,
     onTabChange: (FavouriteType) -> Unit,
     onMovieClick: (Int) -> Unit,
 ) {
@@ -91,48 +86,25 @@ fun FavouriteScreen(
             modifier = Modifier.padding(vertical = 16.dp),
             onTabChange = onTabChange,
         )
-
-        if(favouriteUiState.isFavouriteLoading == null &&
-            favouriteUiState.currentTabType == FavouriteType.Favourite){
+        if (favouriteUiState.isFavouriteLoading == null && favouriteUiState.currentTabType == FavouriteType.Favourite) {
             FullScreenLoaderX()
-        }
-
-        else if(favouriteUiState.isWishlistLoading == null &&
-            favouriteUiState.currentTabType == FavouriteType.Watchlist){
+        } else if (favouriteUiState.isWishlistLoading == null && favouriteUiState.currentTabType == FavouriteType.Watchlist) {
             FullScreenLoaderX()
-        }
-
-        else if(favouriteUiState.errorForFav !=null &&
-            favouriteUiState.currentTabType == FavouriteType.Favourite
-            ){
-            FullScreenErrorX(
-                text = favouriteUiState.errorForFav!!,
-                onClick = {
-                    onError(FavouriteType.Favourite)
-                }
-            )
-        }
-
-        else if(favouriteUiState.errorForWishlist != null &&
-            favouriteUiState.currentTabType == FavouriteType.Watchlist){
-            FullScreenErrorX(
-                text = favouriteUiState.errorForWishlist!!,
-                onClick = {
-                    onError(FavouriteType.Watchlist)
-                }
-            )
-        }
-
-        else if (favouriteUiState.favouriteMovies != null &&
-            favouriteUiState.currentTabType == FavouriteType.Favourite) {
+        } else if (favouriteUiState.errorForFav != null && favouriteUiState.currentTabType == FavouriteType.Favourite) {
+            FullScreenErrorX(text = favouriteUiState.errorForFav!!, onClick = {
+                onError(FavouriteType.Favourite)
+            })
+        } else if (favouriteUiState.errorForWishlist != null && favouriteUiState.currentTabType == FavouriteType.Watchlist) {
+            FullScreenErrorX(text = favouriteUiState.errorForWishlist!!, onClick = {
+                onError(FavouriteType.Watchlist)
+            })
+        } else if (favouriteUiState.favouriteMovies != null && favouriteUiState.currentTabType == FavouriteType.Favourite) {
             FavouriteMoviesList(
                 favouriteUiState = favouriteUiState,
                 favouriteListState = favouriteListState,
                 onMovieClick = onMovieClick,
             )
-        }
-
-        else if (favouriteUiState.watchlistMovies != null&& favouriteUiState.currentTabType == FavouriteType.Watchlist) {
+        } else if (favouriteUiState.watchlistMovies != null && favouriteUiState.currentTabType == FavouriteType.Watchlist) {
             WishListMovieList(
                 favouriteUiState = favouriteUiState,
                 wishListState = wishListState,
@@ -149,7 +121,7 @@ fun FavouriteMoviesList(
     onMovieClick: (Int) -> Unit,
 ) {
     MoviesList(
-        modifier = Modifier.padding(horizontal = 20.dp,),
+        modifier = Modifier.padding(horizontal = 20.dp),
         hasReachedEnd = favouriteUiState.hasReachedEndForFavourites,
         movies = favouriteUiState.favouriteMovies!!,
         lazyListState = favouriteListState,
@@ -164,7 +136,7 @@ fun WishListMovieList(
     onMovieClick: (Int) -> Unit,
 ) {
     MoviesList(
-        modifier = Modifier.padding(horizontal = 20.dp,),
+        modifier = Modifier.padding(horizontal = 20.dp),
         hasReachedEnd = favouriteUiState.hasReachedEndForWatchlist,
         movies = favouriteUiState.watchlistMovies!!,
         lazyListState = wishListState,
@@ -181,8 +153,7 @@ fun FavouriteTabRow(
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    TabRow(
-        modifier = modifier,
+    TabRow(modifier = modifier,
         selectedTabIndex = selectedTabIndex,
         backgroundColor = Darkness.water,
         indicator = { tabPositions ->
@@ -193,11 +164,10 @@ fun FavouriteTabRow(
             )
         }) {
         FavouriteType.values().mapIndexed { index, tab ->
-            Tab(
-                modifier = Modifier.padding(vertical = 8.dp),
+            Tab(modifier = Modifier.padding(vertical = 8.dp),
                 selected = index == selectedTabIndex,
                 onClick = {
-                    if(selectedTabIndex!=index){
+                    if (selectedTabIndex != index) {
                         selectedTabIndex = index
                         onTabChange(tab)
                     }

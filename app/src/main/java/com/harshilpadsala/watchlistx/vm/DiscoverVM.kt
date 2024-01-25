@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
-import com.harshilpadsala.watchlistx.constants.MovieList
+import com.harshilpadsala.watchlistx.constants.MovieCategory
 import com.harshilpadsala.watchlistx.constants.addX
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
 import com.harshilpadsala.watchlistx.data.res.model.FilterParams
@@ -25,7 +25,7 @@ data class DiscoverUiState(
     val movies: List<ListItemXData>? = null,
     val currentPage: Int = 1,
     val hasReachedEnd: Boolean = false,
-    val selectedMovieList: MovieList? = null,
+    val selectedMovieList: MovieCategory? = null,
     val isFailure: Boolean = false
 )
 
@@ -40,7 +40,7 @@ class DiscoverVM @Inject constructor(
     val discoverUiState = mutableStateOf(DiscoverUiState())
     private var currentPage = 1
 
-    val movieChipState = mutableStateOf(MovieList.Popular)
+    val movieChipState = mutableStateOf(MovieCategory.Popular)
 
     private var filterArgs: FilterParams? = null
 
@@ -82,7 +82,7 @@ class DiscoverVM @Inject constructor(
                             isLoading = false,
                             movies = discoverUiState.value.movies.addX(it.data?.toListItemX()),
                             currentPage = currentPage,
-                            selectedMovieList = MovieList.NowPlaying,
+                            selectedMovieList = MovieCategory.NowPlaying,
                             hasReachedEnd = it.data?.totalPages == currentPage
                         )
 

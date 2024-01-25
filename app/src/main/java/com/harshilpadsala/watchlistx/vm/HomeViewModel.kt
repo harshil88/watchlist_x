@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.MediaType
-import com.harshilpadsala.watchlistx.constants.MovieList
+import com.harshilpadsala.watchlistx.constants.MovieCategory
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 import com.harshilpadsala.watchlistx.data.res.list.TVContent
@@ -82,7 +82,7 @@ class HomeViewModel @Inject constructor(
     private fun nowPlaying() {
         viewModelScope.launch {
             discoverMovieUseCase.invoke(
-                movieList = MovieList.NowPlaying,
+                movieList = MovieCategory.NowPlaying,
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
@@ -106,7 +106,7 @@ class HomeViewModel @Inject constructor(
     private fun popularMovies() {
         viewModelScope.launch {
             discoverMovieUseCase.invoke(
-                movieList = MovieList.Popular,
+                movieList = MovieCategory.Popular,
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
@@ -154,7 +154,7 @@ class HomeViewModel @Inject constructor(
     private fun topRatedMovies() {
         viewModelScope.launch {
             discoverMovieUseCase.invoke(
-                movieList = MovieList.TopRated,
+                movieList = MovieCategory.TopRated,
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
@@ -176,7 +176,7 @@ class HomeViewModel @Inject constructor(
     private fun upcomingMovies() {
         viewModelScope.launch {
             discoverMovieUseCase.invoke(
-                movieList = MovieList.Upcoming,
+                movieList = MovieCategory.Upcoming,
             ).collect {
                 when (it) {
                     is ResultX.Success -> {

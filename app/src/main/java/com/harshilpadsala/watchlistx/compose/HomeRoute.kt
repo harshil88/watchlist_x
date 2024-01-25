@@ -46,7 +46,7 @@ import com.harshilpadsala.watchlistx.compose.components.CardListComponent
 import com.harshilpadsala.watchlistx.compose.components.GenresRow
 import com.harshilpadsala.watchlistx.compose.components.base_x.AsyncImageX
 import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
-import com.harshilpadsala.watchlistx.constants.MovieList
+import com.harshilpadsala.watchlistx.constants.MovieCategory
 import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 import com.harshilpadsala.watchlistx.data.res.model.toRatingArgsModel
@@ -71,7 +71,7 @@ fun HomeRoute(
     onMediaClick: (Int) -> Unit,
     onGenreClick: (Int) -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
-    onShowMoreClick: (MovieList) -> Unit,
+    onShowMoreClick: (MovieCategory) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -139,7 +139,7 @@ fun HomeScreen(
     onFavouriteClick: (Boolean, Int) -> Unit,
     onWatchListClick: (Boolean, Int) -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
-    onShowMoreClick: (MovieList) -> Unit
+    onShowMoreClick: (MovieCategory) -> Unit
 ) {
     ModalBottomSheetLayout(sheetState = sheetState, sheetContent = {
         if (movieStatsUiState.loading == true) {
@@ -188,7 +188,7 @@ fun MediaList(
     uiState: HomeUiState,
     onCardClick: (Int) -> Unit,
     onLongCardClick: (CardModel) -> Unit,
-    onShowMoreClick: (MovieList) -> Unit
+    onShowMoreClick: (MovieCategory) -> Unit
 ) {
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -201,7 +201,7 @@ fun MediaList(
                     cards = uiState.nowPlayingMovieList!!,
                     onCardClick = onCardClick,
                     onShowMoreClick = {
-                        onShowMoreClick(MovieList.NowPlaying)
+                        onShowMoreClick(MovieCategory.NowPlaying)
                     },
                     onLongCardClick = onLongCardClick
                 )
@@ -214,7 +214,7 @@ fun MediaList(
                     title = "Popular",
                     cards = uiState.popularMovieList!!,
                     onCardClick = onCardClick,
-                    onShowMoreClick = { onShowMoreClick(MovieList.Popular) },
+                    onShowMoreClick = { onShowMoreClick(MovieCategory.Popular) },
                     onLongCardClick = onLongCardClick
                 )
             }
@@ -243,7 +243,7 @@ fun MediaList(
                     cards = uiState.topRatedMovieList!!,
                     onCardClick = onCardClick,
                     onShowMoreClick = {
-                        onShowMoreClick(MovieList.TopRated)
+                        onShowMoreClick(MovieCategory.TopRated)
                     },
                     onLongCardClick = onLongCardClick
                 )
@@ -257,7 +257,7 @@ fun MediaList(
                     cards = uiState.upcomingMovieList!!,
                     onCardClick = onCardClick,
                     onShowMoreClick = {
-                        onShowMoreClick(MovieList.Upcoming)
+                        onShowMoreClick(MovieCategory.Upcoming)
                     },
                     onLongCardClick = onLongCardClick
                 )
@@ -394,7 +394,6 @@ fun MovieStatsSheetContent(
 
         ListItem(
             modifier = Modifier.clickable {
-
                 if (cardModel != null) {
                     onRatingClick(cardModel.toRatingArgsModel(value = ratings))
                 }

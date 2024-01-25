@@ -122,13 +122,14 @@ class FavouriteViewModel @Inject constructor(
     private fun watchListMovies() {
         viewModelScope.launch {
             favoriteMovieUseCase.invoke(
-                favouriteType = FavouriteType.Watchlist, page = wishlistCurrentPage
+                favouriteType = FavouriteType.Watchlist,
+                page = wishlistCurrentPage
             ).collect {
                 when (it) {
                     is ResultX.Success -> {
                         favouriteUiState = favouriteUiState.copy(
                             isWishlistLoading = false,
-                            watchlistMovies =  favouriteUiState.watchlistMovies.addX(it.data?.toListItemX()),
+                            watchlistMovies = favouriteUiState.watchlistMovies.addX(it.data?.toListItemX()),
                             currentWatchListPage = wishlistCurrentPage,
                             hasReachedEndForWatchlist = it.data?.totalPages == wishlistCurrentPage
                         )

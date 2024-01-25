@@ -9,22 +9,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class DiscoverMovieUseCase @Inject constructor(
+class MoviesByCategoryUseCase @Inject constructor(
     private val discoverRepo: DiscoverRepo
 ) {
 
-    operator fun invoke(movieList: MovieCategory, page: Int = 1): Flow<ResultX<Content<MovieContent>?>> {
+    operator fun invoke(movieCategory: MovieCategory, page: Int = 1): Flow<ResultX<Content<MovieContent>?>> {
         return flow {
             kotlin.runCatching {
                 runCatching {
-                    when (movieList) {
+                    when (movieCategory) {
                         MovieCategory.NowPlaying -> discoverRepo.nowPlaying(page = page)
                         MovieCategory.Popular -> discoverRepo.popular(page = page)
                         MovieCategory.TopRated -> discoverRepo.topRated(page = page)
                         MovieCategory.Upcoming -> discoverRepo.upcoming(page = page)
                     }
                 }.onSuccess {
-
                     emit(ResultX.Success(data = it.body()))
                 }.onFailure {
                     emit(ResultX.Error(message = it.message))
@@ -32,4 +31,5 @@ class DiscoverMovieUseCase @Inject constructor(
             }
         }
     }
+
 }
