@@ -11,6 +11,7 @@ import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.constants.FavouriteType
 import com.harshilpadsala.watchlistx.constants.MovieCategory
 import com.harshilpadsala.watchlistx.constants.addX
+import com.harshilpadsala.watchlistx.constants.getMovieCategory
 import com.harshilpadsala.watchlistx.data.res.list.toListItemX
 import com.harshilpadsala.watchlistx.data.res.model.ListItemXData
 import com.harshilpadsala.watchlistx.domain.usecase.MoviesByCategoryUseCase
@@ -41,12 +42,7 @@ class MovieCategoryViewModel @Inject constructor(
 
 
     init {
-        state.get<String>(ArgumentsX.movieCategory)?.let {
-            movieCategory = MovieCategory.NowPlaying
-        }
-
-        Log.i("DestinationDebug" , state.get<MovieCategory>(ArgumentsX.movieCategory).toString())
-
+        movieCategory = state.get<String>(ArgumentsX.movieCategory).getMovieCategory()
         movieByCategory(movieCategory)
     }
 
@@ -68,7 +64,6 @@ class MovieCategoryViewModel @Inject constructor(
                             currentPage = currentPage,
                             hasReachedEnd = it.data?.totalPages == currentPage,
                         )
-
 
                         if (!movieCategoryUiState.hasReachedEnd) {
                             currentPage += 1

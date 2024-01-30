@@ -27,7 +27,7 @@ fun <T> List<T>?.addX(newElements: List<T>?): List<T> {
     return tempList.toList()
 }
 
-fun String.getMovieCategory(): MovieCategory {
+fun String?.getMovieCategory(): MovieCategory {
     MovieCategory.values().map { cat -> if (cat.name.equals(this, true)) return cat }
     return MovieCategory.NowPlaying
 }

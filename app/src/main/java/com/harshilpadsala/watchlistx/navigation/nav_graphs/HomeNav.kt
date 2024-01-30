@@ -1,8 +1,6 @@
 package com.harshilpadsala.watchlistx.navigation.nav_graphs
 
 import android.net.Uri
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
