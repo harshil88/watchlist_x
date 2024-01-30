@@ -165,8 +165,6 @@ fun RatingScreen(
                         }
                     )
                 }
-
-
             }
 
             if (ratingUiState.isLoading == true) {

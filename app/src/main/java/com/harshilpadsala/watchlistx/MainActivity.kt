@@ -1,10 +1,11 @@
 package com.harshilpadsala.watchlistx
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,20 +23,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.harshilpadsala.watchlistx.compose.components.TopBarX
 import com.harshilpadsala.watchlistx.constants.WXNavItem
 import com.harshilpadsala.watchlistx.constants.titleCase
+import com.harshilpadsala.watchlistx.navigation.ArgumentsX
 import com.harshilpadsala.watchlistx.navigation.WXAppState
 import com.harshilpadsala.watchlistx.navigation.WatchListXNavigation
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.movieCategoryRoute
 import com.harshilpadsala.watchlistx.navigation.rememberWXAppState
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.ui.theme.WatchlistXTheme
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
-import java.time.ZoneId
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,17 +57,32 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
 fun WXApp(appState: WXAppState) {
-    Scaffold(bottomBar = {
+    Scaffold(topBar = {
+        SetUpTopBarX(appState)
+    }, bottomBar = {
         MainBottomNav(appState)
     }) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             WatchListXNavigation(navController = appState.navController)
         }
     }
+}
+
+@Composable
+fun SetUpTopBarX(appState: WXAppState){
+    if (appState.currentDestination?.route?.contains(movieCategoryRoute) == true) {
+        val title = appState.navController.currentBackStackEntry?.arguments?.getString(ArgumentsX.movieCategory)
+        TopBarX(title = title?:"") {
+        }
+    }
+
 }
 
 
@@ -119,13 +137,7 @@ fun MainBottomNav(appState: WXAppState) {
 
 
 @SuppressLint("NewApi")
-fun ExperimentsWithTruth(){
-
-
-
-
-
-
+fun ExperimentsWithTruth() {
 
 }
 

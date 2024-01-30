@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.vm
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,7 +32,7 @@ data class MovieCategoryUiState(
 @HiltViewModel
 class MovieCategoryViewModel @Inject constructor(
     private val movieByCategoryUseCase: MoviesByCategoryUseCase,
-    private val state: SavedStateHandle,
+    state: SavedStateHandle,
 ) : ViewModel() {
     var movieCategoryUiState by mutableStateOf(MovieCategoryUiState())
 
@@ -40,9 +41,11 @@ class MovieCategoryViewModel @Inject constructor(
 
 
     init {
-        state.get<MovieCategory>(ArgumentsX.movieCategory)?.let {
-            movieCategory = it
+        state.get<String>(ArgumentsX.movieCategory)?.let {
+            movieCategory = MovieCategory.NowPlaying
         }
+
+        Log.i("DestinationDebug" , state.get<MovieCategory>(ArgumentsX.movieCategory).toString())
 
         movieByCategory(movieCategory)
     }

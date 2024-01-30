@@ -40,7 +40,7 @@ fun MovieCategoryRoute(
     MovieCategoryScreen(
         uiState = uiState.value,
         listState = listState,
-        onMovieClick = {},
+        onMovieClick = onMovieClick,
         onError = {},
     )
 }

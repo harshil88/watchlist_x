@@ -7,28 +7,36 @@ import com.harshilpadsala.watchlistx.navigation.nav_graphs.discoverRoute
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.favoriteRoute
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.homeRoute
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.movieCategory
-import com.harshilpadsala.watchlistx.navigation.nav_graphs.toMovieCategoryNav
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.movieDetailRoute
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.toMovieCategory
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.toMovieDetail
 
 
 @Composable
 fun WatchListXNavigation(navController: NavHostController) {
 
     NavHost(
-        navController = navController, startDestination = homeRoute
+        navController = navController,
+        startDestination = homeRoute
     ) {
 
-        homeRoute(onMovieClick = {},
-            onShowMoreClick = navController::toMovieCategoryNav,
+        homeRoute(
+            onMovieClick = {},
+            onShowMoreClick = navController::toMovieCategory,
             onRatingClick = {},
             nestedGraphBuilder = {
-                movieCategory(onMovieClick = {})
+                movieCategory(onMovieClick = navController::toMovieDetail)
             })
 
         discoverRoute(onMovieClick = {})
 
         favoriteRoute(onMovieClick = {})
 
-        movieCategory(onMovieClick = {})
+        movieCategory(onMovieClick = navController::toMovieDetail)
 
+        movieDetailRoute(
+            onBackClick = {},
+            onRatingClick = {}
+        )
     }
 }

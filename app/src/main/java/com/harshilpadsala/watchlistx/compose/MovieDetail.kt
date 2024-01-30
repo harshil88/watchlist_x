@@ -44,6 +44,13 @@ import utils.ErrorX
 import utils.LoaderX
 
 
+//Todo : Add Dynamic on Movie on Rating Press
+
+//Todo : Learn more about flexible row layouts
+
+//Todo : Bug About Row Arrangement Of Action Buttons
+
+
 @Composable
 fun MovieDetailRoute(
     onBackClick: () -> Unit,
@@ -56,12 +63,6 @@ fun MovieDetailRoute(
     val favouriteUiState = viewModel.favouriteUiState.collectAsState()
     val creditsUiState = viewModel.mediaCreditsStateFlow.collectAsState()
     val ratingUiState = viewModel.ratingUiState.collectAsState()
-
-    //Todo : Add Dynamic on Movie on Rating Press
-
-    //Todo : Learn more about flexible row layouts
-
-    //Todo : Bug About Row Arrangement Of Action Buttons
 
     MovieDetailScreen(
         movieDetailUiState = movieDetailUiState.value,

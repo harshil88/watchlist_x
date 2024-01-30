@@ -12,20 +12,20 @@ import com.harshilpadsala.watchlistx.navigation.ArgumentsX
 
 internal const val movieCategoryRoute = "MovieCategoryRoute"
 
-fun NavController.toMovieCategoryNav(movieCategory: MovieCategory) {
+fun NavController.toMovieCategory(movieCategory: MovieCategory) {
     this.navigate("${movieCategoryRoute}/${movieCategory}")
 }
 
 fun NavGraphBuilder.movieCategory(onMovieClick: (Int) -> Unit) {
     composable(
-        route = "${movieCategoryRoute}/{${ArgumentsX.movieId}}",
+        route = "${movieCategoryRoute}/{${ArgumentsX.movieCategory}}",
         arguments = listOf(
             navArgument(
-                name = ArgumentsX.movieId,
+                name = ArgumentsX.movieCategory,
             ){
                 type = NavType.StringType
-                defaultValue = null
-                nullable = true
+                defaultValue = MovieCategory.NowPlaying.toString()
+                nullable = false
             }
         )
     ) {

@@ -43,10 +43,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.harshilpadsala.watchlistx.compose.components.CardListComponent
-import com.harshilpadsala.watchlistx.compose.components.GenresRow
 import com.harshilpadsala.watchlistx.compose.components.base_x.AsyncImageX
+import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenErrorX
 import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
 import com.harshilpadsala.watchlistx.constants.MovieCategory
+import com.harshilpadsala.watchlistx.constants.hideX
 import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 import com.harshilpadsala.watchlistx.data.res.model.toRatingArgsModel
@@ -58,25 +59,22 @@ import com.harshilpadsala.watchlistx.vm.MovieStatsUiState
 import kotlinx.coroutines.launch
 import utils.ToastX
 
-//todo : Question -> A deeper understanding of scopes
 
-//todo : Furthur Optimization -> For Different Types Of Movie API Calls Use Enums
 
-//todo : NUNI -> While Using Swipe To Refresh, The First List Of Now Playing gets scrolled to first item, not happening with other
+
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeRoute(
     onMediaClick: (Int) -> Unit,
-    onGenreClick: (Int) -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
     onShowMoreClick: (MovieCategory) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    val uiState = rememberUpdatedState(newValue = viewModel.uiState.value)
-    val movieStatsUiState = rememberUpdatedState(newValue = viewModel.movieStatsUiState.value)
+    val uiState = rememberUpdatedState(newValue = viewModel.uiState)
+    val movieStatsUiState = rememberUpdatedState(newValue = viewModel.movieStatsUiState)
     val scope = rememberCoroutineScope()
 
     val refreshingState = rememberPullRefreshState(
@@ -91,17 +89,11 @@ fun HomeRoute(
         viewModel.resetMovieStats()
     }
 
-    movieStatsUiState.value.successMessage.let {
-        if (it != null) {
-            ToastX(message = it)
-        }
+    movieStatsUiState.value.message?.let {
+        ToastX(message = it)
+        sheetState.hideX(scope)
     }
 
-    movieStatsUiState.value.errorMessage.let {
-        if (it != null) {
-            ToastX(message = it)
-        }
-    }
 
     HomeScreen(
         uiState = uiState.value,
@@ -111,9 +103,7 @@ fun HomeRoute(
         onFavouriteClick = viewModel::favourite,
         onWatchListClick = viewModel::wishList,
         onRatingClick = { ratingArgsModel ->
-            scope.launch {
-                sheetState.hide()
-            }
+            sheetState.hideX(scope)
             onRatingClick(ratingArgsModel)
         },
         onCardClick = onMediaClick,
@@ -123,7 +113,8 @@ fun HomeRoute(
                 sheetState.show()
                 viewModel.movieStats(movieDetails)
             }
-        }
+        },
+        onRetryClick = viewModel::startApiCall
     )
 }
 
@@ -139,7 +130,8 @@ fun HomeScreen(
     onFavouriteClick: (Boolean, Int) -> Unit,
     onWatchListClick: (Boolean, Int) -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
-    onShowMoreClick: (MovieCategory) -> Unit
+    onShowMoreClick: (MovieCategory) -> Unit,
+    onRetryClick: () -> Unit,
 ) {
     ModalBottomSheetLayout(sheetState = sheetState, sheetContent = {
         if (movieStatsUiState.loading == true) {
@@ -162,6 +154,10 @@ fun HomeScreen(
     }, content = {
         if (uiState.loading == true) {
             FullScreenLoaderX()
+        } else if (uiState.showError == true) {
+            FullScreenErrorX(
+                onClick = onRetryClick
+            )
         } else {
             Box(
                 modifier = Modifier
@@ -172,7 +168,7 @@ fun HomeScreen(
                     uiState = uiState,
                     onCardClick = onCardClick,
                     onLongCardClick = onLongCardClick,
-                    onShowMoreClick = onShowMoreClick
+                    onShowMoreClick = onShowMoreClick,
                 )
                 PullRefreshIndicator(
                     uiState.refreshing, refreshingState, Modifier.align(Alignment.TopCenter)
@@ -188,7 +184,7 @@ fun MediaList(
     uiState: HomeUiState,
     onCardClick: (Int) -> Unit,
     onLongCardClick: (CardModel) -> Unit,
-    onShowMoreClick: (MovieCategory) -> Unit
+    onShowMoreClick: (MovieCategory) -> Unit,
 ) {
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -217,21 +213,6 @@ fun MediaList(
                     onShowMoreClick = { onShowMoreClick(MovieCategory.Popular) },
                     onLongCardClick = onLongCardClick
                 )
-            }
-        }
-
-        if (!uiState.genres.isNullOrEmpty()) {
-            item {
-                Column(
-                    modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 8.dp)
-                ) {
-                    Text(
-                        text = "Get By Genres",
-                        style = StylesX.titleLarge.copy(color = Darkness.rise)
-                    )
-                    Spacer(modifier = Modifier.padding(top = 16.dp))
-                    GenresRow(genres = uiState.genres!!)
-                }
             }
         }
 
@@ -329,8 +310,7 @@ fun MovieStatsSheetContent(
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        ListItem(
-            text = {
+        ListItem(text = {
             Text(
                 text = cardModel?.title ?: "", style = StylesX.titleLarge,
             )
@@ -340,8 +320,7 @@ fun MovieStatsSheetContent(
                     .height(72.dp)
                     .width(40.dp)
             )
-        }
-        )
+        })
 
         Divider(
             modifier = Modifier

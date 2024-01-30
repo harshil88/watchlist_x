@@ -27,7 +27,6 @@ fun NavGraphBuilder.homeRoute(
     composable(homeRoute) {
         HomeRoute(
             onMediaClick = onMovieClick,
-            onGenreClick = {},
             onRatingClick = {
                 ratingArgsModel ->
                 val convertedToJson = Gson().toJson(

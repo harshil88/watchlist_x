@@ -153,7 +153,8 @@ fun FavouriteTabRow(
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    TabRow(modifier = modifier,
+    TabRow(
+        modifier = modifier,
         selectedTabIndex = selectedTabIndex,
         backgroundColor = Darkness.water,
         indicator = { tabPositions ->

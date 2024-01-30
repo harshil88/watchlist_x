@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun ToastX(message: String) {
+fun ToastX(message: String? = "") {
     Toast.makeText(
         LocalContext.current, message, Toast.LENGTH_SHORT
     ).show()
