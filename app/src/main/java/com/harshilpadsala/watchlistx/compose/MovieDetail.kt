@@ -36,6 +36,7 @@ import utils.ToastX
 
 @Composable
 fun MovieDetailRoute(
+    onBackClick: () -> Unit,
     onRatingClick: (RatingArgsModel) -> Unit,
     viewModel: MovieDetailViewModel = hiltViewModel()
 ) {
@@ -63,7 +64,6 @@ fun MovieDetailRoute(
         onFavouriteClick = viewModel::toggleFavourite,
         onWatchListClick = viewModel::toggleWatchList,
     )
-
 }
 
 

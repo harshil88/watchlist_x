@@ -1,6 +1,5 @@
 package com.harshilpadsala.watchlistx.navigation.nav_graphs
 
-import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -17,18 +16,14 @@ fun NavController.toMovieCategory(movieCategory: MovieCategory) {
 }
 
 fun NavGraphBuilder.movieCategory(onMovieClick: (Int) -> Unit) {
-    composable(
-        route = "${movieCategoryRoute}/{${ArgumentsX.movieCategory}}",
-        arguments = listOf(
-            navArgument(
-                name = ArgumentsX.movieCategory,
-            ){
-                type = NavType.StringType
-                defaultValue = MovieCategory.NowPlaying.toString()
-                nullable = false
-            }
-        )
-    ) {
+    composable(route = "${movieCategoryRoute}/{${ArgumentsX.movieCategory}}",
+        arguments = listOf(navArgument(
+            name = ArgumentsX.movieCategory,
+        ) {
+            type = NavType.StringType
+            defaultValue = MovieCategory.NowPlaying.toString()
+            nullable = false
+        })) {
         MovieCategoryRoute(
             onMovieClick = onMovieClick
         )

@@ -1,8 +1,6 @@
 package com.harshilpadsala.watchlistx.navigation.nav_graphs
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.harshilpadsala.watchlistx.compose.DiscoverRoute
 import com.harshilpadsala.watchlistx.constants.WXNavItem
@@ -12,18 +10,15 @@ import com.harshilpadsala.watchlistx.navigation.ArgumentsX
 
 val discoverRoute = WXNavItem.DISCOVER.name
 
-fun NavController.navigateToDiscover(navOptions: NavOptions? = null) {
-    this.navigate(discoverRoute, navOptions)
-}
-
 fun NavGraphBuilder.discoverRoute(
     onFilterClick : () -> Unit,
     onMovieClick: (Int) -> Unit,
 ) {
     composable(discoverRoute) {
         entry ->
+        val filterParams = entry.savedStateHandle.get<String>(ArgumentsX.filter)?.parseData<FilterParams>()
         DiscoverRoute(
-            filterParams = entry.savedStateHandle.get<String>(ArgumentsX.filter)?.parseData<FilterParams>(),
+            filterParams = filterParams,
             onMovieClick = onMovieClick,
             onFilterClick = onFilterClick,
         )

@@ -82,13 +82,7 @@ fun SetUpTopBarX(appState: WXAppState) {
         val title =
             appState.navController.currentBackStackEntry?.arguments?.getString(ArgumentsX.movieCategory)
         TopBarX(title = title ?: "") {
-            appState.navController.navigateUp()
-        }
-    } else if (appState.currentDestination?.route?.contains(movieDetailRoute) == true) {
-        val title =
-            appState.navController.currentBackStackEntry?.arguments?.getString(ArgumentsX.movieCategory)
-        TopBarX(title = title ?: "") {
-            appState.navController.navigateUp()
+
         }
     }
 }
@@ -100,7 +94,6 @@ fun SetUpTopBarX(appState: WXAppState) {
 fun MainBottomNav(appState: WXAppState) {
 
 
-    ExperimentsWithTruth()
 
     val navStackBackEntry by appState.navController.currentBackStackEntryAsState()
     val currentDestination = navStackBackEntry?.destination

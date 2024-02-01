@@ -33,6 +33,7 @@ fun NavGraphBuilder.movieDetailRoute(
     ) {
         MovieDetailRoute(
             onRatingClick = onRatingClick,
+            onBackClick = onBackClick
         )
     }
 }
