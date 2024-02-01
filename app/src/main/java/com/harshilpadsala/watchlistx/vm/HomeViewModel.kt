@@ -183,8 +183,7 @@ class HomeViewModel @Inject constructor(
         movieStatsUiState = MovieStatsUiState(loading = true)
         viewModelScope.launch {
             movieStatsUseCase.invoke(
-                mediaType = MediaType.Movie,
-                mediaId = cardModel.id ?: 0,
+                movieId = cardModel.id ?: 0,
             ).collect {
                 when (it) {
                     is ResultX.Success -> {

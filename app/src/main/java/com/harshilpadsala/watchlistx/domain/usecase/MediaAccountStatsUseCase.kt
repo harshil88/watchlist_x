@@ -1,8 +1,6 @@
 package com.harshilpadsala.watchlistx.domain.usecase
 
-import android.util.Log
 import com.harshilpadsala.watchlistx.base.ResultX
-import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
 import com.harshilpadsala.watchlistx.data.res.detail.parseRating
 import com.harshilpadsala.watchlistx.repo.HomeRepo
@@ -14,13 +12,10 @@ class MediaAccountStatsUseCase @Inject constructor(
     private val homeRepo: HomeRepo
 ) {
 
-    operator fun invoke(mediaType: MediaType , mediaId : Int): Flow<ResultX<MovieStats>> {
+    operator fun invoke(movieId : Int): Flow<ResultX<MovieStats>> {
         return flow {
                 runCatching {
-                    when (mediaType) {
-                        MediaType.Movie -> homeRepo.getMovieStats(mediaId.toLong())
-                        MediaType.Tv -> homeRepo.getTvStats(mediaId.toLong())
-                    }
+                         homeRepo.getMovieStats(movieId.toLong())
                 }.onSuccess {
                     emit(ResultX.Success(data = it.body()?.parseRating()))
                 }.onFailure {

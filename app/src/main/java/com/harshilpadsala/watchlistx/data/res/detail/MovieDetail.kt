@@ -74,10 +74,11 @@ fun MovieDetails.toPresentation(movieStats: MovieStats? = null , images : List<S
         id, title, releaseDate, overview, voteAverage, voteCount, genres, images,movieStats
     )
 
-fun MovieDetails.toRatingArgs(isRated : Boolean? , ratings : Int?): RatingArgsModel =
+fun MovieDetails?.toRatingArgs(isRated : Boolean? , ratings : Int?): RatingArgsModel =
     RatingArgsModel(
-        id, title, isRated, ratings, posterPath
+        this?.id, this?.title, isRated, ratings, this?.posterPath
     )
+
 
 
 

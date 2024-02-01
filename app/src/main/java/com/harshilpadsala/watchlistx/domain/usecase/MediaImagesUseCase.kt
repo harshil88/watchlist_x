@@ -11,14 +11,11 @@ import javax.inject.Inject
 class MediaImagesUseCase @Inject constructor(
     private val homeRepo: HomeRepo
 ) {
-    operator fun invoke(mediaType: MediaType, mediaId : Int): Flow<ResultX<MovieImages>> {
+    operator fun invoke( mediaId : Int): Flow<ResultX<MovieImages>> {
         return flow {
             kotlin.runCatching {
                 runCatching {
-                    when (mediaType) {
-                        MediaType.Movie -> homeRepo.getMovieImages(mediaId.toLong())
-                        MediaType.Tv -> homeRepo.getTvImages(mediaId.toLong())
-                    }
+                        homeRepo.getMovieImages(mediaId.toLong())
                 }.onSuccess {
                     emit(ResultX.Success(data = it.body()))
                 }.onFailure {

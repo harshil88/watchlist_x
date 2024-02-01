@@ -60,7 +60,6 @@ fun MovieCategoryScreen(
     } else if (!uiState.error.isNullOrEmpty()) {
         FullScreenErrorX(text = uiState.error!!, onClick = onError)
     }
-
 }
 
 @Composable

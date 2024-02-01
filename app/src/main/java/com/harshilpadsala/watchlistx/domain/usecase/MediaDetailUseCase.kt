@@ -2,7 +2,6 @@ package com.harshilpadsala.watchlistx.domain.usecase
 
 import com.harshilpadsala.watchlistx.base.ResultX
 import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
-import com.harshilpadsala.watchlistx.data.res.detail.TVShowDetails
 import com.harshilpadsala.watchlistx.repo.HomeRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -12,7 +11,7 @@ class MediaDetailUseCase @Inject constructor(
     private val homeRepo: HomeRepo
 ) {
 
-      fun invokeMovieDetails(movieId: Int): Flow<ResultX<MovieDetails>> {
+    fun invoke(movieId: Int): Flow<ResultX<MovieDetails>> {
         return flow {
             kotlin.runCatching {
                 runCatching {
@@ -26,18 +25,5 @@ class MediaDetailUseCase @Inject constructor(
         }
     }
 
-    fun invokeTvDetails(tvShowId: Int): Flow<ResultX<TVShowDetails>> {
-        return flow {
-            kotlin.runCatching {
-                runCatching {
-                    homeRepo.getTvShowDetails(tvShowId.toLong())
-                }.onSuccess {
-                    emit(ResultX.Success(data = it.body()))
-                }.onFailure {
-                    emit(ResultX.Error(message = it.message))
-                }
-            }
-        }
-    }
 
 }

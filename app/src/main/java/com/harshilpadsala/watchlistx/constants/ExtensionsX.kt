@@ -1,10 +1,11 @@
 package com.harshilpadsala.watchlistx.constants
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SheetState
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -39,5 +40,16 @@ fun ModalBottomSheetState.hideX(scope : CoroutineScope){
             this@hideX.hide()
         }
     }
+}
+
+fun Any.toEncodedUri(): String {
+    val json = Gson().toJson(this)
+    return Uri.encode(json)
+}
+
+inline fun <reified T> String.parseData() : T?{
+    val decoded = Uri.decode(this)
+    Log.i("DecodedJson" , decoded.toString())
+    return Gson().fromJson(decoded , T::class.java)
 }
 

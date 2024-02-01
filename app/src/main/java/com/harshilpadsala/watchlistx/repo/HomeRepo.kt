@@ -30,14 +30,10 @@ interface HomeRepo {
     @GET("3/movie/{movieId}")
     suspend fun getMovieDetails(@Path("movieId") movieId : Long) : Response<MovieDetails>
 
-    @GET("3/tv/{seriesId}")
-    suspend fun getTvShowDetails(@Path("seriesId") movieId : Long) : Response<TVShowDetails>
 
     @GET("3/movie/{movieId}/account_states")
     suspend fun getMovieStats(@Path("movieId") movieId : Long) : Response<MovieStats>
 
-    @GET("3/tv/{tvId}/account_states")
-    suspend fun getTvStats(@Path("tvId") tvId : Long) : Response<MovieStats>
 
     @GET("3/movie/{movieId}/images")
     suspend fun getMovieImages(@Path("movieId") movieId : Long) : Response<MovieImages>
@@ -47,9 +43,6 @@ interface HomeRepo {
 
     @GET("3/movie/{movieId}/credits")
     suspend fun getMovieCredits(@Path("movieId") movieId : Long) : Response<MovieCredits>
-
-    @GET("3/tv/{tvId}/credits")
-    suspend fun getTvCredits(@Path("tvId") tvId : Long) : Response<MovieCredits>
 
     @POST("3/account/{accountId}/favorite")
     suspend fun toggleFavourite(@Path("accountId") accountId : Long , @Body request : ToggleFavouriteRequest) : Response<UpdateResponse>

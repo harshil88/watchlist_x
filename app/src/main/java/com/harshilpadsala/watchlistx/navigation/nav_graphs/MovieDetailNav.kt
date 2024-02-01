@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.harshilpadsala.watchlistx.compose.MovieDetailRoute
+import com.harshilpadsala.watchlistx.data.res.model.RatingArgsModel
 import com.harshilpadsala.watchlistx.navigation.ArgumentsX
 
 const val movieDetailRoute = "movieDetailRoute"
@@ -17,21 +18,21 @@ fun NavController.toMovieDetail(movieId : Int, navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.movieDetailRoute(
     onBackClick: () -> Unit,
-    onRatingClick: (String) -> Unit,
+    onRatingClick: (RatingArgsModel) -> Unit,
 ) {
     composable(
         route = "${movieDetailRoute}/{${ArgumentsX.movieId}}",
-        arguments = listOf(navArgument(
+        arguments = listOf(
+                navArgument(
             name = ArgumentsX.movieId,
         ) {
             type = NavType.IntType
             defaultValue = 0
             nullable = false
-        }),
+        } ,),
     ) {
         MovieDetailRoute(
-            onBackClick = onBackClick,
-            onRatingClick = {},
+            onRatingClick = onRatingClick,
         )
     }
 }

@@ -7,12 +7,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
+import com.harshilpadsala.watchlistx.constants.toEncodedUri
 import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 import com.harshilpadsala.watchlistx.data.res.list.KeywordContent
 import com.harshilpadsala.watchlistx.data.res.model.FilterParams
 import com.harshilpadsala.watchlistx.domain.usecase.FilterMoviesUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.GenreUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.SearchKeywordsUseCase
+import com.harshilpadsala.watchlistx.navigation.ArgumentsX
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,7 +55,7 @@ class FilterViewModel @Inject constructor(
     private val genreUseCase: GenreUseCase,
     private val searchKeywordsUseCase: SearchKeywordsUseCase,
     private val filterMoviesUseCase: FilterMoviesUseCase,
-    private val savedStateHandle: SavedStateHandle,
+    private val state: SavedStateHandle,
 ) : ViewModel() {
 
      var filterUiState by mutableStateOf(FilterUiState())
@@ -65,6 +67,10 @@ class FilterViewModel @Inject constructor(
     init {
         genres()
         searchQueryCollector()
+    }
+
+    fun saveFilterToState(){
+        state[ArgumentsX.filter] = selectedFilterParams.toEncodedUri()
     }
 
     fun genres() {

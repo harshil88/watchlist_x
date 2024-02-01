@@ -29,12 +29,13 @@ fun GenreChipX(
     }
 
     FilterChip(
+        enabled = false,
         modifier = modifier,
         onClick = {
             if(selectable){
                 isSelected.value = !isSelected.value
+                onGenreClick()
             }
-            onGenreClick()
         },
         border = FilterChipDefaults.filterChipBorder(
             borderColor = Darkness.water
@@ -54,7 +55,9 @@ fun GenreChipX(
             )
         }, selected = isSelected.value, colors = FilterChipDefaults.filterChipColors(
             containerColor = Darkness.night,
-            selectedContainerColor = Darkness.rise
+            selectedContainerColor = Darkness.rise,
+            disabledContainerColor = Darkness.night,
+            disabledSelectedContainerColor = Darkness.rise
         )
     )
 }

@@ -30,6 +30,7 @@ import com.harshilpadsala.watchlistx.navigation.ArgumentsX
 import com.harshilpadsala.watchlistx.navigation.WXAppState
 import com.harshilpadsala.watchlistx.navigation.WatchListXNavigation
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.movieCategoryRoute
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.movieDetailRoute
 import com.harshilpadsala.watchlistx.navigation.rememberWXAppState
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
@@ -76,13 +77,20 @@ fun WXApp(appState: WXAppState) {
 }
 
 @Composable
-fun SetUpTopBarX(appState: WXAppState){
+fun SetUpTopBarX(appState: WXAppState) {
     if (appState.currentDestination?.route?.contains(movieCategoryRoute) == true) {
-        val title = appState.navController.currentBackStackEntry?.arguments?.getString(ArgumentsX.movieCategory)
-        TopBarX(title = title?:"") {
+        val title =
+            appState.navController.currentBackStackEntry?.arguments?.getString(ArgumentsX.movieCategory)
+        TopBarX(title = title ?: "") {
+            appState.navController.navigateUp()
+        }
+    } else if (appState.currentDestination?.route?.contains(movieDetailRoute) == true) {
+        val title =
+            appState.navController.currentBackStackEntry?.arguments?.getString(ArgumentsX.movieCategory)
+        TopBarX(title = title ?: "") {
+            appState.navController.navigateUp()
         }
     }
-
 }
 
 

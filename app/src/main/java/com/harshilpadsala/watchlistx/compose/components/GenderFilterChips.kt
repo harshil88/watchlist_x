@@ -12,8 +12,9 @@ import com.harshilpadsala.watchlistx.data.res.list.GenreContent
 @Composable
 fun GenderFilterChips(
     genres: List<GenreContent>,
-    selectedGendersCallback: (List<GenreContent>) -> Unit,
     modifier: Modifier = Modifier,
+    selectedGendersCallback: (List<GenreContent>) -> Unit = {},
+    clickable : Boolean = true
 ) {
 
     val selectedGenders = mutableListOf<GenreContent>()
@@ -21,21 +22,24 @@ fun GenderFilterChips(
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = modifier
     ) {
-        genres.mapIndexed { index, genre ->
+        genres.mapIndexed {
+                          index, genre ->
             item {
                 GenreChipX(modifier = Modifier.padding(
                     start = if (index == 0) 20.dp else 0.dp,
                 ),
+                    selectable = clickable,
                     selected = selectedGenders.contains(genre),
                     text = genre.name ?: "Unknown Genre",
                     onGenreClick = {
-                        if (selectedGenders.contains(genre)) {
-                            selectedGenders.remove(genre)
-                        } else {
-                            genre.let { selectedGenders.add(genre) }
-                        }
-                        selectedGendersCallback(selectedGenders)
-                    })
+                           if (selectedGenders.contains(genre)) {
+                               selectedGenders.remove(genre)
+                           } else {
+                               genre.let { selectedGenders.add(genre) }
+                           }
+                           selectedGendersCallback(selectedGenders)
+                    }
+                )
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.vm
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -36,26 +37,23 @@ class DiscoverVM @Inject constructor(
     val state: SavedStateHandle,
 ) : ViewModel() {
 
-
     val discoverUiState = mutableStateOf(DiscoverUiState())
     private var currentPage = 1
 
-    val movieChipState = mutableStateOf(MovieCategory.Popular)
 
-    private var filterArgs: FilterParams? = null
-
+    private var filterParams: FilterParams? = null
 
     init {
-            discoverMovieList()
+        discoverMovieList()
     }
 
-
-//    fun toggleSheet(index: Int){
-//        if (selectedMediaType.value == MediaType.Movie) {
-//            movieChipState.value = MovieList.values()[index]
-//            discoverMovieList(movieChipState.value)
-//        }
-//    }
+    fun callApi(updatedFilterParams: FilterParams?) {
+        if (filterParams != updatedFilterParams) {
+            filterParams = updatedFilterParams
+            discoverUiState.value = DiscoverUiState()
+            discoverMovieList()
+        }
+    }
 
     fun nextPage() {
         if (discoverUiState.value.isLoading == false) {
@@ -66,15 +64,14 @@ class DiscoverVM @Inject constructor(
 
 
     private fun discoverMovieList() {
-
         viewModelScope.launch {
             filterMoviesUseCase.invoke(
                 page = currentPage,
-                dateGte = filterArgs?.dateGte,
-                dateLte = filterArgs?.dateLte,
-                sortBy = filterArgs?.sortBy,
-                withGenres = filterArgs?.withGenres,
-                withKeywords = filterArgs?.withKeywords,
+                dateGte = filterParams?.dateGte,
+                dateLte = filterParams?.dateLte,
+                sortBy = filterParams?.sortBy,
+                withGenres = filterParams?.withGenres,
+                withKeywords = filterParams?.withKeywords,
             ).collect {
                 when (it) {
                     is ResultX.Success -> {

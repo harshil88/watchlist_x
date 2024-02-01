@@ -1,13 +1,13 @@
 package com.harshilpadsala.watchlistx.data.res.model
 
-import com.harshilpadsala.watchlistx.state.RatingUiState
+import com.harshilpadsala.watchlistx.vm.RatingUiState
 
 data class RatingArgsModel(
-    val movieId : Int?,
-    val movieName : String?,
-    val isRated : Boolean?,
-    val ratings : Int?,
-    val posterPath : String?,
+    val movieId : Int? = null,
+    val movieName : String? = null,
+    val isRated : Boolean? = null,
+    val ratings : Int? = null,
+    val posterPath : String? = null,
 )
 
 fun RatingArgsModel.toRatingUiState() : RatingUiState = RatingUiState(

@@ -66,10 +66,10 @@ enum class DateRangeType {
 
 
 @SuppressLint("NewApi")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterRoute(
-    onApplyClick: (FilterParams) -> Unit,
+    onApplyClick : (FilterParams) -> Unit,
     onBackClick: () -> Unit,
     viewModel: FilterViewModel = hiltViewModel()
 ) {
@@ -111,9 +111,7 @@ fun FilterRoute(
         searchController = searchController,
         onBackClick = onBackClick,
         onFloatingButtonClick = {
-            onApplyClick(
-                viewModel.selectedFilterParams
-            )
+                                onApplyClick(viewModel.selectedFilterParams)
         },
         onFromDateChange = {
             viewModel.selectedFilterParams.dateGte = it

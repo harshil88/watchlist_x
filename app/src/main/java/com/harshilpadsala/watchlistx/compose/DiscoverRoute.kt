@@ -1,6 +1,7 @@
 package com.harshilpadsala.watchlistx.compose
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import com.harshilpadsala.watchlistx.base.OnLifecycleEvent
 import com.harshilpadsala.watchlistx.compose.components.MoviesList
 import com.harshilpadsala.watchlistx.compose.components.base_x.FullScreenLoaderX
 import com.harshilpadsala.watchlistx.constants.isScrolledToEnd
@@ -32,19 +35,15 @@ import com.harshilpadsala.watchlistx.ui.theme.StylesX
 import com.harshilpadsala.watchlistx.vm.DiscoverUiState
 import com.harshilpadsala.watchlistx.vm.DiscoverVM
 
-//todo : Learn when and why to use rememberUpdatedState
 
-//todo : Reduce state calls is at all possible
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun DiscoverRoute(
     onMovieClick: (Int) -> Unit,
     onFilterClick: () -> Unit,
-    modifier: Modifier = Modifier,
     filterParams: FilterParams? = null,
     viewModel: DiscoverVM = hiltViewModel()
-
 ) {
 
     val uiState = rememberUpdatedState(newValue = viewModel.discoverUiState.value)
@@ -65,11 +64,18 @@ fun DiscoverRoute(
         viewModel.nextPage()
     }
 
+    OnLifecycleEvent { owner, event ->
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {viewModel.callApi(filterParams)}
+            else                      -> {}
+        }
+    }
+
     DiscoverScreen(
         uiState = uiState.value,
         lazyListState = lazyListState,
         onMovieClick = onMovieClick,
-        onFilterListClick = onFilterClick,
+        onFilterClick = onFilterClick,
     )
 }
 
@@ -77,7 +83,7 @@ fun DiscoverRoute(
 @Composable
 fun DiscoverScreen(
     uiState: DiscoverUiState,
-    onFilterListClick: () -> Unit,
+    onFilterClick: () -> Unit,
     onMovieClick: (Int) -> Unit,
     lazyListState: LazyListState,
 ) {
@@ -92,7 +98,7 @@ fun DiscoverScreen(
             Text(
                 text = "Discover Movies", style = StylesX.titleLarge.copy(color = Darkness.rise)
             )
-            IconButton(onClick = onFilterListClick) {
+            IconButton(onClick = onFilterClick) {
                 Icon(
                     imageVector = Icons.Filled.FilterList,
                     contentDescription = "Show More Icon",

@@ -1,5 +1,6 @@
 package com.harshilpadsala.watchlistx.compose.components.base_x
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -30,7 +31,7 @@ fun DateSelectorRow(
     onFromDateChange: (String) -> Unit,
     onToDateChange: (String) -> Unit,
 ) {
-
+    
     val fromDate = remember {
         mutableStateOf("Select")
     }
@@ -98,7 +99,6 @@ fun DateSelectorRow(
                     toDatePickerState.selectedDateMillis?.let {
                         toDate.value = dateFormat.format(Date(it))
                         onToDateChange(toDate.value)
-
                     }
                 }
 

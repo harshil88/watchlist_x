@@ -1,174 +1,237 @@
 package com.harshilpadsala.watchlistx.vm
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.harshilpadsala.watchlistx.base.ResultX
-import com.harshilpadsala.watchlistx.constants.MediaType
 import com.harshilpadsala.watchlistx.data.res.detail.MovieDetails
 import com.harshilpadsala.watchlistx.data.res.detail.MovieStats
-import com.harshilpadsala.watchlistx.data.res.detail.toPresentation
-import com.harshilpadsala.watchlistx.data.res.list.MovieImages
+import com.harshilpadsala.watchlistx.data.res.list.GenreContent
+import com.harshilpadsala.watchlistx.data.res.list.toCardList
 import com.harshilpadsala.watchlistx.data.res.list.toImageList
+import com.harshilpadsala.watchlistx.data.res.model.CardModel
 import com.harshilpadsala.watchlistx.domain.usecase.AddToWatchListUseCase
+import com.harshilpadsala.watchlistx.domain.usecase.GenreUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaAccountStatsUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaCreditsUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaDetailUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.MediaImagesUseCase
-import com.harshilpadsala.watchlistx.domain.usecase.RateMediaUseCase
 import com.harshilpadsala.watchlistx.domain.usecase.WatchListOperation
-import com.harshilpadsala.watchlistx.state.movie_detail.CreditsUiState
-import com.harshilpadsala.watchlistx.state.movie_detail.FavouriteUiState
-import com.harshilpadsala.watchlistx.state.movie_detail.MovieDetailUiState
-import com.harshilpadsala.watchlistx.state.movie_detail.WatchlistUiState
+import com.harshilpadsala.watchlistx.navigation.ArgumentsX
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+data class MovieDetailUiState(
+    var isLoading: Boolean? = null,
+    var error: String? = null,
+    var genres: List<GenreContent>? = null,
+    var images: List<String>? = null,
+    var details: MovieDetails? = null,
+    var stats: MovieStats? = null,
+    var credits: List<CardModel>? = null,
+    var favMessage: String? = null,
+    var isFavourite : Boolean? = null,
+    var isWatchList : Boolean? = null,
+)
+
 @HiltViewModel
 class MovieDetailViewModel @Inject constructor(
-    mediaStatsUseCase: MediaAccountStatsUseCase,
-    mediaDetailUseCase: MediaDetailUseCase,
-    mediaImagesUseCase: MediaImagesUseCase,
+    private val mediaStatsUseCase: MediaAccountStatsUseCase,
+    private val movieDetailUseCase: MediaDetailUseCase,
+    private val mediaImagesUseCase: MediaImagesUseCase,
+    private val genreUseCase: GenreUseCase,
     private val watchListUseCase: AddToWatchListUseCase,
-    private val rateMediaUseCase: RateMediaUseCase,
     private val movieCreditsUseCase: MediaCreditsUseCase,
+    state: SavedStateHandle
 ) : ViewModel() {
 
-    private val tempMovieId = 901362
+    var movieId = 0
 
-    val favouriteUiState = MutableStateFlow<FavouriteUiState>(FavouriteUiState.Loading)
+    init {
+        movieId = state.get<Int>(ArgumentsX.movieId) ?: 0
+        details()
+    }
 
-    val watchListUiState = MutableStateFlow<WatchlistUiState>(WatchlistUiState.Loading)
+    var uiState by mutableStateOf(MovieDetailUiState())
 
-    val ratingUiState = MutableStateFlow<WatchlistUiState>(WatchlistUiState.Loading)
+    fun reset(){
+        uiState = uiState.copy(
+            favMessage = null
+        )
+    }
 
-    val mediaCreditsStateFlow = MutableStateFlow<CreditsUiState>(CreditsUiState.Loading)
+    private fun images() {
+        viewModelScope.launch {
+            mediaImagesUseCase.invoke(
+                mediaId = movieId
+            ).collect {
+                when (it) {
+                    is ResultX.Success -> {
+                        uiState = uiState.copy(
+                            isLoading = false, images = it.data?.toImageList()
+                        )
+                        genres()
+                    }
 
-    private val mediaStatsFlow = mediaStatsUseCase.invoke(
-        mediaType = MediaType.Movie,
-        mediaId = tempMovieId,
-    )
+                    is ResultX.Error -> {
+                        uiState = uiState.copy(
+                            isLoading = false,
+                            error = it.message,
+                        )
+                        genres()
+                    }
+                }
+            }
+        }
+    }
 
-    private val movieDetailFlow = mediaDetailUseCase.invokeMovieDetails(
-        movieId = tempMovieId,
-    )
+    private fun details() {
+        viewModelScope.launch {
+            movieDetailUseCase.invoke(
+                movieId = movieId
+            ).collect {
+                when (it) {
+                    is ResultX.Success -> {
+                        uiState = uiState.copy(
+                            isLoading = false, details = it.data
+                        )
+                        images()
+                    }
 
-    private val movieImagesFlow = mediaImagesUseCase.invoke(
-        mediaType = MediaType.Movie,
-        mediaId = tempMovieId,
-    )
+                    is ResultX.Error -> {
+                        uiState = uiState.copy(
+                            isLoading = false,
+                            error = it.message,
+                        )
+                        images()
 
+                    }
+                }
+            }
+        }
+    }
 
-    val movieDetailStateFlow: StateFlow<MovieDetailUiState> = combine(
-        flow = mediaStatsFlow,
-        flow2 = movieDetailFlow,
-        flow3 = movieImagesFlow,
-        transform = ::emitMovieDetailState
-    ).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-        initialValue = MovieDetailUiState.Loading
-    )
+   private fun genres() {
+        viewModelScope.launch {
+            genreUseCase.invoke().collect {
+                when (it) {
+                    is ResultX.Success -> {
+                        uiState = uiState.copy(
+                            isLoading = false, genres = it.data?.genres
+                        )
+                        stats()
+                    }
+
+                    is ResultX.Error -> {
+                        uiState = uiState.copy(
+                            isLoading = false,
+                            error = it.message,
+                        )
+                        stats()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun stats() {
+        viewModelScope.launch {
+            mediaStatsUseCase.invoke(
+                movieId = movieId
+            ).collect {
+                when (it) {
+                    is ResultX.Success -> {
+                        uiState = uiState.copy(
+                            isLoading = false, stats = it.data,
+                            isFavourite = it.data?.favorite,
+                            isWatchList = it.data?.watchlist
+                        )
+                        credits()
+                    }
+
+                    is ResultX.Error -> {
+                        uiState = uiState.copy(
+                            isLoading = false,
+                            error = it.message,
+                        )
+                        credits()
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun credits() {
+        viewModelScope.launch {
+            movieCreditsUseCase.invoke(
+                movieId = movieId
+            ).collect {
+                uiState = when (it) {
+                    is ResultX.Success -> {
+                        uiState.copy(
+                            isLoading = false, credits = it.data?.toCardList()
+                        )
+                    }
+
+                    is ResultX.Error -> {
+                        uiState.copy(
+                            isLoading = false,
+                            error = it.message,
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+
 
     fun toggleWatchList(value: Boolean) {
         viewModelScope.launch {
             watchListUseCase.invoke(
-                movieId = tempMovieId,
+                movieId = movieId,
                 watchListOperation = WatchListOperation.Watchlist,
                 wishList = value,
             ).collect {
-                watchListUiState.value = when (it) {
-                    is ResultX.Success -> WatchlistUiState.Success(value)
-                    is ResultX.Error -> WatchlistUiState.Error(value)
+                uiState = when (it) {
+                    is ResultX.Success -> uiState.copy(
+                        isLoading = false,
+                        isWatchList = value,
+                        favMessage = it.toString()
+                    )
+
+                    is ResultX.Error -> uiState.copy(isLoading = false, favMessage = it.toString())
                 }
             }
         }
     }
 
     fun toggleFavourite(value: Boolean) {
-        favouriteUiState.value = FavouriteUiState.Loading
         viewModelScope.launch {
             watchListUseCase.invoke(
-                movieId = tempMovieId,
+                movieId = movieId,
                 watchListOperation = WatchListOperation.Favourites,
                 wishList = value,
             ).collect {
-                favouriteUiState.value = when (it) {
-                    is ResultX.Success -> if (value) FavouriteUiState.AddedToFav else FavouriteUiState.RemovedFromFav
-                    is ResultX.Error -> FavouriteUiState.Error(it.message)
+                uiState = when (it) {
+                    is ResultX.Success -> uiState.copy(
+                        isLoading = false,
+                        isFavourite = value,
+                        favMessage = it.toString()
+                    )
+
+                    is ResultX.Error -> uiState.copy(isLoading = false, favMessage = it.toString())
                 }
             }
         }
-    }
-
-//    fun addRating(value: Double) {
-//        viewModelScope.launch {
-//            rateMediaUseCase.invoke(
-//                mediaType = MediaType.Movie,
-//                mediaId = tempMovieId,
-//                value = value,
-//                ratingOperation = RatingOperation.AddRating
-//            ).collect {
-//                when (it) {
-//                    is ResponseX.Loading -> RatingUiState.Loading
-//                    is ResponseX.Success -> RatingUiState.Success(
-//                        message = it.data?.statusMessage ?: ""
-//                    )
-//
-//                    is ResponseX.Error -> RatingUiState.Error(it.message ?: "")
-//                }
-//            }
-//        }
-//    }
-
-    private fun getMediaCredits() {
-        viewModelScope.launch {
-            movieCreditsUseCase.invoke(
-                mediaType = MediaType.Movie,
-                mediaId = tempMovieId,
-            ).collect {
-                mediaCreditsStateFlow.value = when (it) {
-                    is ResultX.Success -> CreditsUiState.Success(credits = it.data?.cast)
-                    is ResultX.Error -> CreditsUiState.Error(it.message ?: "")
-                }
-            }
-        }
-    }
-
-    private fun emitMovieDetailState(
-        statsResponse: ResultX<MovieStats>,
-        detailResponse: ResultX<MovieDetails>,
-        imagesResponse: ResultX<MovieImages>
-    ): MovieDetailUiState {
-        if (
-            statsResponse is ResultX.Success
-            && detailResponse is ResultX.Success
-            && imagesResponse is ResultX.Success) {
-            getMediaCredits()
-            if (statsResponse.data?.favorite == true) {
-                favouriteUiState.value = FavouriteUiState.AddedToFav
-            } else {
-                favouriteUiState.value = FavouriteUiState.RemovedFromFav
-            }
-
-            statsResponse.data?.watchlist?.let {
-                watchListUiState.value = WatchlistUiState.Success(successValue = it)
-            }
-
-            return MovieDetailUiState.MovieDetailsSuccess(
-                data = detailResponse.data?.toPresentation(
-                    movieStats = statsResponse.data, images = imagesResponse.data?.toImageList()
-                )
-            )
-        } else if (statsResponse is ResultX.Error || detailResponse is ResultX.Error || imagesResponse is ResultX.Error) {
-            return MovieDetailUiState.Error(message = "Something went wrong")
-        }
-        return MovieDetailUiState.Loading
     }
 
 }
+
+

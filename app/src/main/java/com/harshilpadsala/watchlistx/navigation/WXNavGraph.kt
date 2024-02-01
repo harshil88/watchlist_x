@@ -3,40 +3,55 @@ package com.harshilpadsala.watchlistx.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.harshilpadsala.watchlistx.constants.toEncodedUri
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.discoverRoute
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.favoriteRoute
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.filterRoute
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.homeRoute
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.movieCategory
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.movieDetailRoute
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.ratingRoute
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.toFilter
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.toMovieCategory
 import com.harshilpadsala.watchlistx.navigation.nav_graphs.toMovieDetail
+import com.harshilpadsala.watchlistx.navigation.nav_graphs.toRating
 
 
 @Composable
 fun WatchListXNavigation(navController: NavHostController) {
 
     NavHost(
-        navController = navController,
-        startDestination = homeRoute
+        navController = navController, startDestination = homeRoute
     ) {
 
         homeRoute(
-            onMovieClick = {},
+            onMovieClick = navController::toMovieDetail,
             onShowMoreClick = navController::toMovieCategory,
-            onRatingClick = {},
-            nestedGraphBuilder = {
-                movieCategory(onMovieClick = navController::toMovieDetail)
-            })
+            onRatingClick = navController::toRating,
+        )
 
-        discoverRoute(onMovieClick = {})
+        discoverRoute(
+            onMovieClick = navController::toMovieDetail,
+            onFilterClick = navController::toFilter
+        )
 
-        favoriteRoute(onMovieClick = {})
+        favoriteRoute(onMovieClick = navController::toMovieDetail)
 
         movieCategory(onMovieClick = navController::toMovieDetail)
 
         movieDetailRoute(
-            onBackClick = {},
-            onRatingClick = {}
+            onBackClick = { navController.navigateUp() }, onRatingClick = navController::toRating
         )
+
+        ratingRoute(onBackClick = { navController.navigateUp() })
+
+        filterRoute(onApplyClick = {
+            navController.previousBackStackEntry?.savedStateHandle?.set(
+                ArgumentsX.filter,
+                it.toEncodedUri()
+            )
+            navController.navigateUp()
+        }, onBackClick = { navController.navigateUp() })
+
     }
 }

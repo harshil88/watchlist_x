@@ -118,21 +118,7 @@ class MovieVM @Inject constructor() : ViewModel() {
         }
     }
 
-    fun getMovieCredits(movieId : Long) {
-        viewModelScope.launch {
-            kotlin.runCatching {
-                homeRepo.getMovieCredits(movieId)
-            }.onSuccess {
-                _movieCreditsState.value = MovieCreditsSuccess(
-                    response = it.body()
-                )
-            }.onFailure {
-                _movieCreditsState.value = FailureState(
-                    error = it.message
-                )
-            }
-        }
-    }
+
     fun toggleFavourite(fav : Boolean) {
 
         val toggleFavouriteRequest = ToggleFavouriteRequest(

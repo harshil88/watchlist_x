@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -31,9 +32,9 @@ import com.harshilpadsala.watchlistx.Constant
 import com.harshilpadsala.watchlistx.compose.components.TopBarX
 import com.harshilpadsala.watchlistx.compose.components.WXButton
 import com.harshilpadsala.watchlistx.compose.components.base_x.AsyncImageX
-import com.harshilpadsala.watchlistx.state.RatingUiState
 import com.harshilpadsala.watchlistx.ui.theme.Darkness
 import com.harshilpadsala.watchlistx.ui.theme.StylesX
+import com.harshilpadsala.watchlistx.vm.RatingUiState
 import com.harshilpadsala.watchlistx.vm.RatingViewModel
 import utils.ToastX
 
@@ -72,8 +73,6 @@ fun RatingRoute(
         onDeleteRating = viewModel::deleteRatings,
         onCancelPress = onBackPress,
     )
-
-
 }
 
 
